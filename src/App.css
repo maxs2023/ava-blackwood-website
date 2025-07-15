@@ -1,0 +1,145 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.625rem;
+  /* Dark Academia Color Scheme */
+  --background: #F8F6F0; /* Cream background */
+  --foreground: #1A1A1A; /* Dark charcoal text */
+  --card: #FFFFFF;
+  --card-foreground: #1A1A1A;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A1A;
+  --primary: #8B1538; /* Deep burgundy */
+  --primary-foreground: #F8F6F0;
+  --secondary: #2C2C2C; /* Charcoal gray */
+  --secondary-foreground: #F8F6F0;
+  --muted: #E5E3DD;
+  --muted-foreground: #6B6B6B;
+  --accent: #D4AF37; /* Gold accent */
+  --accent-foreground: #1A1A1A;
+  --destructive: #DC2626;
+  --border: #D1CFC7;
+  --input: #FFFFFF;
+  --ring: #8B1538;
+  --chart-1: #8B1538;
+  --chart-2: #D4AF37;
+  --chart-3: #2C2C2C;
+  --chart-4: #6B6B6B;
+  --chart-5: #E5E3DD;
+  --sidebar: #F8F6F0;
+  --sidebar-foreground: #1A1A1A;
+  --sidebar-primary: #8B1538;
+  --sidebar-primary-foreground: #F8F6F0;
+  --sidebar-accent: #D4AF37;
+  --sidebar-accent-foreground: #1A1A1A;
+  --sidebar-border: #D1CFC7;
+  --sidebar-ring: #8B1538;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+  }
+  
+  .font-serif {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+  
+  .font-accent {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+  }
+}
+
+/* Custom styles for dark academia theme */
+.hero-section {
+  background: linear-gradient(135deg, var(--primary) 0%, #6B1129 100%);
+}
+
+.book-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.book-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(139, 21, 56, 0.2);
+}
+
+.gold-button {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.gold-button:hover {
+  background: #B8941F;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.burgundy-section {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.text-gold {
+  color: var(--accent);
+}
+
+.text-burgundy {
+  color: var(--primary);
+}
+
