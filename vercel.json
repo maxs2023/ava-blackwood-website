@@ -1,28 +1,7 @@
-<<<<<<< HEAD
 {
   "functions": {
-    "api/**/*.js": {
+    "pages/api/**/*.js": {
       "runtime": "nodejs18.x"
     }
-  },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    }
-  ]
-=======
-{
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    }
-  ]
->>>>>>> 2f2fb831c5e22b4e467555ccd560e009629d24a0
+  }
 }
