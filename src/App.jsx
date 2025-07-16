@@ -4,8 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input.jsx'
 import { Badge } from '@/components/ui/badge.jsx'
 import { Textarea } from '@/components/ui/textarea.jsx'
-import { BookOpen, Mail, ExternalLink, Calendar, User, Heart, Send, CheckCircle, AlertCircle } from 'lucide-react'
-import { sendContactEmail, sendNewsletterWelcome, isValidEmail, sanitizeInput } from './services/emailService'
+import { BookOpen, Mail, ExternalLink, Calendar, User, Heart, Send } from 'lucide-react'
+import { sendContactEmail, sendNewsletterWelcome, isValidEmail, sanitizeInput } from './emailService.js'
 import './App.css'
 
 // Sample book data based on research
@@ -18,7 +18,7 @@ const booksData = {
       amazonUrl: "https://www.amazon.com/Playing-Fire-Romance-Ava-Blackwood-ebook/dp/B0F9PYXD8R",
       publishDate: "2024",
       series: "Blackwood Academy",
-      cover: "/api/placeholder/300/450"
+      cover: "https://placehold.co/300x450/231F20/FFFFFF?text=Playing+with+Fire"
     },
     {
       id: 2,
@@ -27,7 +27,7 @@ const booksData = {
       amazonUrl: "https://www.amazon.com/Control-Release-Ava-Blackwood-ebook/dp/B0F9FQMW9L",
       publishDate: "2024",
       series: "Blackwood Academy",
-      cover: "/api/placeholder/300/450"
+      cover: "https://placehold.co/300x450/800020/FFFFFF?text=Control+and+Release"
     },
     {
       id: 3,
@@ -36,7 +36,7 @@ const booksData = {
       amazonUrl: "https://www.amazon.com/Preludes-Desire-Ava-Blackwood/dp/B0F91VK6GX",
       publishDate: "2024",
       series: "Standalone",
-      cover: "/api/placeholder/300/450"
+      cover: "https://placehold.co/300x450/4A4A4A/FFFFFF?text=Preludes+of+Desire"
     },
     {
       id: 4,
@@ -45,7 +45,7 @@ const booksData = {
       amazonUrl: "https://www.amazon.com/En-Pointe-Ava-Blackwood-ebook/dp/B0F9PQNGSG",
       publishDate: "2024",
       series: "Standalone",
-      cover: "/api/placeholder/300/450"
+      cover: "https://placehold.co/300x450/D3D3D3/000000?text=En+Pointe"
     }
   ],
   medical: [
@@ -56,7 +56,7 @@ const booksData = {
       amazonUrl: "https://www.amazon.com/Under-Surgical-Lights-Ava-Blackwood/dp/B0F9FTLSC3",
       publishDate: "2024",
       series: "Medical Romance",
-      cover: "/api/placeholder/300/450"
+      cover: "https://placehold.co/300x450/ADD8E6/000000?text=Under+Surgical+Lights"
     }
   ],
   sports: [
@@ -67,41 +67,36 @@ const booksData = {
       amazonUrl: "https://www.amazon.com/Volley-Temptation-Romance-Ava-Blackwood-ebook/dp/B0F9Q1K3GD",
       publishDate: "2024",
       series: "Sports Romance",
-      cover: "/api/placeholder/300/450"
+      cover: "https://placehold.co/300x450/006400/FFFFFF?text=Volley+of+Temptation"
     }
   ]
 }
 
 // Newsletter Signup Component
-const NewsletterSignup = () => {
+const NewsletterSignup = ({ variant, className }) => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
+  const [submitStatus, setSubmitStatus] = useState(null); // null, 'success', 'error', 'invalid_email'
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setSubmitStatus(null);
 
-    try {
-      // Replace 'YOUR_NEWSLETTER_FORM_ID' with your actual Formspree form ID for newsletter
-      const response = await fetch('https://formspree.io/f/meozqrvq', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          type: 'newsletter_signup',
-          _subject: 'New Newsletter Subscription',
-        }),
-      });
+    if (!isValidEmail(email)) {
+      setSubmitStatus('invalid_email');
+      return;
+    }
 
-      if (response.ok) {
+    setIsSubmitting(true);
+
+    try {
+      const result = await sendNewsletterWelcome(email);
+      if (result.success) {
         setSubmitStatus('success');
         setEmail('');
       } else {
         setSubmitStatus('error');
+        console.error('Newsletter signup failed:', result.error);
       }
     } catch (error) {
       console.error('Newsletter signup error:', error);
@@ -110,11 +105,17 @@ const NewsletterSignup = () => {
       setIsSubmitting(false);
     }
   };
+  
+  const isCompact = variant === 'compact';
 
   return (
-    <div className="bg-charcoal text-cream p-8 rounded-lg">
-      <h3 className="text-2xl font-bold mb-4">Join My Newsletter</h3>
-      <p className="mb-6">Get updates on new releases, exclusive content, and behind-the-scenes insights.</p>
+    <div className={`${isCompact ? '' : 'bg-charcoal text-cream p-8 rounded-lg'} ${className || ''}`}>
+      {!isCompact && (
+        <>
+          <h3 className="text-2xl font-bold mb-4">Join My Newsletter</h3>
+          <p className="mb-6">Get updates on new releases, exclusive content, and behind-the-scenes insights.</p>
+        </>
+      )}
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -137,14 +138,18 @@ const NewsletterSignup = () => {
         </button>
 
         {submitStatus === 'success' && (
-          <div className="text-green-400 text-center">
-            Welcome to the newsletter! Check your email for confirmation.
+          <div className="text-green-400 text-center mt-2">
+            Welcome! Check your email for confirmation.
           </div>
         )}
-
         {submitStatus === 'error' && (
-          <div className="text-red-400 text-center">
+          <div className="text-red-400 text-center mt-2">
             Sorry, there was an error. Please try again.
+          </div>
+        )}
+        {submitStatus === 'invalid_email' && (
+           <div className="text-yellow-400 text-center mt-2">
+            Please enter a valid email address.
           </div>
         )}
       </form>
@@ -161,7 +166,7 @@ const ContactForm = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
+  const [submitStatus, setSubmitStatus] = useState(null); // null, 'success', 'error', 'invalid_email'
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -173,30 +178,30 @@ const ContactForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setSubmitStatus(null);
 
-    try {
-      // Replace 'YOUR_FORM_ID' with your actual Formspree form ID
-      const response = await fetch('https://formspree.io/f/manbybjd', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-          _replyto: formData.email, // Formspree will use this for replies
-        }),
-      });
+    if (!isValidEmail(formData.email)) {
+      setSubmitStatus('invalid_email');
+      return;
+    }
 
-      if (response.ok) {
+    setIsSubmitting(true);
+
+    const sanitizedData = {
+      name: sanitizeInput(formData.name),
+      email: sanitizeInput(formData.email),
+      subject: sanitizeInput(formData.subject),
+      message: sanitizeInput(formData.message),
+    };
+
+    try {
+      const result = await sendContactEmail(sanitizedData);
+      if (result.success) {
         setSubmitStatus('success');
         setFormData({ name: '', email: '', subject: '', message: '' });
       } else {
         setSubmitStatus('error');
+        console.error('Contact form submission failed:', result.error);
       }
     } catch (error) {
       console.error('Contact form error:', error);
@@ -288,10 +293,14 @@ const ContactForm = () => {
             Thank you! Your message has been sent successfully. I'll get back to you soon.
           </div>
         )}
-
         {submitStatus === 'error' && (
           <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
             Sorry, there was an error sending your message. Please try again or email me directly at contact@avablackwood.com.
+          </div>
+        )}
+        {submitStatus === 'invalid_email' && (
+           <div className="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg">
+            Please enter a valid email address.
           </div>
         )}
       </form>
@@ -365,7 +374,7 @@ function App() {
             <div className="flex justify-center">
               <div className="book-card bg-white p-4 rounded-lg shadow-2xl max-w-sm">
                 <img 
-                  src="/api/placeholder/300/450" 
+                  src="https://placehold.co/300x450/231F20/FFFFFF?text=Playing+with+Fire" 
                   alt="Latest Book" 
                   className="w-full rounded-md"
                 />
@@ -461,101 +470,38 @@ function App() {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-5xl font-serif text-burgundy text-center mb-12">Books by Ava Blackwood</h1>
         
-        {/* Dark Academia Series */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-serif text-burgundy mb-8">Dark Academia Series</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {booksData.darkAcademia.map((book) => (
-              <Card key={book.id} className="book-card">
-                <CardContent className="p-4">
-                  <img 
-                    src={book.cover} 
-                    alt={book.title}
-                    className="w-full h-64 object-cover rounded-md mb-4"
-                  />
-                  <h3 className="text-lg font-serif text-burgundy mb-2">{book.title}</h3>
-                  <Badge variant="secondary" className="mb-2">{book.series}</Badge>
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-3">{book.description}</p>
-                  <div className="flex items-center text-xs text-gray-500 mb-4">
-                    <Calendar size={12} className="mr-1" />
-                    {book.publishDate}
-                  </div>
-                  <Button 
-                    className="w-full gold-button text-sm"
-                    onClick={() => window.open(book.amazonUrl, '_blank')}
-                  >
-                    <ExternalLink size={14} className="mr-2" />
-                    Buy on Amazon
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* Medical Romance */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-serif text-burgundy mb-8">Medical Romance</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {booksData.medical.map((book) => (
-              <Card key={book.id} className="book-card">
-                <CardContent className="p-4">
-                  <img 
-                    src={book.cover} 
-                    alt={book.title}
-                    className="w-full h-64 object-cover rounded-md mb-4"
-                  />
-                  <h3 className="text-lg font-serif text-burgundy mb-2">{book.title}</h3>
-                  <Badge variant="secondary" className="mb-2">{book.series}</Badge>
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-3">{book.description}</p>
-                  <div className="flex items-center text-xs text-gray-500 mb-4">
-                    <Calendar size={12} className="mr-1" />
-                    {book.publishDate}
-                  </div>
-                  <Button 
-                    className="w-full gold-button text-sm"
-                    onClick={() => window.open(book.amazonUrl, '_blank')}
-                  >
-                    <ExternalLink size={14} className="mr-2" />
-                    Buy on Amazon
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* Sports Romance */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-serif text-burgundy mb-8">Sports Romance</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {booksData.sports.map((book) => (
-              <Card key={book.id} className="book-card">
-                <CardContent className="p-4">
-                  <img 
-                    src={book.cover} 
-                    alt={book.title}
-                    className="w-full h-64 object-cover rounded-md mb-4"
-                  />
-                  <h3 className="text-lg font-serif text-burgundy mb-2">{book.title}</h3>
-                  <Badge variant="secondary" className="mb-2">{book.series}</Badge>
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-3">{book.description}</p>
-                  <div className="flex items-center text-xs text-gray-500 mb-4">
-                    <Calendar size={12} className="mr-1" />
-                    {book.publishDate}
-                  </div>
-                  <Button 
-                    className="w-full gold-button text-sm"
-                    onClick={() => window.open(book.amazonUrl, '_blank')}
-                  >
-                    <ExternalLink size={14} className="mr-2" />
-                    Buy on Amazon
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
+        {Object.entries(booksData).map(([genre, books]) => (
+          <section className="mb-16" key={genre}>
+            <h2 className="text-3xl font-serif text-burgundy mb-8 capitalize">{genre.replace(/([A-Z])/g, ' $1')}</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {books.map((book) => (
+                <Card key={book.id} className="book-card">
+                  <CardContent className="p-4">
+                    <img 
+                      src={book.cover} 
+                      alt={book.title}
+                      className="w-full h-64 object-cover rounded-md mb-4"
+                    />
+                    <h3 className="text-lg font-serif text-burgundy mb-2">{book.title}</h3>
+                    <Badge variant="secondary" className="mb-2">{book.series}</Badge>
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-3">{book.description}</p>
+                    <div className="flex items-center text-xs text-gray-500 mb-4">
+                      <Calendar size={12} className="mr-1" />
+                      {book.publishDate}
+                    </div>
+                    <Button 
+                      className="w-full gold-button text-sm"
+                      onClick={() => window.open(book.amazonUrl, '_blank')}
+                    >
+                      <ExternalLink size={14} className="mr-2" />
+                      Buy on Amazon
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        ))}
 
         {/* Newsletter Signup */}
         <section className="bg-muted p-8 rounded-lg">
@@ -620,7 +566,6 @@ function App() {
               </CardContent>
             </Card>
             
-            {/* Newsletter Signup */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-burgundy">Stay Connected</CardTitle>
@@ -649,7 +594,6 @@ function App() {
             Ava will be sharing insights about dark academia, writing process, and the psychology behind her characters.
           </p>
           
-          {/* Newsletter Signup */}
           <div className="max-w-md mx-auto">
             <Card>
               <CardHeader>
@@ -689,7 +633,6 @@ function App() {
               </div>
             </div>
             
-            {/* Professional Contact Info */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-burgundy">Professional Inquiries</CardTitle>
@@ -797,4 +740,3 @@ function App() {
 
 export { ContactForm, NewsletterSignup };
 export default App
-
