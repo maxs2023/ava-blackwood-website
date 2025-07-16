@@ -85,7 +85,7 @@ const NewsletterSignup = () => {
 
     try {
       // Replace 'YOUR_NEWSLETTER_FORM_ID' with your actual Formspree form ID for newsletter
-      const response = await fetch('https://formspree.io/f/YOUR_NEWSLETTER_FORM_ID', {
+      const response = await fetch('https://formspree.io/f/meozqrvq', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -178,7 +178,7 @@ const ContactForm = () => {
 
     try {
       // Replace 'YOUR_FORM_ID' with your actual Formspree form ID
-      const response = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+      const response = await fetch('https://formspree.io/f/manbybjd', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
