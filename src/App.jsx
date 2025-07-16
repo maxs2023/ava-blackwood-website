@@ -73,119 +73,84 @@ const booksData = {
 }
 
 // Newsletter Signup Component
-const NewsletterSignup = ({ className = "", variant = "default" }) => {
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [status, setStatus] = useState(null)
+const NewsletterSignup = () => {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
-    if (!isValidEmail(email)) {
-      setStatus('invalid-email')
-      return
-    }
-
-    setIsSubmitting(true)
-    setStatus(null)
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus(null);
 
     try {
-      const result = await sendNewsletterWelcome(email, sanitizeInput(name))
-      
-      if (result.success) {
-        setStatus('success')
-        setEmail('')
-        setName('')
+      // Replace 'YOUR_NEWSLETTER_FORM_ID' with your actual Formspree form ID for newsletter
+      const response = await fetch('https://formspree.io/f/YOUR_NEWSLETTER_FORM_ID', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          type: 'newsletter_signup',
+          _subject: 'New Newsletter Subscription',
+        }),
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setEmail('');
       } else {
-        setStatus('error')
+        setSubmitStatus('error');
       }
     } catch (error) {
-      console.error('Newsletter signup error:', error)
-      setStatus('error')
+      console.error('Newsletter signup error:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    setIsSubmitting(false)
-  }
-
-  if (status === 'success') {
-    return (
-      <div className={`text-center p-6 bg-green-50 border border-green-200 rounded-lg ${className}`}>
-        <CheckCircle className="mx-auto mb-3 text-green-600" size={32} />
-        <h3 className="text-lg font-serif text-green-800 mb-2">Welcome to the Circle! 🎉</h3>
-        <p className="text-green-700">
-          Check your email for a welcome message with exclusive content and updates.
-        </p>
-      </div>
-    )
-  }
-
-  const isCompact = variant === "compact"
+  };
 
   return (
-    <div className={className}>
+    <div className="bg-charcoal text-cream p-8 rounded-lg">
+      <h3 className="text-2xl font-bold mb-4">Join My Newsletter</h3>
+      <p className="mb-6">Get updates on new releases, exclusive content, and behind-the-scenes insights.</p>
+      
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className={isCompact ? "flex flex-col sm:flex-row gap-2" : "grid grid-cols-1 sm:grid-cols-2 gap-4"}>
-          {!isCompact && (
-            <Input
-              type="text"
-              placeholder="Your name (optional)"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="bg-white"
-            />
-          )}
-          <Input
+        <div>
+          <input
             type="email"
-            placeholder="Your email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="bg-white"
+            className="w-full px-4 py-3 rounded-lg text-charcoal"
+            placeholder="Enter your email address"
           />
         </div>
         
-        <Button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={isSubmitting}
-          className={`${isCompact ? 'w-full sm:w-auto' : 'w-full'} gold-button`}
+          className="w-full bg-gold text-charcoal py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90 transition-colors disabled:opacity-50"
         >
-          {isSubmitting ? (
-            <>
-              <span className="animate-spin mr-2">⏳</span>
-              Subscribing...
-            </>
-          ) : (
-            <>
-              <Mail size={16} className="mr-2" />
-              Join the Dark Academia Circle
-            </>
-          )}
-        </Button>
-        
-        {status === 'error' && (
-          <div className="flex items-center text-red-600 text-sm">
-            <AlertCircle size={16} className="mr-2" />
-            Something went wrong. Please try again.
+          {isSubmitting ? 'Subscribing...' : 'Subscribe'}
+        </button>
+
+        {submitStatus === 'success' && (
+          <div className="text-green-400 text-center">
+            Welcome to the newsletter! Check your email for confirmation.
           </div>
         )}
-        
-        {status === 'invalid-email' && (
-          <div className="flex items-center text-red-600 text-sm">
-            <AlertCircle size={16} className="mr-2" />
-            Please enter a valid email address.
+
+        {submitStatus === 'error' && (
+          <div className="text-red-400 text-center">
+            Sorry, there was an error. Please try again.
           </div>
         )}
       </form>
-      
-      {!isCompact && (
-        <p className="text-xs text-gray-500 text-center mt-2">
-          No spam, ever. Unsubscribe anytime with one click.
-        </p>
-      )}
     </div>
-  )
-}
+  );
+};
 
 // Contact Form Component
 const ContactForm = () => {
@@ -194,161 +159,145 @@ const ContactForm = () => {
     email: '',
     subject: '',
     message: ''
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState(null)
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: sanitizeInput(value)
-    }))
-  }
+      [name]: value
+    }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
-    if (!isValidEmail(formData.email)) {
-      setSubmitStatus('invalid-email')
-      return
-    }
-
-    setIsSubmitting(true)
-    setSubmitStatus(null)
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus(null);
 
     try {
-      const result = await sendContactEmail(formData)
-      
-      if (result.success) {
-        setSubmitStatus('success')
-        setFormData({ name: '', email: '', subject: '', message: '' })
+      // Replace 'YOUR_FORM_ID' with your actual Formspree form ID
+      const response = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          _replyto: formData.email, // Formspree will use this for replies
+        }),
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setFormData({ name: '', email: '', subject: '', message: '' });
       } else {
-        setSubmitStatus('error')
-        console.error('Contact form error:', result.error)
+        setSubmitStatus('error');
       }
     } catch (error) {
-      console.error('Contact form error:', error)
-      setSubmitStatus('error')
+      console.error('Contact form error:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    setIsSubmitting(false)
-  }
+  };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-burgundy">Send a Message</CardTitle>
-        <CardDescription>
-          I'd love to hear from you! Whether it's about my books, collaboration opportunities, or just to say hello.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Name *</label>
-              <Input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                placeholder="Your full name"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Email *</label>
-              <Input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                placeholder="your.email@example.com"
-              />
-            </div>
+    <div className="max-w-2xl mx-auto p-6">
+      <h2 className="text-3xl font-bold text-burgundy mb-6">Contact Me</h2>
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-charcoal mb-2">
+            Name *
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            required
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
+            placeholder="Your full name"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-charcoal mb-2">
+            Email *
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
+            placeholder="your.email@example.com"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="subject" className="block text-sm font-medium text-charcoal mb-2">
+            Subject *
+          </label>
+          <input
+            type="text"
+            id="subject"
+            name="subject"
+            value={formData.subject}
+            onChange={handleInputChange}
+            required
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
+            placeholder="What's this about?"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="message" className="block text-sm font-medium text-charcoal mb-2">
+            Message *
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            value={formData.message}
+            onChange={handleInputChange}
+            required
+            rows={6}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy focus:border-transparent"
+            placeholder="Your message..."
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-burgundy text-cream py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? 'Sending...' : 'Send Message'}
+        </button>
+
+        {submitStatus === 'success' && (
+          <div className="p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+            Thank you! Your message has been sent successfully. I'll get back to you soon.
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-2">Subject *</label>
-            <Input
-              type="text"
-              name="subject"
-              value={formData.subject}
-              onChange={handleChange}
-              required
-              placeholder="What's this about?"
-            />
+        )}
+
+        {submitStatus === 'error' && (
+          <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            Sorry, there was an error sending your message. Please try again or email me directly at contact@avablackwood.com.
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-2">Message *</label>
-            <Textarea
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              required
-              placeholder="Your message here..."
-              rows="6"
-            />
-          </div>
-          
-          <Button 
-            type="submit" 
-            disabled={isSubmitting}
-            className="w-full gold-button"
-          >
-            {isSubmitting ? (
-              <>
-                <span className="animate-spin mr-2">⏳</span>
-                Sending...
-              </>
-            ) : (
-              <>
-                <Send size={16} className="mr-2" />
-                Send Message
-              </>
-            )}
-          </Button>
-          
-          {submitStatus === 'success' && (
-            <div className="p-4 bg-green-50 border border-green-200 rounded-md">
-              <div className="flex items-center">
-                <CheckCircle className="text-green-600 mr-2" size={20} />
-                <p className="text-green-800">
-                  Message sent successfully! I'll get back to you soon.
-                </p>
-              </div>
-            </div>
-          )}
-          
-          {submitStatus === 'error' && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-              <div className="flex items-center">
-                <AlertCircle className="text-red-600 mr-2" size={20} />
-                <p className="text-red-800">
-                  Failed to send message. Please try again or email me directly at contact@avablackwood.com
-                </p>
-              </div>
-            </div>
-          )}
-          
-          {submitStatus === 'invalid-email' && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-              <div className="flex items-center">
-                <AlertCircle className="text-red-600 mr-2" size={20} />
-                <p className="text-red-800">
-                  Please enter a valid email address.
-                </p>
-              </div>
-            </div>
-          )}
-        </form>
-      </CardContent>
-    </Card>
-  )
-}
+        )}
+      </form>
+    </div>
+  );
+};
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
@@ -846,5 +795,6 @@ function App() {
   )
 }
 
+export { ContactForm, NewsletterSignup };
 export default App
 
