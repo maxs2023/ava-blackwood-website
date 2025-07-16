@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input.jsx'
 import { Badge } from '@/components/ui/badge.jsx'
 import { Textarea } from '@/components/ui/textarea.jsx'
 import { BookOpen, Mail, ExternalLink, Calendar, User, Heart, Send } from 'lucide-react'
-import { sendContactEmail, sendNewsletterWelcome, isValidEmail, sanitizeInput } from './emailService.js'
+import { sendContactEmail, sendNewsletterWelcome, isValidEmail, sanitizeInput } from './services/emailService.js'
 import './App.css'
 
 // Sample book data based on research
