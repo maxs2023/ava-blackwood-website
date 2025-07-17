@@ -1,6 +1,14 @@
 import { Resend } from 'resend';
-import { supabase } from '../src/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
 
+// --- Supabase Client Initialization ---
+// Initialize the client directly inside the API route.
+// Ensure SUPABASE_URL and SUPABASE_ANON_KEY are set in Vercel Environment Variables.
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// --- Resend Client Initialization ---
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req, res) {
@@ -9,12 +17,10 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // Ensure the request method is POST
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -36,8 +42,8 @@ export default async function handler(req, res) {
       .single();
 
     if (supabaseError) {
-      console.error('Supabase error in contact form:', supabaseError.message);
-      return res.status(500).json({ error: 'Failed to save contact message to the database.' });
+      console.error('Supabase Error in contact form:', supabaseError.message);
+      return res.status(500).json({ error: `Database Error: ${supabaseError.message}` });
     }
 
     // --- Step 2: Send email notification ---
@@ -76,7 +82,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, data: supabaseData });
 
   } catch (error) {
-    console.error('A server error occurred in contact form handler:', error);
-    return res.status(500).json({ error: 'A server error occurred. Please try again later.' });
+    console.error('Unhandled Server Error in contact form handler:', error);
+    return res.status(500).json({ error: 'A server error occurred. Please check the logs.' });
   }
 }
