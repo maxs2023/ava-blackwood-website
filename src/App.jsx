@@ -206,7 +206,7 @@ const NewsletterSignup = ({ variant, className }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="flex-1 px-4 py-3 rounded-lg text-gray-900 border-0 focus:ring-2 focus:ring-accent"
+              className="flex-1 px-4 py-3 rounded-lg text-gray-900 border-5 focus:ring-2 focus:ring-accent"
               placeholder="Enter your email address"
             />
             <button
