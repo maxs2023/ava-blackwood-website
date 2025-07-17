@@ -7,34 +7,355 @@ import { Textarea } from '@/components/ui/textarea.jsx'
 import { BookOpen, Mail, ExternalLink, Calendar, User, Heart, Send, Star } from 'lucide-react'
 import './App.css'
 
-// --- ADDED: Import the Sanity client and PortableText component ---
-import sanityClient from './sanityClient.js'
-import { PortableText } from '@portabletext/react'
-
 // Import book cover images
 import playingWithFireCover from './assets/Playing with Fire.jpg'
 import controlAndReleaseCover from './assets/Control and Release.jpg'
-import preludesOfDesireCover from './assets/Beneath the Scholar\'s Veil.jpg'
+import preludesOfDesireCover from './assets/Beneath the Scholar\'s Veil.jpg' // Using this as placeholder for Preludes
 import enPointeCover from './assets/En Pointe.jpg'
 import underSurgicalLightsCover from './assets/Under Surgical Lights.jpg'
 import volleyOfTemptationCover from './assets/Volley of Temptation.jpg'
 
-// --- Analytics Component (Unchanged) ---
-const Analytics = () => { /* ... */ };
-const trackEvent = (eventName, eventParams) => { /* ... */ };
-const isValidEmail = (email) => { /* ... */ };
-const sanitizeInput = (input) => { /* ... */ };
+// --- Analytics Component ---
+const Analytics = () => {
+  // IMPORTANT: Replace with your actual Google Analytics Measurement ID
+  const GA_MEASUREMENT_ID = 'G-CLVD5YQKWB';
 
-// --- Book Data (Unchanged) ---
-const booksData = { /* ... */ };
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production' || window.gtag) {
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+    script.async = true;
+    document.head.appendChild(script);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', GA_MEASUREMENT_ID);
+  }, []);
 
-// --- REMOVED: The hardcoded blogPostsData array is no longer needed ---
+  return null;
+};
 
-// --- NewsletterSignup Component (Unchanged) ---
-const NewsletterSignup = ({ variant, className }) => { /* ... */ };
+const trackEvent = (eventName, eventParams) => {
+  if (window.gtag) {
+    window.gtag('event', eventName, eventParams);
+  } else {
+    console.log(`Analytics event (not sent): ${eventName}`, eventParams);
+  }
+};
+
+// --- Helper Functions ---
+const isValidEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const sanitizeInput = (input) => {
+  if (typeof input !== 'string') return '';
+  const scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+  return input.trim().replace(scriptRegex, '');
+};
+
+// --- Updated Book Data with Local Cover Images ---
+const booksData = {
+  darkAcademia: [
+    { 
+      id: 1, 
+      title: "Playing with Fire", 
+      fullTitle: "Playing with Fire: A Dark-Academia Romance of Power, Desire, and Restraint",
+      description: "Delve into Playing with Fire, where the forbidden allure of a professor-student romance ignites amidst the storied halls of Blackwood Academy. A Dark-Academia Romance of Power, Desire, and Restraint that explores the dangerous territory between mentorship and desire.", 
+      amazonUrl: "https://www.amazon.com/Playing-Fire-Dark-Academia-Romance-Restraint-ebook/dp/B0F99HK62", 
+      publishDate: "2024", 
+      series: "Dark Academia", 
+      cover: playingWithFireCover,
+      rating: 4.5,
+      genre: "Dark Academia Romance"
+    },
+    { 
+      id: 2, 
+      title: "Control and Release", 
+      fullTitle: "Control and Release: A Dark Academia Romance",
+      description: "Control and Release is an electrifying exploration of forbidden attraction and the intricate dance of power dynamics in academia. When boundaries blur between professor and student, passion becomes a dangerous game of control.", 
+      amazonUrl: "https://www.amazon.com/Control-Release-Ava-Blackwood-ebook/dp/B0F9FQMW9L", 
+      publishDate: "2024", 
+      series: "Dark Academia", 
+      cover: controlAndReleaseCover,
+      rating: 4.3,
+      genre: "Dark Academia Romance"
+    },
+    { 
+      id: 3, 
+      title: "Preludes of Desire", 
+      fullTitle: "Preludes of Desire: A Dark Academia Romance",
+      description: "Seventeen-year-old piano prodigy Evelina Moreau has always used her music to control the world around her. But when she meets her enigmatic composition professor, she discovers that some melodies are too dangerous to play.", 
+      amazonUrl: "https://www.amazon.com/Preludes-Desire-Ava-Blackwood/dp/B0F91VK6GX", 
+      publishDate: "2024", 
+      series: "Dark Academia", 
+      cover: preludesOfDesireCover,
+      rating: 4.4,
+      genre: "Dark Academia Romance"
+    },
+    { 
+      id: 4, 
+      title: "En Pointe", 
+      fullTitle: "En Pointe: Romance Edition",
+      description: "En Pointe is a story of passion, ambition, and forbidden love set against the backdrop of the illustrious Opéra Garnier. When ballet meets desire, every movement becomes a dance of seduction.", 
+      amazonUrl: "https://www.amazon.com/En-Pointe-Ava-Blackwood-ebook/dp/B0F9PQNGSG", 
+      publishDate: "2024", 
+      series: "Standalone", 
+      cover: enPointeCover,
+      rating: 4.6,
+      genre: "Romance"
+    }
+  ],
+  medical: [
+    { 
+      id: 5, 
+      title: "Under Surgical Lights", 
+      fullTitle: "Under Surgical Lights: A Medical Romance",
+      description: "A provocative medical romance exploring power dynamics in the high-stakes world of surgery. When Dr. Sarah Chen meets the enigmatic Chief of Surgery, their professional relationship becomes dangerously personal.", 
+      amazonUrl: "https://www.amazon.com/Under-Surgical-Lights-Ava-Blackwood/dp/B0F9FTLSC3", 
+      publishDate: "2024", 
+      series: "Medical Romance", 
+      cover: underSurgicalLightsCover,
+      rating: 4.2,
+      genre: "Medical Romance"
+    }
+  ],
+  sports: [
+    { 
+      id: 6, 
+      title: "Volley of Temptation", 
+      fullTitle: "Volley of Temptation: A Dark-Academia Sports Romance",
+      description: "A dark academia sports romance that explores the tension between competition and desire on the volleyball court. When winning becomes secondary to the game of hearts, every serve is a shot at love.", 
+      amazonUrl: "https://www.amazon.com/Volley-Temptation-Romance-Ava-Blackwood-ebook/dp/B0F9Q1K3GD", 
+      publishDate: "2024", 
+      series: "Dark Academia Sports", 
+      cover: volleyOfTemptationCover,
+      rating: 4.1,
+      genre: "Sports Romance"
+    }
+  ]
+};
+
+
+// --- START: NEW BLOG POST DATA ---
+const blogPostsData = [
+  {
+    id: 1,
+    title: "The Allure of the Forbidden: Crafting Dark Academia",
+    date: "July 15, 2025",
+    author: "Ava Blackwood",
+    summary: "A deep dive into the magnetic pull of dark academia, exploring its core themes of ambition, forbidden knowledge, and the intoxicating dance between power and desire...",
+    content: `
+      <p>There's a unique magic to the hallowed halls of academia. The scent of old books, the hushed whispers in a grand library, the palpable weight of history—it's a world brimming with secrets waiting to be unearthed. This is the world of Dark Academia, and it's a genre that has utterly captivated me, both as a reader and a writer.</p>
+      <p>At its heart, Dark Academia is about the pursuit of knowledge, but often at a perilous cost. It explores the lines we cross for ambition, the moral compromises we make for greatness, and the intoxicating allure of the forbidden. In my novels like "Playing with Fire," I sought to capture this tension—the intellectual spark between a professor and student that threatens to ignite into a consuming flame.</p>
+      <p>The aesthetic is just as crucial as the themes. Think tweed jackets, Gothic architecture, late-night study sessions illuminated by a single desk lamp, and the melancholic beauty of a rain-streaked window. These elements create an atmosphere that is both intellectual and deeply sensual, a perfect backdrop for the complex, often dangerous, relationships that unfold.</p>
+      <p>Why are we so drawn to these stories? Perhaps it's because they reflect our own deepest desires for meaning, passion, and a connection to something greater than ourselves, even if that path is fraught with darkness. It's a reminder that the most profound lessons are often learned not in the classroom, but in the hidden corridors of the human heart.</p>
+    `
+  },
+  {
+    id: 2,
+    title: "Behind the Veil: The Inspiration for 'Preludes of Desire'",
+    date: "July 02, 2025",
+    author: "Ava Blackwood",
+    summary: "Ever wonder where a story begins? For 'Preludes of Desire', it started not with a plot, but with a sound—the haunting melody of a piano echoing through an empty conservatory...",
+    content: `
+      <p>Every book has its own origin story. Some arrive in a flash of inspiration, a fully-formed plot demanding to be written. Others, like "Preludes of Desire," begin more subtly. For this story, it was a sound: the haunting melody of a piano, played with a mix of technical brilliance and raw, untamed emotion, echoing through an empty conservatory.</p>
+      <p>I imagined Evelina, my seventeen-year-old prodigy, pouring all her frustrations, ambitions, and nascent desires into the keys. The piano isn't just an instrument for her; it's her armor, her voice, her method of control in a world that feels overwhelming. But what happens when she meets someone who can read the music of her soul? Someone who understands the dissonance and the longing hidden beneath the polished surface?</p>
+      <p>That's where her enigmatic professor comes in. Their relationship is a duet of control and surrender, a complex composition where every note is fraught with unspoken meaning. The conservatory setting was vital, providing a stage for this intimate, high-stakes performance of passion and power. It's a story about art, obsession, and the moment a student's talent becomes so profound it threatens to eclipse the master's.</p>
+    `
+  },
+  {
+    id: 3,
+    title: "My Writing Ritual: Coffee, Candlelight, and Chaos",
+    date: "June 21, 2025",
+    author: "Ava Blackwood",
+    summary: "Readers often ask about my writing process. Is it structured and serene, or a whirlwind of creative chaos? The truth, as with my stories, lies somewhere in between...",
+    content: `
+      <p>The writer's life is often romanticized—a solitary genius typing away in a charming, sun-drenched study. While I wish I could claim such elegant serenity, my process is a bit more... chaotic. It's a ritual, to be sure, but one that embraces the beautiful mess of creation.</p>
+      <p>It always starts with coffee. Strong, black, and in a mug that feels just right for the day's mood. Then comes the atmosphere. I'm a firm believer in setting the scene, even for myself. For my Dark Academia tales, this means low light, perhaps a single scented candle (sandalwood or old parchment are favorites), and a curated playlist of classical or ambient music. It helps me slip into the world I'm trying to build.</p>
+      <p>The 'chaos' part comes from the writing itself. I'm not a meticulous outliner. I start with a character, a feeling, a core conflict, and let the story guide me. There are days of furious typing where the words flow effortlessly, and then there are days spent staring at a blinking cursor, wrestling with a single sentence. Both are part of the dance.</p>
+      <p>It's a process of surrendering to the story, of letting the characters surprise me. And through all the coffee, candlelight, and chaos, I find my way to 'The End,' ready to start the dance all over again.</p>
+    `
+  }
+];
+// --- END: NEW BLOG POST DATA ---
+
+
+// --- Newsletter Signup Component (Updated) ---
+const NewsletterSignup = ({ variant, className }) => {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // null, 'success', 'error', 'invalid_email', 'duplicate'
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitStatus(null);
+
+    if (!isValidEmail(email)) {
+      setSubmitStatus('invalid_email');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/send-newsletter-welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setEmail('');
+        trackEvent('newsletter_signup', { method: 'Website Form' });
+      } else if (response.status === 409) {
+        setSubmitStatus('duplicate');
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (error) {
+      console.error('Newsletter signup error:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isCompact = variant === 'compact';
+
+  return (
+    <div className={`${isCompact ? '' : 'bg-charcoal text-cream p-8 rounded-lg'} ${className || ''}`}>
+      {!isCompact && (
+        <>
+          <h3 className="text-2xl font-bold mb-4">Join My Newsletter</h3>
+          <p className="mb-6">Get updates on new releases, exclusive content, and behind-the-scenes insights.</p>
+        </>
+      )}
+      
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full px-4 py-3 rounded-lg text-charcoal"
+            placeholder="Enter your email address"
+          />
+        </div>
+        
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-gold text-charcoal py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90 transition-colors disabled:opacity-50"
+        >
+          {isSubmitting ? 'Subscribing...' : 'Subscribe'}
+        </button>
+
+        {submitStatus === 'success' && (
+          <div className="text-green-400 text-center mt-2">
+            Welcome! Check your email for confirmation.
+          </div>
+        )}
+        {submitStatus === 'error' && (
+          <div className="text-red-400 text-center mt-2">
+            Sorry, there was an error. Please try again.
+          </div>
+        )}
+        {submitStatus === 'invalid_email' && (
+           <div className="text-yellow-400 text-center mt-2">
+            Please enter a valid email address.
+          </div>
+        )}
+        {submitStatus === 'duplicate' && (
+           <div className="text-yellow-400 text-center mt-2">
+            This email address is already subscribed.
+          </div>
+        )}
+      </form>
+    </div>
+  );
+};
 
 // --- Contact Form Component (Unchanged) ---
-const ContactForm = () => { /* ... */ };
+const ContactForm = () => {
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!isValidEmail(formData.email)) {
+      setSubmitStatus('invalid_email');
+      return;
+    }
+    setIsSubmitting(true);
+    const sanitizedData = {
+      name: sanitizeInput(formData.name),
+      email: sanitizeInput(formData.email),
+      subject: sanitizeInput(formData.subject),
+      message: sanitizeInput(formData.message),
+    };
+    try {
+      const response = await fetch('/api/send-contact-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sanitizedData),
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-6">
+      <h2 className="text-3xl font-bold text-burgundy mb-6">Contact Me</h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-charcoal mb-2">Name *</label>
+          <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Your full name" />
+        </div>
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-charcoal mb-2">Email *</label>
+          <input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="your.email@example.com" />
+        </div>
+        <div>
+          <label htmlFor="subject" className="block text-sm font-medium text-charcoal mb-2">Subject *</label>
+          <input type="text" id="subject" name="subject" value={formData.subject} onChange={handleInputChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="What's this about?" />
+        </div>
+        <div>
+          <label htmlFor="message" className="block text-sm font-medium text-charcoal mb-2">Message *</label>
+          <textarea id="message" name="message" value={formData.message} onChange={handleInputChange} required rows={6} className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Your message..."></textarea>
+        </div>
+        <button type="submit" disabled={isSubmitting} className="w-full bg-burgundy text-cream py-3 px-6 rounded-lg font-semibold">
+          {isSubmitting ? 'Sending...' : 'Send Message'}
+        </button>
+        {submitStatus === 'success' && <div className="p-4 bg-green-100 text-green-700 rounded-lg">Thank you! Your message has been sent.</div>}
+        {submitStatus === 'error' && <div className="p-4 bg-red-100 text-red-700 rounded-lg">Sorry, there was an error.</div>}
+        {submitStatus === 'invalid_email' && <div className="p-4 bg-yellow-100 text-yellow-700 rounded-lg">Please enter a valid email.</div>}
+      </form>
+    </div>
+  );
+};
 
 
 // --- Main App Component and Page Structure ---
@@ -47,6 +368,7 @@ function App() {
     window.open(book.amazonUrl, '_blank');
   };
 
+  // Get all books in a flat array
   const getAllBooks = () => {
     return [
       ...booksData.darkAcademia,
@@ -55,6 +377,7 @@ function App() {
     ];
   };
 
+  // Filter books by genre
   const getFilteredBooks = () => {
     if (selectedGenre === 'all') {
       return getAllBooks();
@@ -93,51 +416,186 @@ function App() {
     </nav>
   );
 
-  const HomePage = () => ( <div>{/*... Home Page Code Unchanged ...*/}</div> );
-  const BooksPage = () => ( <div>{/*... Books Page Code Unchanged ...*/}</div> );
+  const HomePage = () => (
+    <div className="min-h-screen">
+      <section className="hero-section py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="text-center md:text-left">
+              <h1 className="text-5xl md:text-6xl font-serif text-white mb-6">Unlock the Secrets of the Heart</h1>
+              <p className="text-xl text-gray-200 mb-8 leading-relaxed">Discover dark and enchanting tales where passion and mystery entwine.</p>
+              <Button className="gold-button text-lg px-8 py-3" onClick={() => setCurrentPage('books')}>View Books</Button>
+            </div>
+            <div className="flex justify-center">
+              <div className="book-card bg-white p-4 rounded-lg shadow-2xl max-w-sm">
+                <div className="w-full h-80 bg-gray-100 rounded-md overflow-hidden">
+                  <img 
+                    src={booksData.darkAcademia[0].cover} 
+                    alt="Latest Book" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <h3 className="text-xl font-serif text-burgundy mt-4 text-center">{booksData.darkAcademia[0].title}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="py-16 px-4 bg-muted">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl font-serif text-burgundy text-center mb-12">Featured Books</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {booksData.darkAcademia.slice(0, 3).map((book) => (
+              <Card key={book.id} className="book-card cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="w-full h-64 bg-gray-100 rounded-md overflow-hidden mb-4">
+                    <img 
+                      src={book.cover} 
+                      alt={book.title} 
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <h3 className="text-xl font-serif text-burgundy mb-2">{book.title}</h3>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">{book.description}</p>
+                  <Button className="w-full gold-button" onClick={() => handleAmazonClick(book)}>
+                    <ExternalLink size={16} className="mr-2" /> Buy on Amazon
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+
+  const BooksPage = () => (
+    <div className="min-h-screen py-12 px-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-serif text-burgundy mb-4">My Books</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Explore my collection of dark academia romances, medical dramas, and sports romances. 
+            Each story weaves passion, power, and forbidden desire into unforgettable tales.
+          </p>
+        </div>
+
+        <div className="flex justify-center mb-8">
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={selectedGenre === 'all' ? 'default' : 'outline'}
+              onClick={() => setSelectedGenre('all')}
+              className={selectedGenre === 'all' ? 'bg-burgundy text-white' : ''}
+            >
+              All Books ({getAllBooks().length})
+            </Button>
+            <Button
+              variant={selectedGenre === 'darkAcademia' ? 'default' : 'outline'}
+              onClick={() => setSelectedGenre('darkAcademia')}
+              className={selectedGenre === 'darkAcademia' ? 'bg-burgundy text-white' : ''}
+            >
+              Dark Academia ({booksData.darkAcademia.length})
+            </Button>
+            <Button
+              variant={selectedGenre === 'medical' ? 'default' : 'outline'}
+              onClick={() => setSelectedGenre('medical')}
+              className={selectedGenre === 'medical' ? 'bg-burgundy text-white' : ''}
+            >
+              Medical Romance ({booksData.medical.length})
+            </Button>
+            <Button
+              variant={selectedGenre === 'sports' ? 'default' : 'outline'}
+              onClick={() => setSelectedGenre('sports')}
+              className={selectedGenre === 'sports' ? 'bg-burgundy text-white' : ''}
+            >
+              Sports Romance ({booksData.sports.length})
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {getFilteredBooks().map((book) => (
+            <Card key={book.id} className="book-card hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-6">
+                <div className="relative mb-4">
+                  <div className="w-full h-80 bg-gray-100 rounded-md overflow-hidden">
+                    <img 
+                      src={book.cover} 
+                      alt={book.title} 
+                      className="w-full h-full object-contain shadow-md"
+                    />
+                  </div>
+                  <Badge className="absolute top-2 right-2 bg-burgundy text-white">
+                    {book.genre}
+                  </Badge>
+                </div>
+                
+                <div className="space-y-3">
+                  <h3 className="text-xl font-serif text-burgundy font-bold line-clamp-2">
+                    {book.title}
+                  </h3>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={16}
+                          className={i < Math.floor(book.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600">({book.rating})</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Calendar size={14} />
+                    <span>{book.publishDate}</span>
+                    <span>•</span>
+                    <span>{book.series}</span>
+                  </div>
+                  
+                  <p className="text-gray-600 text-sm line-clamp-4 leading-relaxed">
+                    {book.description}
+                  </p>
+                  
+                  <Button 
+                    className="w-full bg-burgundy hover:bg-burgundy/90 text-white" 
+                    onClick={() => handleAmazonClick(book)}
+                  >
+                    <ExternalLink size={16} className="mr-2" />
+                    Buy on Amazon
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="mt-16">
+          <NewsletterSignup />
+        </div>
+      </div>
+    </div>
+  );
+
   const AboutPage = () => ( <div>...</div> );
 
-  // --- START: UPDATED BLOG PAGE COMPONENT ---
+  // --- START: NEW BLOG PAGE COMPONENT ---
   const BlogPage = () => {
-    const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [selectedPost, setSelectedPost] = useState(null);
 
-    useEffect(() => {
-      // GROQ query to fetch all documents of type 'post'
-      // and order them by the published date in descending order.
-      const query = `*[_type == "post"] | order(publishedAt desc)`;
-      
-      sanityClient.fetch(query)
-        .then((data) => {
-          setPosts(data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Error fetching blog posts from Sanity:", err);
-          setError("Failed to load blog posts.");
-          setLoading(false);
-        });
-    }, []); // The empty array ensures this effect runs only once
-
+    // Navigate to a single post view
     const handlePostClick = (post) => {
       setSelectedPost(post);
-      window.scrollTo(0, 0);
+      window.scrollTo(0, 0); // Scroll to top when a post is selected
     };
 
+    // Return to the main blog list
     const handleBackClick = () => {
       setSelectedPost(null);
     };
 
-    // --- Loading and Error States ---
-    if (loading) {
-      return <div className="text-center py-20">Loading posts...</div>;
-    }
-    if (error) {
-      return <div className="text-center py-20 text-red-500">{error}</div>;
-    }
-    
     // --- Single Post View ---
     if (selectedPost) {
       return (
@@ -150,15 +608,15 @@ function App() {
               <CardHeader>
                 <CardTitle className="text-4xl font-serif text-burgundy">{selectedPost.title}</CardTitle>
                 <CardDescription className="flex items-center gap-4 text-sm text-gray-500 pt-2">
-                  {selectedPost.author?.name && <span className="flex items-center gap-2"><User size={14} /> {selectedPost.author.name}</span>}
-                  {selectedPost.publishedAt && <span className="flex items-center gap-2"><Calendar size={14} /> {new Date(selectedPost.publishedAt).toLocaleDateString()}</span>}
+                  <span className="flex items-center gap-2"><User size={14} /> {selectedPost.author}</span>
+                  <span className="flex items-center gap-2"><Calendar size={14} /> {selectedPost.date}</span>
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Use PortableText to render rich text from Sanity */}
-                <div className="blog-content text-lg text-charcoal">
-                  <PortableText value={selectedPost.body} />
-                </div>
+                <div 
+                  className="blog-content text-lg text-charcoal" 
+                  dangerouslySetInnerHTML={{ __html: selectedPost.content }} 
+                />
               </CardContent>
             </Card>
           </div>
@@ -178,17 +636,16 @@ function App() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-            {posts.map((post) => (
-              <Card key={post._id} className="flex flex-col hover:shadow-lg transition-shadow">
+            {blogPostsData.map((post) => (
+              <Card key={post.id} className="flex flex-col hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-2xl font-serif text-burgundy line-clamp-2">{post.title}</CardTitle>
                   <CardDescription className="text-xs text-gray-500">
-                    {new Date(post.publishedAt).toLocaleDateString()}
+                    {post.date} &bull; {post.author}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  {/* Note: The blog schema from Sanity doesn't have a summary field by default. You can add one! */}
-                  <p className="text-gray-700 text-sm line-clamp-4">A look inside the latest musings from Ava Blackwood...</p>
+                  <p className="text-gray-700 text-sm line-clamp-4">{post.summary}</p>
                 </CardContent>
                 <div className="p-6 pt-0 mt-auto">
                   <Button variant="link" onClick={() => handlePostClick(post)} className="p-0 text-burgundy font-semibold">
@@ -202,7 +659,7 @@ function App() {
       </div>
     );
   };
-  // --- END: UPDATED BLOG PAGE COMPONENT ---
+  // --- END: NEW BLOG PAGE COMPONENT ---
 
   const ContactPage = () => ( <div><ContactForm /></div> );
   const Footer = () => ( <footer>...</footer> );
@@ -227,9 +684,6 @@ function App() {
     </div>
   );
 }
-
-// NOTE: I've left the HomePage and BooksPage components collapsed (`{/* ... */}`) 
-// for brevity, as they were not changed. You should keep your original code for those.
 
 export { ContactForm, NewsletterSignup };
 export default App;

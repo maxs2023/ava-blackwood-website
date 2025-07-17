@@ -143,3 +143,12 @@
   color: var(--primary);
 }
 
+.blog-content p {
+  margin-bottom: 1.25rem; /* Adds spacing between paragraphs */
+  line-height: 1.75;      /* Improves readability */
+}
+
+.blog-content a {
+  color: #8C2F39; /* Burgundy color for links */
+  text-decoration: underline;
+}
