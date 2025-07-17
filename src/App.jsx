@@ -20,7 +20,7 @@ import underSurgicalLightsCover from './assets/Under Surgical Lights.jpg'
 import volleyOfTemptationCover from './assets/Volley of Temptation.jpg'
 
 // Import author profile photo
-import authorPhoto from './assets/authorprofilephoto.png'
+import authorPhoto from './src/assets/authorprofilephoto.png'
 
 // --- Analytics Component ----
 const Analytics = () => {
