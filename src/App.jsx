@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input.jsx'
 import { Badge } from '@/components/ui/badge.jsx'
 import { Textarea } from '@/components/ui/textarea.jsx'
-import { BookOpen, Mail, ExternalLink, Calendar, User, Heart, Send, Star } from 'lucide-react'
+import { BookOpen, Mail, ExternalLink, Calendar, User, Heart, Send, Star, Award, Coffee, Pen } from 'lucide-react'
 import './App.css'
 
 // --- ADDED: Import the Sanity client and PortableText component ---
@@ -18,6 +18,9 @@ import preludesOfDesireCover from './assets/Beneath the Scholar\'s Veil.jpg'
 import enPointeCover from './assets/En Pointe.jpg'
 import underSurgicalLightsCover from './assets/Under Surgical Lights.jpg'
 import volleyOfTemptationCover from './assets/Volley of Temptation.jpg'
+
+// Import author profile photo
+import authorPhoto from './assets/authorprofilephoto.png'
 
 // --- Analytics Component ----
 const Analytics = () => {
@@ -586,15 +589,157 @@ function App() {
 
   const AboutPage = () => ( 
     <div className="min-h-screen py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
+      <div className="max-w-6xl mx-auto">
+        {/* Header Section */}
+        <div className="text-center mb-16">
           <h1 className="text-5xl font-serif text-burgundy mb-4">About Ava Blackwood</h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Crafting tales of passion, power, and forbidden desire in the shadows of academia.
           </p>
         </div>
-        <div className="prose prose-lg mx-auto text-gray-700">
-          <p>More content coming soon...</p>
+
+        {/* Main Content */}
+        <div className="grid lg:grid-cols-3 gap-12 mb-16">
+          {/* Author Photo */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24">
+              <div className="relative">
+                <img 
+                  src={authorPhoto} 
+                  alt="Ava Blackwood" 
+                  className="w-full rounded-lg shadow-2xl"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
+              </div>
+              
+              {/* Quick Stats */}
+              <div className="mt-8 space-y-4">
+                <div className="flex items-center gap-3 text-gray-700">
+                  <BookOpen size={20} className="text-burgundy" />
+                  <span className="font-medium">{getAllBooks().length} Published Books</span>
+                </div>
+                <div className="flex items-center gap-3 text-gray-700">
+                  <Award size={20} className="text-burgundy" />
+                  <span className="font-medium">Dark Academia Specialist</span>
+                </div>
+                <div className="flex items-center gap-3 text-gray-700">
+                  <Pen size={20} className="text-burgundy" />
+                  <span className="font-medium">Romance Author</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Biography Content */}
+          <div className="lg:col-span-2 space-y-8">
+            <div>
+              <h2 className="text-3xl font-serif text-burgundy mb-6">Welcome to My World</h2>
+              <div className="prose prose-lg text-gray-700 space-y-6">
+                <p className="text-lg leading-relaxed">
+                  Welcome to the shadowy halls of academia, where passion and intellect collide in the most unexpected ways. 
+                  I'm Ava Blackwood, and I invite you to explore worlds where forbidden desires unfold against the backdrop 
+                  of prestigious institutions, ancient libraries, and moonlit courtyards.
+                </p>
+                
+                <p className="leading-relaxed">
+                  My stories delve deep into the complexities of power dynamics, the intoxicating allure of the forbidden, 
+                  and the delicate dance between mentorship and desire. Each tale is carefully crafted to explore the 
+                  psychological depths of human connection, where every glance carries weight and every word holds power.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-2xl font-serif text-burgundy mb-4">My Writing Journey</h3>
+              <div className="prose text-gray-700 space-y-4">
+                <p>
+                  Drawing from my background in literature and behavioral psychology, I bring a unique perspective to 
+                  the romance genre. My fascination with the intricate workings of the human psyche, combined with 
+                  a deep appreciation for academic settings, naturally led me to the dark academia genre.
+                </p>
+                
+                <p>
+                  I believe that the most compelling stories are born from the tension between what we desire and 
+                  what we're told we cannot have. In my novels, you'll find characters who challenge boundaries, 
+                  question authority, and ultimately discover that the heart wants what it wants—regardless of 
+                  the consequences.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-2xl font-serif text-burgundy mb-4">What Drives My Stories</h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-muted p-6 rounded-lg">
+                  <h4 className="font-semibold text-burgundy mb-3">Dark Academia</h4>
+                  <p className="text-gray-700 text-sm">
+                    The mysterious allure of ancient institutions, secret societies, and the pursuit of forbidden knowledge.
+                  </p>
+                </div>
+                <div className="bg-muted p-6 rounded-lg">
+                  <h4 className="font-semibold text-burgundy mb-3">Power Dynamics</h4>
+                  <p className="text-gray-700 text-sm">
+                    Exploring the complex interplay between authority and submission, mentorship and desire.
+                  </p>
+                </div>
+                <div className="bg-muted p-6 rounded-lg">
+                  <h4 className="font-semibold text-burgundy mb-3">Psychological Depth</h4>
+                  <p className="text-gray-700 text-sm">
+                    Characters with rich inner lives, complex motivations, and authentic emotional journeys.
+                  </p>
+                </div>
+                <div className="bg-muted p-6 rounded-lg">
+                  <h4 className="font-semibold text-burgundy mb-3">Slow-Burn Romance</h4>
+                  <p className="text-gray-700 text-sm">
+                    Building tension through meaningful glances, charged conversations, and emotional intimacy.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-2xl font-serif text-burgundy mb-4">Beyond the Page</h3>
+              <div className="prose text-gray-700 space-y-4">
+                <p>
+                  When I'm not crafting tales of forbidden romance, you'll find me exploring historic libraries, 
+                  studying in cozy coffee shops, or wandering through university campuses that inspire my settings. 
+                  I'm an avid reader of classical literature, psychology texts, and contemporary romance.
+                </p>
+                
+                <p>
+                  I believe in the power of stories to help us understand ourselves and others more deeply. 
+                  Through my work, I hope to create a safe space where readers can explore complex emotions 
+                  and relationships, finding both escape and insight within the pages.
+                </p>
+              </div>
+            </div>
+
+            {/* Call to Action */}
+            <div className="bg-burgundy text-white p-8 rounded-lg">
+              <h3 className="text-2xl font-serif mb-4">Join My Literary Journey</h3>
+              <p className="mb-6">
+                Stay connected for exclusive content, behind-the-scenes insights, and early access to new releases. 
+                Let's explore the shadows of academia together.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  className="gold-button flex-1" 
+                  onClick={() => setCurrentPage('books')}
+                >
+                  <BookOpen size={16} className="mr-2" />
+                  Explore My Books
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1 border-white text-white hover:bg-white hover:text-burgundy"
+                  onClick={() => setCurrentPage('contact')}
+                >
+                  <Mail size={16} className="mr-2" />
+                  Get In Touch
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -700,7 +845,7 @@ function App() {
 
   const ContactPage = () => ( <div><ContactForm /></div> );
   
-  // --- UPDATED: Footer Component with Proper Colors ---
+  // --- Footer Component ---
   const Footer = () => (
     <footer className="burgundy-section py-16 px-4 mt-16">
       <div className="max-w-7xl mx-auto">
