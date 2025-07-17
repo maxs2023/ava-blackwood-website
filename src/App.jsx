@@ -874,7 +874,7 @@ function App() {
             </ul>
           </div>
           
-          <div>
+          {/* <div>
             <h4 className="text-lg font-semibold mb-4 text-white">Connect</h4>
             <p className="text-gray-300 mb-4">
               Follow my journey and get the latest updates on new releases and exclusive content.
@@ -882,8 +882,8 @@ function App() {
             <div className="flex items-center gap-2 text-gray-300">
               <Mail size={16} />
               <span className="text-sm">Newsletter subscribers get first access to new releases</span>
-            </div>
-          </div>
+            </div> */}
+          {/* </div> */}
         </div>
         
         {/* Copyright */}
