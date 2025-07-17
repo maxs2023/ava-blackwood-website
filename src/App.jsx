@@ -140,55 +140,11 @@ const booksData = {
   ]
 };
 
-
-// --- START: NEW BLOG POST DATA ---
-const blogPostsData = [
-  {
-    id: 1,
-    title: "The Allure of the Forbidden: Crafting Dark Academia",
-    date: "July 15, 2025",
-    author: "Ava Blackwood",
-    summary: "A deep dive into the magnetic pull of dark academia, exploring its core themes of ambition, forbidden knowledge, and the intoxicating dance between power and desire...",
-    content: `
-      <p>There's a unique magic to the hallowed halls of academia. The scent of old books, the hushed whispers in a grand library, the palpable weight of history—it's a world brimming with secrets waiting to be unearthed. This is the world of Dark Academia, and it's a genre that has utterly captivated me, both as a reader and a writer.</p>
-      <p>At its heart, Dark Academia is about the pursuit of knowledge, but often at a perilous cost. It explores the lines we cross for ambition, the moral compromises we make for greatness, and the intoxicating allure of the forbidden. In my novels like "Playing with Fire," I sought to capture this tension—the intellectual spark between a professor and student that threatens to ignite into a consuming flame.</p>
-      <p>The aesthetic is just as crucial as the themes. Think tweed jackets, Gothic architecture, late-night study sessions illuminated by a single desk lamp, and the melancholic beauty of a rain-streaked window. These elements create an atmosphere that is both intellectual and deeply sensual, a perfect backdrop for the complex, often dangerous, relationships that unfold.</p>
-      <p>Why are we so drawn to these stories? Perhaps it's because they reflect our own deepest desires for meaning, passion, and a connection to something greater than ourselves, even if that path is fraught with darkness. It's a reminder that the most profound lessons are often learned not in the classroom, but in the hidden corridors of the human heart.</p>
-    `
-  },
-  {
-    id: 2,
-    title: "Behind the Veil: The Inspiration for 'Preludes of Desire'",
-    date: "July 02, 2025",
-    author: "Ava Blackwood",
-    summary: "Ever wonder where a story begins? For 'Preludes of Desire', it started not with a plot, but with a sound—the haunting melody of a piano echoing through an empty conservatory...",
-    content: `
-      <p>Every book has its own origin story. Some arrive in a flash of inspiration, a fully-formed plot demanding to be written. Others, like "Preludes of Desire," begin more subtly. For this story, it was a sound: the haunting melody of a piano, played with a mix of technical brilliance and raw, untamed emotion, echoing through an empty conservatory.</p>
-      <p>I imagined Evelina, my seventeen-year-old prodigy, pouring all her frustrations, ambitions, and nascent desires into the keys. The piano isn't just an instrument for her; it's her armor, her voice, her method of control in a world that feels overwhelming. But what happens when she meets someone who can read the music of her soul? Someone who understands the dissonance and the longing hidden beneath the polished surface?</p>
-      <p>That's where her enigmatic professor comes in. Their relationship is a duet of control and surrender, a complex composition where every note is fraught with unspoken meaning. The conservatory setting was vital, providing a stage for this intimate, high-stakes performance of passion and power. It's a story about art, obsession, and the moment a student's talent becomes so profound it threatens to eclipse the master's.</p>
-    `
-  },
-  {
-    id: 3,
-    title: "My Writing Ritual: Coffee, Candlelight, and Chaos",
-    date: "June 21, 2025",
-    author: "Ava Blackwood",
-    summary: "Readers often ask about my writing process. Is it structured and serene, or a whirlwind of creative chaos? The truth, as with my stories, lies somewhere in between...",
-    content: `
-      <p>The writer's life is often romanticized—a solitary genius typing away in a charming, sun-drenched study. While I wish I could claim such elegant serenity, my process is a bit more... chaotic. It's a ritual, to be sure, but one that embraces the beautiful mess of creation.</p>
-      <p>It always starts with coffee. Strong, black, and in a mug that feels just right for the day's mood. Then comes the atmosphere. I'm a firm believer in setting the scene, even for myself. For my Dark Academia tales, this means low light, perhaps a single scented candle (sandalwood or old parchment are favorites), and a curated playlist of classical or ambient music. It helps me slip into the world I'm trying to build.</p>
-      <p>The 'chaos' part comes from the writing itself. I'm not a meticulous outliner. I start with a character, a feeling, a core conflict, and let the story guide me. There are days of furious typing where the words flow effortlessly, and then there are days spent staring at a blinking cursor, wrestling with a single sentence. Both are part of the dance.</p>
-      <p>It's a process of surrendering to the story, of letting the characters surprise me. And through all the coffee, candlelight, and chaos, I find my way to 'The End,' ready to start the dance all over again.</p>
-    `
-  }
-];
-// --- END: NEW BLOG POST DATA ---
-
-
 // --- Newsletter Signup Component (Updated) ---
 const NewsletterSignup = ({ variant, className }) => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // --- NEW: Added 'duplicate' status ---
   const [submitStatus, setSubmitStatus] = useState(null); // null, 'success', 'error', 'invalid_email', 'duplicate'
 
   const handleSubmit = async (e) => {
@@ -203,6 +159,7 @@ const NewsletterSignup = ({ variant, className }) => {
     setIsSubmitting(true);
 
     try {
+      // --- NEW: Fetching directly to handle specific error codes ---
       const response = await fetch('/api/send-newsletter-welcome', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -214,8 +171,10 @@ const NewsletterSignup = ({ variant, className }) => {
         setEmail('');
         trackEvent('newsletter_signup', { method: 'Website Form' });
       } else if (response.status === 409) {
+        // --- NEW: Handle duplicate email case ---
         setSubmitStatus('duplicate');
       } else {
+        // Handle other server errors
         setSubmitStatus('error');
       }
     } catch (error) {
@@ -272,6 +231,7 @@ const NewsletterSignup = ({ variant, className }) => {
             Please enter a valid email address.
           </div>
         )}
+        {/* --- NEW: Message for duplicate email --- */}
         {submitStatus === 'duplicate' && (
            <div className="text-yellow-400 text-center mt-2">
             This email address is already subscribed.
@@ -357,7 +317,6 @@ const ContactForm = () => {
   );
 };
 
-
 // --- Main App Component and Page Structure ---
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -428,13 +387,7 @@ function App() {
             </div>
             <div className="flex justify-center">
               <div className="book-card bg-white p-4 rounded-lg shadow-2xl max-w-sm">
-                <div className="w-full h-80 bg-gray-100 rounded-md overflow-hidden">
-                  <img 
-                    src={booksData.darkAcademia[0].cover} 
-                    alt="Latest Book" 
-                    className="w-full h-full object-contain"
-                  />
-                </div>
+                <img src={booksData.darkAcademia[0].cover} alt="Latest Book" className="w-full rounded-md" />
                 <h3 className="text-xl font-serif text-burgundy mt-4 text-center">{booksData.darkAcademia[0].title}</h3>
               </div>
             </div>
@@ -448,13 +401,7 @@ function App() {
             {booksData.darkAcademia.slice(0, 3).map((book) => (
               <Card key={book.id} className="book-card cursor-pointer">
                 <CardContent className="p-6">
-                  <div className="w-full h-64 bg-gray-100 rounded-md overflow-hidden mb-4">
-                    <img 
-                      src={book.cover} 
-                      alt={book.title} 
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
+                  <img src={book.cover} alt={book.title} className="w-full h-64 object-cover rounded-md mb-4" />
                   <h3 className="text-xl font-serif text-burgundy mb-2">{book.title}</h3>
                   <p className="text-gray-600 text-sm mb-4 line-clamp-3">{book.description}</p>
                   <Button className="w-full gold-button" onClick={() => handleAmazonClick(book)}>
@@ -472,6 +419,7 @@ function App() {
   const BooksPage = () => (
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-serif text-burgundy mb-4">My Books</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -480,6 +428,7 @@ function App() {
           </p>
         </div>
 
+        {/* Genre Filter */}
         <div className="flex justify-center mb-8">
           <div className="flex flex-wrap gap-2">
             <Button
@@ -513,18 +462,18 @@ function App() {
           </div>
         </div>
 
+        {/* Books Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {getFilteredBooks().map((book) => (
             <Card key={book.id} className="book-card hover:shadow-lg transition-shadow duration-300">
               <CardContent className="p-6">
                 <div className="relative mb-4">
-                  <div className="w-full h-80 bg-gray-100 rounded-md overflow-hidden">
-                    <img 
-                      src={book.cover} 
-                      alt={book.title} 
-                      className="w-full h-full object-contain shadow-md"
-                    />
-                  </div>
+                  <img 
+                    src={book.cover} 
+                    alt={book.title} 
+                    className="w-full h-80 object-cover rounded-md shadow-md" 
+                    style={{ aspectRatio: '3/4' }}
+                  />
                   <Badge className="absolute top-2 right-2 bg-burgundy text-white">
                     {book.genre}
                   </Badge>
@@ -572,6 +521,7 @@ function App() {
           ))}
         </div>
 
+        {/* Newsletter Signup Section */}
         <div className="mt-16">
           <NewsletterSignup />
         </div>
@@ -580,87 +530,7 @@ function App() {
   );
 
   const AboutPage = () => ( <div>...</div> );
-
-  // --- START: NEW BLOG PAGE COMPONENT ---
-  const BlogPage = () => {
-    const [selectedPost, setSelectedPost] = useState(null);
-
-    // Navigate to a single post view
-    const handlePostClick = (post) => {
-      setSelectedPost(post);
-      window.scrollTo(0, 0); // Scroll to top when a post is selected
-    };
-
-    // Return to the main blog list
-    const handleBackClick = () => {
-      setSelectedPost(null);
-    };
-
-    // --- Single Post View ---
-    if (selectedPost) {
-      return (
-        <div className="min-h-screen py-12 px-4 bg-muted">
-          <div className="max-w-3xl mx-auto">
-            <Button variant="outline" onClick={handleBackClick} className="mb-8 bg-white">
-              &larr; Back to All Posts
-            </Button>
-            <Card className="bg-white">
-              <CardHeader>
-                <CardTitle className="text-4xl font-serif text-burgundy">{selectedPost.title}</CardTitle>
-                <CardDescription className="flex items-center gap-4 text-sm text-gray-500 pt-2">
-                  <span className="flex items-center gap-2"><User size={14} /> {selectedPost.author}</span>
-                  <span className="flex items-center gap-2"><Calendar size={14} /> {selectedPost.date}</span>
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div 
-                  className="blog-content text-lg text-charcoal" 
-                  dangerouslySetInnerHTML={{ __html: selectedPost.content }} 
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      );
-    }
-
-    // --- Main Blog List View ---
-    return (
-      <div className="min-h-screen py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-5xl font-serif text-burgundy mb-4">From the Desk of Ava Blackwood</h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Musings on writing, romance, and the shadows in between.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-            {blogPostsData.map((post) => (
-              <Card key={post.id} className="flex flex-col hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="text-2xl font-serif text-burgundy line-clamp-2">{post.title}</CardTitle>
-                  <CardDescription className="text-xs text-gray-500">
-                    {post.date} &bull; {post.author}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <p className="text-gray-700 text-sm line-clamp-4">{post.summary}</p>
-                </CardContent>
-                <div className="p-6 pt-0 mt-auto">
-                  <Button variant="link" onClick={() => handlePostClick(post)} className="p-0 text-burgundy font-semibold">
-                    Read More &rarr;
-                  </Button>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
-  // --- END: NEW BLOG PAGE COMPONENT ---
-
+  const BlogPage = () => ( <div>...</div> );
   const ContactPage = () => ( <div><ContactForm /></div> );
   const Footer = () => ( <footer>...</footer> );
   
