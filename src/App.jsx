@@ -715,7 +715,7 @@ function App() {
             </div>
 
             {/* Call to Action */}
-            <div className="bg-burgundy text-white p-8 rounded-lg">
+            <div className="bg-burgundy text-burgundy p-8 rounded-lg">
               <h3 className="text-2xl font-serif mb-4">Join My Literary Journey</h3>
               <p className="mb-6">
                 Stay connected for exclusive content, behind-the-scenes insights, and early access to new releases. 
