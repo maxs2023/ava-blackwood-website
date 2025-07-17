@@ -203,13 +203,13 @@ const NewsletterSignup = ({ variant, className }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="flex-1 px-4 py-3 rounded-lg text-charcoal border-0 focus:ring-2 focus:ring-gold"
+              className="flex-1 px-4 py-3 rounded-lg text-gray-900 border-0 focus:ring-2 focus:ring-accent"
               placeholder="Enter your email address"
             />
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-gold text-charcoal px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors disabled:opacity-50 whitespace-nowrap"
+              className="gold-button px-6 py-3 rounded-lg font-semibold whitespace-nowrap"
             >
               {isSubmitting ? 'Subscribing...' : 'Subscribe'}
             </button>
@@ -241,7 +241,7 @@ const NewsletterSignup = ({ variant, className }) => {
   }
 
   return (
-    <div className={`${isCompact ? '' : 'bg-charcoal text-cream p-8 rounded-lg'} ${className || ''}`}>
+    <div className={`${isCompact ? '' : 'bg-gray-800 text-white p-8 rounded-lg'} ${className || ''}`}>
       {!isCompact && (
         <>
           <h3 className="text-2xl font-bold mb-4">Join My Newsletter</h3>
@@ -256,7 +256,7 @@ const NewsletterSignup = ({ variant, className }) => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-lg text-charcoal"
+            className="w-full px-4 py-3 rounded-lg text-gray-900"
             placeholder="Enter your email address"
           />
         </div>
@@ -264,7 +264,7 @@ const NewsletterSignup = ({ variant, className }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-gold text-charcoal py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90 transition-colors disabled:opacity-50"
+          className="w-full gold-button py-3 px-6 rounded-lg font-semibold"
         >
           {isSubmitting ? 'Subscribing...' : 'Subscribe'}
         </button>
@@ -343,22 +343,22 @@ const ContactForm = () => {
       <h2 className="text-3xl font-bold text-burgundy mb-6">Contact Me</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-charcoal mb-2">Name *</label>
-          <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Your full name" />
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+          <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900" placeholder="Your full name" />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-charcoal mb-2">Email *</label>
-          <input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="your.email@example.com" />
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+          <input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900" placeholder="your.email@example.com" />
         </div>
         <div>
-          <label htmlFor="subject" className="block text-sm font-medium text-charcoal mb-2">Subject *</label>
-          <input type="text" id="subject" name="subject" value={formData.subject} onChange={handleInputChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="What's this about?" />
+          <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
+          <input type="text" id="subject" name="subject" value={formData.subject} onChange={handleInputChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900" placeholder="What's this about?" />
         </div>
         <div>
-          <label htmlFor="message" className="block text-sm font-medium text-charcoal mb-2">Message *</label>
-          <textarea id="message" name="message" value={formData.message} onChange={handleInputChange} required rows={6} className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Your message..."></textarea>
+          <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+          <textarea id="message" name="message" value={formData.message} onChange={handleInputChange} required rows={6} className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900" placeholder="Your message..."></textarea>
         </div>
-        <button type="submit" disabled={isSubmitting} className="w-full bg-burgundy text-cream py-3 px-6 rounded-lg font-semibold">
+        <button type="submit" disabled={isSubmitting} className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary/90">
           {isSubmitting ? 'Sending...' : 'Send Message'}
         </button>
         {submitStatus === 'success' && <div className="p-4 bg-green-100 text-green-700 rounded-lg">Thank you! Your message has been sent.</div>}
@@ -494,28 +494,28 @@ function App() {
             <Button
               variant={selectedGenre === 'all' ? 'default' : 'outline'}
               onClick={() => setSelectedGenre('all')}
-              className={selectedGenre === 'all' ? 'bg-burgundy text-white' : ''}
+              className={selectedGenre === 'all' ? 'bg-primary text-white' : 'text-gray-700 border-gray-300 hover:text-burgundy'}
             >
               All Books ({getAllBooks().length})
             </Button>
             <Button
               variant={selectedGenre === 'darkAcademia' ? 'default' : 'outline'}
               onClick={() => setSelectedGenre('darkAcademia')}
-              className={selectedGenre === 'darkAcademia' ? 'bg-burgundy text-white' : ''}
+              className={selectedGenre === 'darkAcademia' ? 'bg-primary text-white' : 'text-gray-700 border-gray-300 hover:text-burgundy'}
             >
               Dark Academia ({booksData.darkAcademia.length})
             </Button>
             <Button
               variant={selectedGenre === 'medical' ? 'default' : 'outline'}
               onClick={() => setSelectedGenre('medical')}
-              className={selectedGenre === 'medical' ? 'bg-burgundy text-white' : ''}
+              className={selectedGenre === 'medical' ? 'bg-primary text-white' : 'text-gray-700 border-gray-300 hover:text-burgundy'}
             >
               Medical Romance ({booksData.medical.length})
             </Button>
             <Button
               variant={selectedGenre === 'sports' ? 'default' : 'outline'}
               onClick={() => setSelectedGenre('sports')}
-              className={selectedGenre === 'sports' ? 'bg-burgundy text-white' : ''}
+              className={selectedGenre === 'sports' ? 'bg-primary text-white' : 'text-gray-700 border-gray-300 hover:text-burgundy'}
             >
               Sports Romance ({booksData.sports.length})
             </Button>
@@ -534,7 +534,7 @@ function App() {
                       className="w-full h-full object-contain shadow-md"
                     />
                   </div>
-                  <Badge className="absolute top-2 right-2 bg-burgundy text-white">
+                  <Badge className="absolute top-2 right-2 bg-primary text-white">
                     {book.genre}
                   </Badge>
                 </div>
@@ -569,7 +569,7 @@ function App() {
                   </p>
                   
                   <Button 
-                    className="w-full bg-burgundy hover:bg-burgundy/90 text-white" 
+                    className="w-full bg-primary hover:bg-primary/90 text-white" 
                     onClick={() => handleAmazonClick(book)}
                   >
                     <ExternalLink size={16} className="mr-2" />
@@ -631,7 +631,7 @@ function App() {
     };
 
     if (loading) {
-      return <div className="text-center py-20">Loading posts...</div>;
+      return <div className="text-center py-20 text-gray-600">Loading posts...</div>;
     }
     if (error) {
       return <div className="text-center py-20 text-red-500">{error}</div>;
@@ -641,7 +641,7 @@ function App() {
       return (
         <div className="min-h-screen py-12 px-4 bg-muted">
           <div className="max-w-3xl mx-auto">
-            <Button variant="outline" onClick={handleBackClick} className="mb-8 bg-white">
+            <Button variant="outline" onClick={handleBackClick} className="mb-8 bg-white text-gray-700 border-gray-300 hover:text-burgundy">
               &larr; Back to All Posts
             </Button>
             <Card className="bg-white">
@@ -653,7 +653,7 @@ function App() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="blog-content text-lg text-charcoal">
+                <div className="blog-content text-lg text-gray-700">
                   <PortableText value={selectedPost.body} />
                 </div>
               </CardContent>
@@ -686,7 +686,7 @@ function App() {
                   <p className="text-gray-700 text-sm line-clamp-4">A look inside the latest musings from Ava Blackwood...</p>
                 </CardContent>
                 <div className="p-6 pt-0 mt-auto">
-                  <Button variant="link" onClick={() => handlePostClick(post)} className="p-0 text-burgundy font-semibold">
+                  <Button variant="link" onClick={() => handlePostClick(post)} className="p-0 text-burgundy font-semibold hover:text-burgundy/80">
                     Read More &rarr;
                   </Button>
                 </div>
@@ -700,9 +700,9 @@ function App() {
 
   const ContactPage = () => ( <div><ContactForm /></div> );
   
-  // --- UPDATED: Prominent Footer Component with Newsletter ---
+  // --- UPDATED: Footer Component with Proper Colors ---
   const Footer = () => (
-    <footer className="bg-burgundy text-white py-16 px-4 mt-16">
+    <footer className="burgundy-section py-16 px-4 mt-16">
       <div className="max-w-7xl mx-auto">
         {/* Newsletter Section */}
         <div className="mb-12">
@@ -712,14 +712,14 @@ function App() {
         {/* Footer Content */}
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div>
-            <h3 className="text-2xl font-serif font-bold mb-4">Ava Blackwood</h3>
+            <h3 className="text-2xl font-serif font-bold mb-4 text-white">Ava Blackwood</h3>
             <p className="text-gray-300 mb-4">
               Crafting tales of passion, power, and forbidden desire in the shadows of academia.
             </p>
           </div>
           
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-lg font-semibold mb-4 text-white">Quick Links</h4>
             <ul className="space-y-2">
               <li><button onClick={() => setCurrentPage('home')} className="text-gray-300 hover:text-white transition-colors">Home</button></li>
               <li><button onClick={() => setCurrentPage('books')} className="text-gray-300 hover:text-white transition-colors">Books</button></li>
@@ -730,7 +730,7 @@ function App() {
           </div>
           
           <div>
-            <h4 className="text-lg font-semibold mb-4">Connect</h4>
+            <h4 className="text-lg font-semibold mb-4 text-white">Connect</h4>
             <p className="text-gray-300 mb-4">
               Follow my journey and get the latest updates on new releases and exclusive content.
             </p>
@@ -742,7 +742,7 @@ function App() {
         </div>
         
         {/* Copyright */}
-        <div className="border-t border-burgundy-light pt-8 text-center text-gray-300">
+        <div className="border-t border-gray-600 pt-8 text-center text-gray-300">
           <p>&copy; 2024 Ava Blackwood. All rights reserved.</p>
         </div>
       </div>
