@@ -21,35 +21,47 @@ export default async function handler(req, res) {
   }
 
   try {
+    // --- Enhanced Logging: Check for environment variables ---
+    console.log("Newsletter function started.");
+    if (!process.env.RESEND_API_KEY) {
+        console.error("Server Error: RESEND_API_KEY is not set.");
+    }
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+        console.error("Server Error: Supabase environment variables are not set.");
+    }
+    if (!supabase) {
+        console.error("Server Error: Supabase client failed to initialize.");
+    }
+
     const { email, name = '' } = req.body;
 
     // Validate input
     if (!email) {
+      console.log("Validation failed: Email is required.");
       return res.status(400).json({ error: 'Email is required' });
     }
 
     // --- Step 1: Insert data into Supabase ---
-    // This is the most critical step. If it fails, we stop.
+    console.log(`Attempting to insert email: ${email} into 'subscribers' table.`);
     const { data: supabaseData, error: supabaseError } = await supabase
       .from('subscribers')
       .insert([{ email, name }])
-      .select() // Use .select() to get the inserted data back
-      .single(); // Expecting a single record
+      .select()
+      .single();
 
     if (supabaseError) {
-      // Log the detailed error for debugging
-      console.error('Supabase error:', supabaseError.message);
-      // Provide a generic error to the client
-      return res.status(500).json({ error: 'Failed to save subscriber to the database.' });
+      console.error('Supabase Error:', supabaseError.message);
+      return res.status(500).json({ error: `Database Error: ${supabaseError.message}` });
     }
+    console.log("Successfully inserted into Supabase.");
 
     // --- Step 2: Send emails (Welcome and Notification) ---
-    // These are secondary. We can attempt to send them even if one fails.
+    console.log("Attempting to send emails...");
     const welcomeEmailPromise = resend.emails.send({
         from: 'newsletter@avablackwood.com',
         to: [email],
         subject: 'Welcome to Ava Blackwood\'s Dark Academia World',
-        html: `<div>...welcome email content...</div>`, // Keeping it brief
+        html: `<div>...welcome email content...</div>`,
     });
 
     const notificationEmailPromise = resend.emails.send({
@@ -59,10 +71,9 @@ export default async function handler(req, res) {
         html: `<p>New subscriber: ${email}</p>`,
     });
 
-    // Use Promise.allSettled to wait for both emails, regardless of success or failure
     const emailResults = await Promise.allSettled([welcomeEmailPromise, notificationEmailPromise]);
+    console.log("Email sending process completed.");
 
-    // Optional: Log any email sending failures for monitoring
     emailResults.forEach((result, index) => {
         if (result.status === 'rejected') {
             const emailType = index === 0 ? 'Welcome Email' : 'Notification Email';
@@ -71,11 +82,11 @@ export default async function handler(req, res) {
     });
 
     // --- Step 3: Return success response ---
-    // The primary operation (database insert) was successful.
+    console.log("Function finished successfully. Sending 200 response.");
     return res.status(200).json({ success: true, data: supabaseData });
 
   } catch (error) {
-    console.error('A server error occurred in newsletter handler:', error);
-    return res.status(500).json({ error: 'A server error occurred. Please try again later.' });
+    console.error('Unhandled Server Error in newsletter handler:', error);
+    return res.status(500).json({ error: 'A server error occurred. Please check the logs.' });
   }
 }
