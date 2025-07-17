@@ -51,73 +51,19 @@ const sanitizeInput = (input) => {
 };
 
 
-// --- Updated Book Data with Real Information from Amazon ---
+// --- Sample Book Data ---
 const booksData = {
   darkAcademia: [
-    { 
-      id: 1, 
-      title: "Playing with Fire", 
-      fullTitle: "Playing with Fire: A Dark-Academia Romance of Power, Desire, and Restraint",
-      description: "Delve into Playing with Fire, where the forbidden allure of a professor-student romance ignites amidst the storied halls of Blackwood Academy. A Dark-Academia Romance of Power, Desire, and Restraint.", 
-      amazonUrl: "https://www.amazon.com/Playing-Fire-Dark-Academia-Romance-Restraint-ebook/dp/B0F99HK62", 
-      publishDate: "2024", 
-      series: "Dark Academia", 
-      cover: "https://m.media-amazon.com/images/I/51VLItWRuYL._AC_CR0%2C0%2C0%2C0_SY315_.jpg" 
-    },
-    { 
-      id: 2, 
-      title: "Control and Release", 
-      fullTitle: "Control and Release: A Dark Academia Romance",
-      description: "Control and Release is an electrifying exploration of forbidden attraction and the intricate dance of power dynamics in academia.", 
-      amazonUrl: "https://www.amazon.com/Control-Release-Ava-Blackwood-ebook/dp/B0F9FQMW9L", 
-      publishDate: "2024", 
-      series: "Dark Academia", 
-      cover: "https://placehold.co/300x450/800020/FFFFFF?text=Control+and+Release" 
-    },
-    { 
-      id: 3, 
-      title: "Preludes of Desire", 
-      fullTitle: "Preludes of Desire: A Dark Academia Romance",
-      description: "Seventeen-year-old piano prodigy Evelina Moreau has always used her music to control the world around her. A captivating tale of music, passion, and forbidden desire.", 
-      amazonUrl: "https://www.amazon.com/Preludes-Desire-Ava-Blackwood/dp/B0F91VK6GX", 
-      publishDate: "2024", 
-      series: "Dark Academia", 
-      cover: "https://placehold.co/300x450/4A4A4A/FFFFFF?text=Preludes+of+Desire" 
-    },
-    { 
-      id: 4, 
-      title: "En Pointe", 
-      fullTitle: "En Pointe: Romance Edition",
-      description: "En Pointe is a story of passion, ambition, and forbidden love set against the backdrop of the illustrious Opéra Garnier.", 
-      amazonUrl: "https://www.amazon.com/En-Pointe-Ava-Blackwood-ebook/dp/B0F9PQNGSG", 
-      publishDate: "2024", 
-      series: "Standalone", 
-      cover: "https://m.media-amazon.com/images/I/51VLItWRuYL._AC_CR0%2C0%2C0%2C0_SY315_.jpg" 
-    }
+    { id: 1, title: "Playing with Fire", description: "Delve into Playing with Fire, where the forbidden allure of a professor-student romance ignites amidst the storied halls of Blackwood Academy.", amazonUrl: "https://www.amazon.com/Playing-Fire-Romance-Ava-Blackwood-ebook/dp/B0F9PYXD8R", publishDate: "2024", series: "Blackwood Academy", cover: "https://placehold.co/300x450/231F20/FFFFFF?text=Playing+with+Fire" },
+    { id: 2, title: "Control and Release", description: "Control and Release is an electrifying exploration of forbidden attraction and the intricate dance of power dynamics in academia.", amazonUrl: "https://www.amazon.com/Control-Release-Ava-Blackwood-ebook/dp/B0F9FQMW9L", publishDate: "2024", series: "Blackwood Academy", cover: "https://placehold.co/300x450/800020/FFFFFF?text=Control+and+Release" },
+    { id: 3, title: "Preludes of Desire", description: "Seventeen-year-old piano prodigy Evelina Moreau has always used her music to control the world around her.", amazonUrl: "https://www.amazon.com/Preludes-Desire-Ava-Blackwood/dp/B0F91VK6GX", publishDate: "2024", series: "Standalone", cover: "https://placehold.co/300x450/4A4A4A/FFFFFF?text=Preludes+of+Desire" },
+    { id: 4, title: "En Pointe", description: "En Pointe is a story of passion, ambition, and forbidden love set against the backdrop of the illustrious Opéra Garnier.", amazonUrl: "https://www.amazon.com/En-Pointe-Ava-Blackwood-ebook/dp/B0F9PQNGSG", publishDate: "2024", series: "Standalone", cover: "https://placehold.co/300x450/D3D3D3/000000?text=En+Pointe" }
   ],
   medical: [
-    { 
-      id: 5, 
-      title: "Under Surgical Lights", 
-      fullTitle: "Under Surgical Lights: A Medical Romance",
-      description: "A provocative medical romance exploring power dynamics in the high-stakes world of surgery.", 
-      amazonUrl: "https://www.amazon.com/Under-Surgical-Lights-Ava-Blackwood/dp/B0F9FTLSC3", 
-      publishDate: "2024", 
-      series: "Medical Romance", 
-      cover: "https://placehold.co/300x450/ADD8E6/000000?text=Under+Surgical+Lights" 
-    }
+    { id: 5, title: "Under Surgical Lights", description: "A provocative medical romance exploring power dynamics in the high-stakes world of surgery.", amazonUrl: "https://www.amazon.com/Under-Surgical-Lights-Ava-Blackwood/dp/B0F9FTLSC3", publishDate: "2024", series: "Medical Romance", cover: "https://placehold.co/300x450/ADD8E6/000000?text=Under+Surgical+Lights" }
   ],
   sports: [
-    { 
-      id: 6, 
-      title: "Volley of Temptation", 
-      fullTitle: "Volley of Temptation: A Dark-Academia Sports Romance",
-      description: "A dark academia sports romance that explores the tension between competition and desire on the volleyball court.", 
-      amazonUrl: "https://www.amazon.com/Volley-Temptation-Romance-Ava-Blackwood-ebook/dp/B0F9Q1K3GD", 
-      publishDate: "2024", 
-      series: "Dark Academia Sports", 
-      cover: "https://m.media-amazon.com/images/I/619RlXfpFUL._AC_CR0%2C0%2C0%2C0_SY315_.jpg" 
-    }
+    { id: 6, title: "Volley of Temptation", description: "A dark academia sports romance that explores the tension between competition and desire.", amazonUrl: "https://www.amazon.com/Volley-Temptation-Romance-Ava-Blackwood-ebook/dp/B0F9Q1K3GD", publishDate: "2024", series: "Sports Romance", cover: "https://placehold.co/300x450/006400/FFFFFF?text=Volley+of+Temptation" }
   ]
 };
 
@@ -348,8 +294,8 @@ function App() {
             </div>
             <div className="flex justify-center">
               <div className="book-card bg-white p-4 rounded-lg shadow-2xl max-w-sm">
-                <img src={booksData.darkAcademia[0].cover} alt="Latest Book" className="w-full rounded-md" />
-                <h3 className="text-xl font-serif text-burgundy mt-4 text-center">{booksData.darkAcademia[0].title}</h3>
+                <img src="https://placehold.co/300x450/231F20/FFFFFF?text=Playing+with+Fire" alt="Latest Book" className="w-full rounded-md" />
+                <h3 className="text-xl font-serif text-burgundy mt-4 text-center">Playing with Fire</h3>
               </div>
             </div>
           </div>
