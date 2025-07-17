@@ -717,7 +717,7 @@ function App() {
             {/* Call to Action */}
             <div className="bg-burgundy text-burgundy p-8 rounded-lg">
               <h3 className="text-2xl font-serif mb-4">Join My Literary Journey</h3>
-              <p className="mb-6">
+              <p className="prose text-gray-700 space-y-4">
                 Stay connected for exclusive content, behind-the-scenes insights, and early access to new releases. 
                 Let's explore the shadows of academia together.
               </p>
@@ -731,7 +731,7 @@ function App() {
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="flex-1 border-white text-white hover:bg-white hover:text-burgundy"
+                  className="gold-button flex-1"
                   onClick={() => setCurrentPage('contact')}
                 >
                   <Mail size={16} className="mr-2" />
