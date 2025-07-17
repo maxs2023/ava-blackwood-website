@@ -19,7 +19,7 @@ import enPointeCover from './assets/En Pointe.jpg'
 import underSurgicalLightsCover from './assets/Under Surgical Lights.jpg'
 import volleyOfTemptationCover from './assets/Volley of Temptation.jpg'
 
-// --- Analytics Component ---
+// --- Analytics Component ----
 const Analytics = () => {
   // IMPORTANT: Replace with your actual Google Analytics Measurement ID
   const GA_MEASUREMENT_ID = 'G-CLVD5YQKWB';
