@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea.jsx'
 import { BookOpen, Mail, ExternalLink, Calendar, User, Heart, Send } from 'lucide-react'
 import './App.css'
 
-// --- Analytics Component ---
+// --- Analytics Component  ---
 const Analytics = () => {
   // IMPORTANT: Replace with your actual Google Analytics Measurement ID
   const GA_MEASUREMENT_ID = 'G-CLVD5YQKWB';
