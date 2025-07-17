@@ -327,4 +327,25 @@ function App() {
   const BlogPage = () => ( <div>...</div> );
   const ContactPage = () => ( <div><ContactForm /></div> );
   const Footer = () => ( <footer>...</footer> );
-  const renderPage =
+  const renderPage = () => {
+    switch(currentPage) {
+      case 'home': return <HomePage />;
+      case 'books': return <BooksPage />;
+      case 'about': return <AboutPage />;
+      case 'blog': return <BlogPage />;
+      case 'contact': return <ContactPage />;
+      default: return <HomePage />;
+    }
+  };
+  return (
+    <div className="min-h-screen bg-background">
+      <Analytics />
+      <Navigation />
+      {renderPage()}
+      <Footer />
+    </div>
+  );
+}
+
+export { ContactForm, NewsletterSignup };
+export default App;
