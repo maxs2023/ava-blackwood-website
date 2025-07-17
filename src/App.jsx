@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input.jsx'
 import { Badge } from '@/components/ui/badge.jsx'
 import { Textarea } from '@/components/ui/textarea.jsx'
 import { BookOpen, Mail, ExternalLink, Calendar, User, Heart, Send } from 'lucide-react'
-import { sendContactEmail, isValidEmail, sanitizeInput } from './services/emailService'
 import './App.css'
 
 // --- Analytics Component ---
@@ -37,6 +36,18 @@ const trackEvent = (eventName, eventParams) => {
   } else {
     console.log(`Analytics event (not sent): ${eventName}`, eventParams);
   }
+};
+
+// --- Helper Functions ---
+const isValidEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const sanitizeInput = (input) => {
+  if (typeof input !== 'string') return '';
+  const scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+  return input.trim().replace(scriptRegex, '');
 };
 
 
@@ -184,8 +195,6 @@ const ContactForm = () => {
       message: sanitizeInput(formData.message),
     };
     try {
-      // Assuming sendContactEmail is defined elsewhere and works
-      // For simplicity, we are not changing this part.
       const response = await fetch('/api/send-contact-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -236,7 +245,7 @@ const ContactForm = () => {
   );
 };
 
-// --- Main App Component and Page Structure (Largely Unchanged) ---
+// --- Main App Component and Page Structure ---
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const handleAmazonClick = (book) => {
