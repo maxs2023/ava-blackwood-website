@@ -7,10 +7,14 @@ import { Textarea } from '@/components/ui/textarea.jsx'
 import { BookOpen, Mail, ExternalLink, Calendar, User, Heart, Send, Star } from 'lucide-react'
 import './App.css'
 
+// --- ADDED: Import the Sanity client and PortableText component ---
+import sanityClient from './sanityClient.js'
+import { PortableText } from '@portabletext/react'
+
 // Import book cover images
 import playingWithFireCover from './assets/Playing with Fire.jpg'
 import controlAndReleaseCover from './assets/Control and Release.jpg'
-import preludesOfDesireCover from './assets/Beneath the Scholar\'s Veil.jpg' // Using this as placeholder for Preludes
+import preludesOfDesireCover from './assets/Beneath the Scholar\'s Veil.jpg'
 import enPointeCover from './assets/En Pointe.jpg'
 import underSurgicalLightsCover from './assets/Under Surgical Lights.jpg'
 import volleyOfTemptationCover from './assets/Volley of Temptation.jpg'
@@ -58,7 +62,7 @@ const sanitizeInput = (input) => {
   return input.trim().replace(scriptRegex, '');
 };
 
-// --- Updated Book Data with Local Cover Images ---
+// --- Book Data ---
 const booksData = {
   darkAcademia: [
     { 
@@ -140,56 +144,11 @@ const booksData = {
   ]
 };
 
-
-// --- START: NEW BLOG POST DATA ---
-const blogPostsData = [
-  {
-    id: 1,
-    title: "The Allure of the Forbidden: Crafting Dark Academia",
-    date: "July 15, 2025",
-    author: "Ava Blackwood",
-    summary: "A deep dive into the magnetic pull of dark academia, exploring its core themes of ambition, forbidden knowledge, and the intoxicating dance between power and desire...",
-    content: `
-      <p>There's a unique magic to the hallowed halls of academia. The scent of old books, the hushed whispers in a grand library, the palpable weight of history—it's a world brimming with secrets waiting to be unearthed. This is the world of Dark Academia, and it's a genre that has utterly captivated me, both as a reader and a writer.</p>
-      <p>At its heart, Dark Academia is about the pursuit of knowledge, but often at a perilous cost. It explores the lines we cross for ambition, the moral compromises we make for greatness, and the intoxicating allure of the forbidden. In my novels like "Playing with Fire," I sought to capture this tension—the intellectual spark between a professor and student that threatens to ignite into a consuming flame.</p>
-      <p>The aesthetic is just as crucial as the themes. Think tweed jackets, Gothic architecture, late-night study sessions illuminated by a single desk lamp, and the melancholic beauty of a rain-streaked window. These elements create an atmosphere that is both intellectual and deeply sensual, a perfect backdrop for the complex, often dangerous, relationships that unfold.</p>
-      <p>Why are we so drawn to these stories? Perhaps it's because they reflect our own deepest desires for meaning, passion, and a connection to something greater than ourselves, even if that path is fraught with darkness. It's a reminder that the most profound lessons are often learned not in the classroom, but in the hidden corridors of the human heart.</p>
-    `
-  },
-  {
-    id: 2,
-    title: "Behind the Veil: The Inspiration for 'Preludes of Desire'",
-    date: "July 02, 2025",
-    author: "Ava Blackwood",
-    summary: "Ever wonder where a story begins? For 'Preludes of Desire', it started not with a plot, but with a sound—the haunting melody of a piano echoing through an empty conservatory...",
-    content: `
-      <p>Every book has its own origin story. Some arrive in a flash of inspiration, a fully-formed plot demanding to be written. Others, like "Preludes of Desire," begin more subtly. For this story, it was a sound: the haunting melody of a piano, played with a mix of technical brilliance and raw, untamed emotion, echoing through an empty conservatory.</p>
-      <p>I imagined Evelina, my seventeen-year-old prodigy, pouring all her frustrations, ambitions, and nascent desires into the keys. The piano isn't just an instrument for her; it's her armor, her voice, her method of control in a world that feels overwhelming. But what happens when she meets someone who can read the music of her soul? Someone who understands the dissonance and the longing hidden beneath the polished surface?</p>
-      <p>That's where her enigmatic professor comes in. Their relationship is a duet of control and surrender, a complex composition where every note is fraught with unspoken meaning. The conservatory setting was vital, providing a stage for this intimate, high-stakes performance of passion and power. It's a story about art, obsession, and the moment a student's talent becomes so profound it threatens to eclipse the master's.</p>
-    `
-  },
-  {
-    id: 3,
-    title: "My Writing Ritual: Coffee, Candlelight, and Chaos",
-    date: "June 21, 2025",
-    author: "Ava Blackwood",
-    summary: "Readers often ask about my writing process. Is it structured and serene, or a whirlwind of creative chaos? The truth, as with my stories, lies somewhere in between...",
-    content: `
-      <p>The writer's life is often romanticized—a solitary genius typing away in a charming, sun-drenched study. While I wish I could claim such elegant serenity, my process is a bit more... chaotic. It's a ritual, to be sure, but one that embraces the beautiful mess of creation.</p>
-      <p>It always starts with coffee. Strong, black, and in a mug that feels just right for the day's mood. Then comes the atmosphere. I'm a firm believer in setting the scene, even for myself. For my Dark Academia tales, this means low light, perhaps a single scented candle (sandalwood or old parchment are favorites), and a curated playlist of classical or ambient music. It helps me slip into the world I'm trying to build.</p>
-      <p>The 'chaos' part comes from the writing itself. I'm not a meticulous outliner. I start with a character, a feeling, a core conflict, and let the story guide me. There are days of furious typing where the words flow effortlessly, and then there are days spent staring at a blinking cursor, wrestling with a single sentence. Both are part of the dance.</p>
-      <p>It's a process of surrendering to the story, of letting the characters surprise me. And through all the coffee, candlelight, and chaos, I find my way to 'The End,' ready to start the dance all over again.</p>
-    `
-  }
-];
-// --- END: NEW BLOG POST DATA ---
-
-
-// --- Newsletter Signup Component (Updated) ---
+// --- Newsletter Signup Component ---
 const NewsletterSignup = ({ variant, className }) => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // null, 'success', 'error', 'invalid_email', 'duplicate'
+  const [submitStatus, setSubmitStatus] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -282,7 +241,7 @@ const NewsletterSignup = ({ variant, className }) => {
   );
 };
 
-// --- Contact Form Component (Unchanged) ---
+// --- Contact Form Component ---
 const ContactForm = () => {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -357,7 +316,6 @@ const ContactForm = () => {
   );
 };
 
-
 // --- Main App Component and Page Structure ---
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -368,7 +326,6 @@ function App() {
     window.open(book.amazonUrl, '_blank');
   };
 
-  // Get all books in a flat array
   const getAllBooks = () => {
     return [
       ...booksData.darkAcademia,
@@ -377,7 +334,6 @@ function App() {
     ];
   };
 
-  // Filter books by genre
   const getFilteredBooks = () => {
     if (selectedGenre === 'all') {
       return getAllBooks();
@@ -581,22 +537,43 @@ function App() {
 
   const AboutPage = () => ( <div>...</div> );
 
-  // --- START: NEW BLOG PAGE COMPONENT ---
   const BlogPage = () => {
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [selectedPost, setSelectedPost] = useState(null);
 
-    // Navigate to a single post view
+    useEffect(() => {
+      const query = `*[_type == "post"] | order(publishedAt desc)`;
+      
+      sanityClient.fetch(query)
+        .then((data) => {
+          setPosts(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching blog posts from Sanity:", err);
+          setError("Failed to load blog posts.");
+          setLoading(false);
+        });
+    }, []);
+
     const handlePostClick = (post) => {
       setSelectedPost(post);
-      window.scrollTo(0, 0); // Scroll to top when a post is selected
+      window.scrollTo(0, 0);
     };
 
-    // Return to the main blog list
     const handleBackClick = () => {
       setSelectedPost(null);
     };
 
-    // --- Single Post View ---
+    if (loading) {
+      return <div className="text-center py-20">Loading posts...</div>;
+    }
+    if (error) {
+      return <div className="text-center py-20 text-red-500">{error}</div>;
+    }
+    
     if (selectedPost) {
       return (
         <div className="min-h-screen py-12 px-4 bg-muted">
@@ -608,15 +585,14 @@ function App() {
               <CardHeader>
                 <CardTitle className="text-4xl font-serif text-burgundy">{selectedPost.title}</CardTitle>
                 <CardDescription className="flex items-center gap-4 text-sm text-gray-500 pt-2">
-                  <span className="flex items-center gap-2"><User size={14} /> {selectedPost.author}</span>
-                  <span className="flex items-center gap-2"><Calendar size={14} /> {selectedPost.date}</span>
+                  {selectedPost.author?.name && <span className="flex items-center gap-2"><User size={14} /> {selectedPost.author.name}</span>}
+                  {selectedPost.publishedAt && <span className="flex items-center gap-2"><Calendar size={14} /> {new Date(selectedPost.publishedAt).toLocaleDateString()}</span>}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div 
-                  className="blog-content text-lg text-charcoal" 
-                  dangerouslySetInnerHTML={{ __html: selectedPost.content }} 
-                />
+                <div className="blog-content text-lg text-charcoal">
+                  <PortableText value={selectedPost.body} />
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -624,7 +600,6 @@ function App() {
       );
     }
 
-    // --- Main Blog List View ---
     return (
       <div className="min-h-screen py-12 px-4">
         <div className="max-w-7xl mx-auto">
@@ -636,16 +611,16 @@ function App() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-            {blogPostsData.map((post) => (
-              <Card key={post.id} className="flex flex-col hover:shadow-lg transition-shadow">
+            {posts.map((post) => (
+              <Card key={post._id} className="flex flex-col hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-2xl font-serif text-burgundy line-clamp-2">{post.title}</CardTitle>
                   <CardDescription className="text-xs text-gray-500">
-                    {post.date} &bull; {post.author}
+                    {new Date(post.publishedAt).toLocaleDateString()}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <p className="text-gray-700 text-sm line-clamp-4">{post.summary}</p>
+                  <p className="text-gray-700 text-sm line-clamp-4">A look inside the latest musings from Ava Blackwood...</p>
                 </CardContent>
                 <div className="p-6 pt-0 mt-auto">
                   <Button variant="link" onClick={() => handlePostClick(post)} className="p-0 text-burgundy font-semibold">
@@ -659,7 +634,6 @@ function App() {
       </div>
     );
   };
-  // --- END: NEW BLOG PAGE COMPONENT ---
 
   const ContactPage = () => ( <div><ContactForm /></div> );
   const Footer = () => ( <footer>...</footer> );
