@@ -4,8 +4,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input.jsx'
 import { Badge } from '@/components/ui/badge.jsx'
 import { Textarea } from '@/components/ui/textarea.jsx'
-import { BookOpen, Mail, ExternalLink, Calendar, User, Heart, Send } from 'lucide-react'
+import { BookOpen, Mail, ExternalLink, Calendar, User, Heart, Send, Star } from 'lucide-react'
 import './App.css'
+
+// Import book cover images
+import playingWithFireCover from './assets/Playing with Fire.jpg'
+import controlAndReleaseCover from './assets/Control and Release.jpg'
+import preludesOfDesireCover from './assets/Beneath the Scholar\'s Veil.jpg' // Using this as placeholder for Preludes
+import enPointeCover from './assets/En Pointe.jpg'
+import underSurgicalLightsCover from './assets/Under Surgical Lights.jpg'
+import volleyOfTemptationCover from './assets/Volley of Temptation.jpg'
 
 // --- Analytics Component ---
 const Analytics = () => {
@@ -50,20 +58,85 @@ const sanitizeInput = (input) => {
   return input.trim().replace(scriptRegex, '');
 };
 
-
-// --- Sample Book Data ---
+// --- Updated Book Data with Local Cover Images ---
 const booksData = {
   darkAcademia: [
-    { id: 1, title: "Playing with Fire", description: "Delve into Playing with Fire, where the forbidden allure of a professor-student romance ignites amidst the storied halls of Blackwood Academy.", amazonUrl: "https://www.amazon.com/Playing-Fire-Romance-Ava-Blackwood-ebook/dp/B0F9PYXD8R", publishDate: "2024", series: "Blackwood Academy", cover: "https://placehold.co/300x450/231F20/FFFFFF?text=Playing+with+Fire" },
-    { id: 2, title: "Control and Release", description: "Control and Release is an electrifying exploration of forbidden attraction and the intricate dance of power dynamics in academia.", amazonUrl: "https://www.amazon.com/Control-Release-Ava-Blackwood-ebook/dp/B0F9FQMW9L", publishDate: "2024", series: "Blackwood Academy", cover: "https://placehold.co/300x450/800020/FFFFFF?text=Control+and+Release" },
-    { id: 3, title: "Preludes of Desire", description: "Seventeen-year-old piano prodigy Evelina Moreau has always used her music to control the world around her.", amazonUrl: "https://www.amazon.com/Preludes-Desire-Ava-Blackwood/dp/B0F91VK6GX", publishDate: "2024", series: "Standalone", cover: "https://placehold.co/300x450/4A4A4A/FFFFFF?text=Preludes+of+Desire" },
-    { id: 4, title: "En Pointe", description: "En Pointe is a story of passion, ambition, and forbidden love set against the backdrop of the illustrious Opéra Garnier.", amazonUrl: "https://www.amazon.com/En-Pointe-Ava-Blackwood-ebook/dp/B0F9PQNGSG", publishDate: "2024", series: "Standalone", cover: "https://placehold.co/300x450/D3D3D3/000000?text=En+Pointe" }
+    { 
+      id: 1, 
+      title: "Playing with Fire", 
+      fullTitle: "Playing with Fire: A Dark-Academia Romance of Power, Desire, and Restraint",
+      description: "Delve into Playing with Fire, where the forbidden allure of a professor-student romance ignites amidst the storied halls of Blackwood Academy. A Dark-Academia Romance of Power, Desire, and Restraint that explores the dangerous territory between mentorship and desire.", 
+      amazonUrl: "https://www.amazon.com/Playing-Fire-Dark-Academia-Romance-Restraint-ebook/dp/B0F99HK62", 
+      publishDate: "2024", 
+      series: "Dark Academia", 
+      cover: playingWithFireCover,
+      rating: 4.5,
+      genre: "Dark Academia Romance"
+    },
+    { 
+      id: 2, 
+      title: "Control and Release", 
+      fullTitle: "Control and Release: A Dark Academia Romance",
+      description: "Control and Release is an electrifying exploration of forbidden attraction and the intricate dance of power dynamics in academia. When boundaries blur between professor and student, passion becomes a dangerous game of control.", 
+      amazonUrl: "https://www.amazon.com/Control-Release-Ava-Blackwood-ebook/dp/B0F9FQMW9L", 
+      publishDate: "2024", 
+      series: "Dark Academia", 
+      cover: controlAndReleaseCover,
+      rating: 4.3,
+      genre: "Dark Academia Romance"
+    },
+    { 
+      id: 3, 
+      title: "Preludes of Desire", 
+      fullTitle: "Preludes of Desire: A Dark Academia Romance",
+      description: "Seventeen-year-old piano prodigy Evelina Moreau has always used her music to control the world around her. But when she meets her enigmatic composition professor, she discovers that some melodies are too dangerous to play.", 
+      amazonUrl: "https://www.amazon.com/Preludes-Desire-Ava-Blackwood/dp/B0F91VK6GX", 
+      publishDate: "2024", 
+      series: "Dark Academia", 
+      cover: preludesOfDesireCover,
+      rating: 4.4,
+      genre: "Dark Academia Romance"
+    },
+    { 
+      id: 4, 
+      title: "En Pointe", 
+      fullTitle: "En Pointe: Romance Edition",
+      description: "En Pointe is a story of passion, ambition, and forbidden love set against the backdrop of the illustrious Opéra Garnier. When ballet meets desire, every movement becomes a dance of seduction.", 
+      amazonUrl: "https://www.amazon.com/En-Pointe-Ava-Blackwood-ebook/dp/B0F9PQNGSG", 
+      publishDate: "2024", 
+      series: "Standalone", 
+      cover: enPointeCover,
+      rating: 4.6,
+      genre: "Romance"
+    }
   ],
   medical: [
-    { id: 5, title: "Under Surgical Lights", description: "A provocative medical romance exploring power dynamics in the high-stakes world of surgery.", amazonUrl: "https://www.amazon.com/Under-Surgical-Lights-Ava-Blackwood/dp/B0F9FTLSC3", publishDate: "2024", series: "Medical Romance", cover: "https://placehold.co/300x450/ADD8E6/000000?text=Under+Surgical+Lights" }
+    { 
+      id: 5, 
+      title: "Under Surgical Lights", 
+      fullTitle: "Under Surgical Lights: A Medical Romance",
+      description: "A provocative medical romance exploring power dynamics in the high-stakes world of surgery. When Dr. Sarah Chen meets the enigmatic Chief of Surgery, their professional relationship becomes dangerously personal.", 
+      amazonUrl: "https://www.amazon.com/Under-Surgical-Lights-Ava-Blackwood/dp/B0F9FTLSC3", 
+      publishDate: "2024", 
+      series: "Medical Romance", 
+      cover: underSurgicalLightsCover,
+      rating: 4.2,
+      genre: "Medical Romance"
+    }
   ],
   sports: [
-    { id: 6, title: "Volley of Temptation", description: "A dark academia sports romance that explores the tension between competition and desire.", amazonUrl: "https://www.amazon.com/Volley-Temptation-Romance-Ava-Blackwood-ebook/dp/B0F9Q1K3GD", publishDate: "2024", series: "Sports Romance", cover: "https://placehold.co/300x450/006400/FFFFFF?text=Volley+of+Temptation" }
+    { 
+      id: 6, 
+      title: "Volley of Temptation", 
+      fullTitle: "Volley of Temptation: A Dark-Academia Sports Romance",
+      description: "A dark academia sports romance that explores the tension between competition and desire on the volleyball court. When winning becomes secondary to the game of hearts, every serve is a shot at love.", 
+      amazonUrl: "https://www.amazon.com/Volley-Temptation-Romance-Ava-Blackwood-ebook/dp/B0F9Q1K3GD", 
+      publishDate: "2024", 
+      series: "Dark Academia Sports", 
+      cover: volleyOfTemptationCover,
+      rating: 4.1,
+      genre: "Sports Romance"
+    }
   ]
 };
 
@@ -169,7 +242,6 @@ const NewsletterSignup = ({ variant, className }) => {
   );
 };
 
-
 // --- Contact Form Component (Unchanged) ---
 const ContactForm = () => {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
@@ -248,10 +320,30 @@ const ContactForm = () => {
 // --- Main App Component and Page Structure ---
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [selectedGenre, setSelectedGenre] = useState('all');
+  
   const handleAmazonClick = (book) => {
     trackEvent('click_amazon_link', { book_title: book.title });
     window.open(book.amazonUrl, '_blank');
   };
+
+  // Get all books in a flat array
+  const getAllBooks = () => {
+    return [
+      ...booksData.darkAcademia,
+      ...booksData.medical,
+      ...booksData.sports
+    ];
+  };
+
+  // Filter books by genre
+  const getFilteredBooks = () => {
+    if (selectedGenre === 'all') {
+      return getAllBooks();
+    }
+    return booksData[selectedGenre] || [];
+  };
+
   const Navigation = () => (
     <nav className="bg-white shadow-sm border-b border-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -282,6 +374,7 @@ function App() {
       </div>
     </nav>
   );
+
   const HomePage = () => (
     <div className="min-h-screen">
       <section className="hero-section py-20 px-4">
@@ -294,8 +387,8 @@ function App() {
             </div>
             <div className="flex justify-center">
               <div className="book-card bg-white p-4 rounded-lg shadow-2xl max-w-sm">
-                <img src="https://placehold.co/300x450/231F20/FFFFFF?text=Playing+with+Fire" alt="Latest Book" className="w-full rounded-md" />
-                <h3 className="text-xl font-serif text-burgundy mt-4 text-center">Playing with Fire</h3>
+                <img src={booksData.darkAcademia[0].cover} alt="Latest Book" className="w-full rounded-md" />
+                <h3 className="text-xl font-serif text-burgundy mt-4 text-center">{booksData.darkAcademia[0].title}</h3>
               </div>
             </div>
           </div>
@@ -322,11 +415,125 @@ function App() {
       </section>
     </div>
   );
-  const BooksPage = () => ( <div>...</div> );
+
+  const BooksPage = () => (
+    <div className="min-h-screen py-12 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-serif text-burgundy mb-4">My Books</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Explore my collection of dark academia romances, medical dramas, and sports romances. 
+            Each story weaves passion, power, and forbidden desire into unforgettable tales.
+          </p>
+        </div>
+
+        {/* Genre Filter */}
+        <div className="flex justify-center mb-8">
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={selectedGenre === 'all' ? 'default' : 'outline'}
+              onClick={() => setSelectedGenre('all')}
+              className={selectedGenre === 'all' ? 'bg-burgundy text-white' : ''}
+            >
+              All Books ({getAllBooks().length})
+            </Button>
+            <Button
+              variant={selectedGenre === 'darkAcademia' ? 'default' : 'outline'}
+              onClick={() => setSelectedGenre('darkAcademia')}
+              className={selectedGenre === 'darkAcademia' ? 'bg-burgundy text-white' : ''}
+            >
+              Dark Academia ({booksData.darkAcademia.length})
+            </Button>
+            <Button
+              variant={selectedGenre === 'medical' ? 'default' : 'outline'}
+              onClick={() => setSelectedGenre('medical')}
+              className={selectedGenre === 'medical' ? 'bg-burgundy text-white' : ''}
+            >
+              Medical Romance ({booksData.medical.length})
+            </Button>
+            <Button
+              variant={selectedGenre === 'sports' ? 'default' : 'outline'}
+              onClick={() => setSelectedGenre('sports')}
+              className={selectedGenre === 'sports' ? 'bg-burgundy text-white' : ''}
+            >
+              Sports Romance ({booksData.sports.length})
+            </Button>
+          </div>
+        </div>
+
+        {/* Books Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {getFilteredBooks().map((book) => (
+            <Card key={book.id} className="book-card hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-6">
+                <div className="relative mb-4">
+                  <img 
+                    src={book.cover} 
+                    alt={book.title} 
+                    className="w-full h-80 object-cover rounded-md shadow-md" 
+                    style={{ aspectRatio: '3/4' }}
+                  />
+                  <Badge className="absolute top-2 right-2 bg-burgundy text-white">
+                    {book.genre}
+                  </Badge>
+                </div>
+                
+                <div className="space-y-3">
+                  <h3 className="text-xl font-serif text-burgundy font-bold line-clamp-2">
+                    {book.title}
+                  </h3>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={16}
+                          className={i < Math.floor(book.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600">({book.rating})</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Calendar size={14} />
+                    <span>{book.publishDate}</span>
+                    <span>•</span>
+                    <span>{book.series}</span>
+                  </div>
+                  
+                  <p className="text-gray-600 text-sm line-clamp-4 leading-relaxed">
+                    {book.description}
+                  </p>
+                  
+                  <Button 
+                    className="w-full bg-burgundy hover:bg-burgundy/90 text-white" 
+                    onClick={() => handleAmazonClick(book)}
+                  >
+                    <ExternalLink size={16} className="mr-2" />
+                    Buy on Amazon
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Newsletter Signup Section */}
+        <div className="mt-16">
+          <NewsletterSignup />
+        </div>
+      </div>
+    </div>
+  );
+
   const AboutPage = () => ( <div>...</div> );
   const BlogPage = () => ( <div>...</div> );
   const ContactPage = () => ( <div><ContactForm /></div> );
   const Footer = () => ( <footer>...</footer> );
+  
   const renderPage = () => {
     switch(currentPage) {
       case 'home': return <HomePage />;
@@ -337,6 +544,7 @@ function App() {
       default: return <HomePage />;
     }
   };
+  
   return (
     <div className="min-h-screen bg-background">
       <Analytics />
