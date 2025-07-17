@@ -186,6 +186,59 @@ const NewsletterSignup = ({ variant, className }) => {
   };
 
   const isCompact = variant === 'compact';
+  const isFooter = variant === 'footer';
+
+  if (isFooter) {
+    return (
+      <div className="max-w-md mx-auto">
+        <div className="text-center mb-6">
+          <h3 className="text-2xl font-bold text-white mb-2">Stay Connected</h3>
+          <p className="text-gray-300">Get updates on new releases, exclusive content, and behind-the-scenes insights.</p>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex gap-2">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="flex-1 px-4 py-3 rounded-lg text-charcoal border-0 focus:ring-2 focus:ring-gold"
+              placeholder="Enter your email address"
+            />
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-gold text-charcoal px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {isSubmitting ? 'Subscribing...' : 'Subscribe'}
+            </button>
+          </div>
+
+          {submitStatus === 'success' && (
+            <div className="text-green-400 text-center text-sm">
+              Welcome! Check your email for confirmation.
+            </div>
+          )}
+          {submitStatus === 'error' && (
+            <div className="text-red-400 text-center text-sm">
+              Sorry, there was an error. Please try again.
+            </div>
+          )}
+          {submitStatus === 'invalid_email' && (
+             <div className="text-yellow-400 text-center text-sm">
+              Please enter a valid email address.
+            </div>
+          )}
+          {submitStatus === 'duplicate' && (
+             <div className="text-yellow-400 text-center text-sm">
+              This email address is already subscribed.
+            </div>
+          )}
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className={`${isCompact ? '' : 'bg-charcoal text-cream p-8 rounded-lg'} ${className || ''}`}>
@@ -527,15 +580,25 @@ function App() {
             </Card>
           ))}
         </div>
-
-        <div className="mt-16">
-          <NewsletterSignup />
-        </div>
       </div>
     </div>
   );
 
-  const AboutPage = () => ( <div>...</div> );
+  const AboutPage = () => ( 
+    <div className="min-h-screen py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-serif text-burgundy mb-4">About Ava Blackwood</h1>
+          <p className="text-xl text-gray-600">
+            Crafting tales of passion, power, and forbidden desire in the shadows of academia.
+          </p>
+        </div>
+        <div className="prose prose-lg mx-auto text-gray-700">
+          <p>More content coming soon...</p>
+        </div>
+      </div>
+    </div>
+  );
 
   const BlogPage = () => {
     const [posts, setPosts] = useState([]);
@@ -636,7 +699,55 @@ function App() {
   };
 
   const ContactPage = () => ( <div><ContactForm /></div> );
-  const Footer = () => ( <footer>...</footer> );
+  
+  // --- UPDATED: Prominent Footer Component with Newsletter ---
+  const Footer = () => (
+    <footer className="bg-burgundy text-white py-16 px-4 mt-16">
+      <div className="max-w-7xl mx-auto">
+        {/* Newsletter Section */}
+        <div className="mb-12">
+          <NewsletterSignup variant="footer" />
+        </div>
+        
+        {/* Footer Content */}
+        <div className="grid md:grid-cols-3 gap-8 mb-8">
+          <div>
+            <h3 className="text-2xl font-serif font-bold mb-4">Ava Blackwood</h3>
+            <p className="text-gray-300 mb-4">
+              Crafting tales of passion, power, and forbidden desire in the shadows of academia.
+            </p>
+          </div>
+          
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <ul className="space-y-2">
+              <li><button onClick={() => setCurrentPage('home')} className="text-gray-300 hover:text-white transition-colors">Home</button></li>
+              <li><button onClick={() => setCurrentPage('books')} className="text-gray-300 hover:text-white transition-colors">Books</button></li>
+              <li><button onClick={() => setCurrentPage('about')} className="text-gray-300 hover:text-white transition-colors">About</button></li>
+              <li><button onClick={() => setCurrentPage('blog')} className="text-gray-300 hover:text-white transition-colors">Blog</button></li>
+              <li><button onClick={() => setCurrentPage('contact')} className="text-gray-300 hover:text-white transition-colors">Contact</button></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Connect</h4>
+            <p className="text-gray-300 mb-4">
+              Follow my journey and get the latest updates on new releases and exclusive content.
+            </p>
+            <div className="flex items-center gap-2 text-gray-300">
+              <Mail size={16} />
+              <span className="text-sm">Newsletter subscribers get first access to new releases</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Copyright */}
+        <div className="border-t border-burgundy-light pt-8 text-center text-gray-300">
+          <p>&copy; 2024 Ava Blackwood. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  );
   
   const renderPage = () => {
     switch(currentPage) {
