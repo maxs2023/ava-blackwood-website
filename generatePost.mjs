@@ -1,7 +1,7 @@
 // generatePost.mjs
 import { createClient } from '@sanity/client';
 import fetch from 'node-fetch';
-import { appendFileSync } from 'fs'; // Import the file system module
+import { appendFileSync } from 'fs';
 
 // --- Configuration ---
 
@@ -16,50 +16,32 @@ const sanityClient = createClient({
 // --- Helper Functions ---
 
 function createSlug(title) {
-  return title
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w-]+/g, '')
-    .replace(/--+/g, '-')
-    .replace(/^-+/, '')
-    .replace(/-+$/, '');
+  return title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 }
 
-// Helper function to generate a short, unique key
 function generateKey(length = 12) {
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return result;
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
 }
 
-/**
- * This function converts the AI's structured response into
- * Sanity's Portable Text format, including rich formatting and unique keys.
- */
 function formatBodyForSanity(bodyArray) {
   const portableTextBody = [];
-
-  // Helper to parse **bold** and *italic* text from a string
   const parseInlineFormatting = (text) => {
     const children = [];
-    // Regex to find **bold** or *italic* text
     const regex = /(\*\*.*?\*\*)|(\*.*?\*)/g;
     let lastIndex = 0;
     let match;
-
     while ((match = regex.exec(text)) !== null) {
-      // Add plain text before the match
       if (match.index > lastIndex) {
         children.push({ _type: 'span', text: text.substring(lastIndex, match.index), _key: generateKey() });
       }
-      
       const matchedText = match[0];
       const marks = [];
       let content = '';
-
       if (matchedText.startsWith('**')) {
         marks.push('strong');
         content = matchedText.substring(2, matchedText.length - 2);
@@ -67,26 +49,23 @@ function formatBodyForSanity(bodyArray) {
         marks.push('em');
         content = matchedText.substring(1, matchedText.length - 1);
       }
-      
       children.push({ _type: 'span', text: content, marks, _key: generateKey() });
       lastIndex = regex.lastIndex;
     }
-
-    // Add any remaining plain text
     if (lastIndex < text.length) {
       children.push({ _type: 'span', text: text.substring(lastIndex), _key: generateKey() });
     }
-    
     return children;
   };
 
   for (const block of bodyArray) {
+    const blockKey = generateKey();
     switch (block.type) {
       case 'heading':
         portableTextBody.push({
           _type: 'block',
           style: `h${block.level || 2}`,
-          _key: generateKey(),
+          _key: blockKey,
           children: [{ _type: 'span', text: block.content, _key: generateKey() }],
         });
         break;
@@ -94,15 +73,15 @@ function formatBodyForSanity(bodyArray) {
         portableTextBody.push({
           _type: 'block',
           style: 'normal',
-          _key: generateKey(),
+          _key: blockKey,
           children: parseInlineFormatting(block.content),
         });
         break;
       case 'blockquote':
-         portableTextBody.push({
+        portableTextBody.push({
           _type: 'block',
           style: 'blockquote',
-          _key: generateKey(),
+          _key: blockKey,
           children: [{ _type: 'span', text: block.content, _key: generateKey() }],
         });
         break;
@@ -129,22 +108,13 @@ async function generateAndPublish() {
   console.log('Starting content generation process...');
   let postContent;
   let plainTextBodyForSocial;
+  let imageAsset;
 
-  // --- Part 1: Generate and Publish Blog Post to Sanity ---
+  // --- Part 1: Generate Blog Post Text ---
   try {
-    console.log("Fetching default author 'Ava Blackwood'...");
-    const authors = await sanityClient.fetch(`*[_type == "author" && name == "Ava Blackwood"]`);
-    if (!authors || authors.length === 0) {
-      throw new Error("Could not find author 'Ava Blackwood' in Sanity.");
-    }
-    const authorRef = { _type: 'reference', _ref: authors[0]._id };
-    console.log(`Found author with reference ID: ${authorRef._ref}`);
-
-    console.log('Generating rich, formatted blog post...');
-    // --- UPDATED PROMPT ---
-    // This new prompt incorporates the feedback for richer, more thematic content.
+    console.log('Generating rich, formatted blog post text...');
     const blogPostPrompt = `
-      You are Ava Blackwood, an author of dark academia and **spicy romance** novels.
+      YYou are Ava Blackwood, an author of dark academia and **spicy romance** novels.
       Your writing style is evocative, atmospheric, and sensual. It explores themes of forbidden desire, power dynamics, intellectual intimacy, and raw vulnerability.
       Your tone is sophisticated and mysterious, offering genuine insights into the **psychology of intense passion**.
 
@@ -170,41 +140,80 @@ async function generateAndPublish() {
       ]
     `;
 
-    const aiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: blogPostPrompt }] }] }),
-      }
-    );
+    const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: blogPostPrompt }] }] }),
+    });
 
-    if (!aiResponse.ok) throw new Error(`Gemini API Error: ${await aiResponse.text()}`);
-
+    if (!aiResponse.ok) throw new Error(`Gemini API Error (Text): ${await aiResponse.text()}`);
     const aiResult = await aiResponse.json();
     const generatedText = aiResult.candidates[0].content.parts[0].text;
     const jsonString = generatedText.match(/```json\n([\s\S]*?)\n```/)[1];
     postContent = JSON.parse(jsonString);
-
     console.log(`Generated Blog Title: ${postContent.title}`);
-    
-    // Convert the structured body into Sanity's Portable Text format
-    const formattedBody = formatBodyForSanity(postContent.body);
-    
-    // Create a plain text version for the social media prompt
-    plainTextBodyForSocial = postContent.body.map(block => block.content || (block.items && block.items.join(' '))).join('\n');
+  } catch (error) {
+    console.error('Failed during blog post text generation:', error);
+    process.exit(1);
+  }
 
+  // --- Part 2: Generate Thematic Image ---
+  try {
+    const lastParagraph = postContent.body.filter(block => block.type === 'paragraph').pop();
+    const imageSceneDescription = lastParagraph ? lastParagraph.content : 'A single crimson lipstick stain on a porcelain coffee cup';
+    
+    const imagePrompt = `Photorealistic, dark academia aesthetic, moody cinematic lighting, shallow depth of field. A close-up shot of: ${imageSceneDescription}. The style is sophisticated, sensual, and mysterious, fitting for a dark romance author.`;
+    console.log(`Generating image with prompt: "${imagePrompt}"`);
+
+    const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ instances: [{ prompt: imagePrompt }], parameters: { "sampleCount": 1 } }),
+    });
+    
+    if (!imageResponse.ok) throw new Error(`Imagen API Error: ${await imageResponse.text()}`);
+    const imageResult = await imageResponse.json();
+    const base64ImageData = imageResult.predictions[0].bytesBase64Encoded;
+
+    console.log('Image generated, now uploading to Sanity...');
+    const imageBuffer = Buffer.from(base64ImageData, 'base64');
+    imageAsset = await sanityClient.assets.upload('image', imageBuffer, {
+      filename: `${createSlug(postContent.title)}.png`,
+      contentType: 'image/png'
+    });
+    console.log('Successfully uploaded image asset with ID:', imageAsset._id);
+  } catch (error) {
+    console.error('Failed during image generation or upload:', error);
+    process.exit(1);
+  }
+
+  // --- Part 3: Publish to Sanity & Social Media ---
+  try {
+    console.log("Fetching default author 'Ava Blackwood'...");
+    const authors = await sanityClient.fetch(`*[_type == "author" && name == "Ava Blackwood"]`);
+    if (!authors || authors.length === 0) throw new Error("Could not find author 'Ava Blackwood' in Sanity.");
+    const authorRef = { _type: 'reference', _ref: authors[0]._id };
+
+    const formattedBody = formatBodyForSanity(postContent.body);
     const slug = createSlug(postContent.title);
+    
     const postDocument = {
       _type: 'post',
       title: postContent.title,
       slug: { _type: 'slug', current: slug },
       author: authorRef,
-      body: formattedBody, // Use the new richly formatted body
+      mainImage: {
+        _type: 'image',
+        asset: {
+          _type: 'reference',
+          _ref: imageAsset._id
+        }
+      },
+      body: formattedBody,
       publishedAt: new Date().toISOString(),
     };
 
-    console.log('Publishing document to Sanity with full schema...');
+    console.log('Publishing document with image to Sanity...');
     const result = await sanityClient.create(postDocument);
     console.log('Successfully created Sanity post with ID:', result._id);
     
@@ -214,60 +223,52 @@ async function generateAndPublish() {
       console.log('Successfully set output for verification step.');
     }
 
+    // Social Media Post Generation
+    plainTextBodyForSocial = postContent.body.map(block => block.content || (block.items && block.items.join(' '))).join('\n');
+    
+    console.log('Generating social media post...');
+    const socialPostPrompt = `
+      You are a social media manager for spicy romance author Ava Blackwood.
+      Create a short, catchy, and intriguing social media post based on her latest blog post.
+      The tone should be sophisticated and tempting.
+      Hint at the spicy advice in the post to encourage clicks.
+      Include 3-4 relevant hashtags like #SpicyRomance, #RomanceAuthor, #BookTok, #AvaBlackwood.
+
+      Blog Post Title: "${postContent.title}"
+      Blog Post Content Summary: "${plainTextBodyForSocial}"
+
+      Based on this, generate a JSON object with one key: "social_post_text".
+    `;
+
+    const socialResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: socialPostPrompt }] }] }),
+    });
+
+    if (!socialResponse.ok) throw new Error(`Gemini API Error (Social): ${await socialResponse.text()}`);
+    
+    const socialResult = await socialResponse.json();
+    const socialGeneratedText = socialResult.candidates[0].content.parts[0].text;
+    const socialJsonString = socialGeneratedText.match(/```json\n([\s\S]*?)\n```/)[1];
+    const socialPost = JSON.parse(socialJsonString);
+    
+    console.log('Generated Social Post:', socialPost.social_post_text);
+    
+    console.log('Sending post to social media webhook...');
+    const webhookResponse = await fetch(process.env.SOCIAL_MEDIA_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: socialPost.social_post_text }),
+    });
+    
+    if (!webhookResponse.ok) throw new Error(`Webhook failed with status: ${webhookResponse.status}`);
+    
+    console.log('Successfully sent post to webhook.');
+
   } catch (error) {
-    console.error('Failed during blog post generation or publishing:', error);
+    console.error('Failed during final publishing steps:', error);
     process.exit(1);
-  }
-
-  // --- Part 2: Generate Social Media Post and Send to Webhook ---
-  if (postContent) {
-    try {
-      console.log('Generating social media post...');
-      const socialPostPrompt = `
-        You are a social media manager for romance author Ava Blackwood.
-        Create a short, catchy social media post based on her latest blog post.
-        The tone should be intriguing and sophisticated.
-        Encourage people to read the full post on the blog.
-        Include 3-4 relevant hashtags like #DarkAcademia, #SpicyRomance, #ForbiddenLove, #RomanceBooks, #AvaBlackwood.
-
-        Blog Post Title: "${postContent.title}"
-        Blog Post Content Summary: "${plainTextBodyForSocial}"
-
-        Based on this, generate a JSON object with one key: "social_post_text".
-      `;
-
-      const socialResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: socialPostPrompt }] }] }),
-        }
-      );
-
-      if (!socialResponse.ok) throw new Error(`Gemini API Error: ${await socialResponse.text()}`);
-
-      const socialResult = await socialResponse.json();
-      const socialGeneratedText = socialResult.candidates[0].content.parts[0].text;
-      const socialJsonString = socialGeneratedText.match(/```json\n([\s\S]*?)\n```/)[1];
-      const socialPost = JSON.parse(socialJsonString);
-
-      console.log('Generated Social Post:', socialPost.social_post_text);
-
-      console.log('Sending post to social media webhook...');
-      const webhookResponse = await fetch(process.env.SOCIAL_MEDIA_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: socialPost.social_post_text }),
-      });
-
-      if (!webhookResponse.ok) throw new Error(`Webhook failed with status: ${webhookResponse.status}`);
-      
-      console.log('Successfully sent post to webhook.');
-
-    } catch (error) {
-      console.error('Failed during social media post generation or webhook sending:', error);
-    }
   }
 }
 
