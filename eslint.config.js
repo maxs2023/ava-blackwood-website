@@ -155,7 +155,6 @@ async function generateAndPublish() {
     console.error('Failed during blog post text generation:', error);
     process.exit(1);
   }
-  
   // --- Part 2: Generate Thematic Image ---
 try {
   const symbolicParagraphs = postContent.body
