@@ -2,7 +2,7 @@ import { createClient } from '@sanity/client';
 
 export default createClient({
   // Find this in your sanity.config.js file or at manage.sanity.io
-  projectId: '2f58nbxb', 
+  projectId: '8vo1vk23', 
   
   // The name of your dataset, usually "production"
   dataset: 'production', 

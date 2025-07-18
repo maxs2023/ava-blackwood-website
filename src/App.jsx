@@ -857,7 +857,7 @@ function App() {
         {/* Footer Content */}
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div>
-            <h3 className="text-2xl font-serif font-bold mb-4 text-white">Ava Blackwood</h3>
+            <h3 className="text-lg font-semibold mb-4 text-white">Ava Blackwood</h3>
             <p className="text-gray-300 mb-4">
               Crafting tales of passion, power, and forbidden desire in the shadows of academia.
             </p>
