@@ -105,6 +105,122 @@ const booksData = {
       genre: "Dark Academia Romance"
     },
     { 
+      id: 7, 
+      title: "Veils of Devotion", 
+      fullTitle: "Veils of Devotion: A Dark Academia Romance",
+      description: "In the shadowed halls of an ancient seminary, forbidden desires bloom between sacred vows and scholarly pursuits. A tale of spiritual awakening and passionate surrender that challenges the boundaries between devotion and desire.", 
+      amazonUrl: "https://www.amazon.com/Veils-Devotion-Ava-Blackwood/dp/B0F9VD8K2L", 
+      publishDate: "2024", 
+      series: "Dark Academia", 
+      cover: veilsOfDevotionCover,
+      rating: 4.2,
+      genre: "Dark Academia Romance"
+    }
+  ],
+  medical: [
+    { 
+      id: 5, 
+      title: "Under Surgical Lights", 
+      fullTitle: "Under Surgical Lights: A Medical Romance",
+      description: "Dr. Elena Vasquez thought she had her life perfectly planned until she meets the enigmatic chief of surgery. Under the harsh glare of surgical lights, professional boundaries blur and hearts race faster than any medical emergency.", 
+      amazonUrl: "https://www.amazon.com/Under-Surgical-Lights-Ava-Blackwood/dp/B0F9SL7M3N", 
+      publishDate: "2024", 
+      series: "Medical Romance", 
+      cover: underSurgicalLightsCover,
+      rating: 4.6,
+      genre: "Medical Romance"
+    }
+  ],
+  sports: [
+    { 
+      id: 4, 
+      title: "En Pointe", 
+      fullTitle: "En Pointe: A Sports Romance",
+      description: "Prima ballerina Sophia Chen has dedicated her life to perfection, but when a career-threatening injury forces her to work with an unconventional physical therapist, she discovers that sometimes the most beautiful performances happen off stage.", 
+      amazonUrl: "https://www.amazon.com/En-Pointe-Ava-Blackwood/dp/B0F9EP4R5T", 
+      publishDate: "2024", 
+      series: "Sports Romance", 
+      cover: enPointeCover,
+      rating: 4.7,
+      genre: "Sports Romance"
+    },
+    { 
+      id: 6, 
+      title: "Volley of Temptation", 
+      fullTitle: "Volley of Temptation: A Dark-Academia Sports Romance",
+      description: "Star volleyball player Marcus Rivera never expected to find his match in the brilliant but guarded team statistician. As the championship approaches, they must navigate the fine line between competition and desire.", 
+      amazonUrl: "https://www.amazon.com/Volley-Temptation-Ava-Blackwood/dp/B0F9VT6H8K", 
+      publishDate: "2024", 
+      series: "Sports Romance", 
+      cover: volleyOfTemptationCover,
+      rating: 4.5,
+      genre: "Sports Romance"
+    }
+  ],
+  legal: [
+    { 
+      id: 8, 
+      title: "Bound by Briefs", 
+      fullTitle: "Bound by Briefs: A Legal Romance",
+      description: "High-powered attorney Alexandra Stone has never lost a case, but when she faces off against her former law school rival in the courtroom, she discovers that some battles are worth losing. A passionate legal romance where justice and desire collide.", 
+      amazonUrl: "https://www.amazon.com/Bound-Briefs-Ava-Blackwood/dp/B0F9BB7L9M", 
+      publishDate: "2024", 
+      series: "Legal Romance", 
+      cover: boundByBriefsCover,
+      rating: 4.3,
+      genre: "Legal Romance"
+    }
+  ]
+};
+
+// Flatten all books for easier access
+const allBooks = [
+  ...booksData.darkAcademia,
+  ...booksData.medical,
+  ...booksData.sports,
+  ...booksData.legal
+];
+
+/* // --- Book Data ---
+const booksData = {
+  darkAcademia: [
+    { 
+      id: 1, 
+      title: "Playing with Fire", 
+      fullTitle: "Playing with Fire: A Dark-Academia Romance of Power, Desire, and Restraint",
+      description: "Delve into Playing with Fire, where the forbidden allure of a professor-student romance ignites amidst the storied halls of Blackwood Academy. A Dark-Academia Romance of Power, Desire, and Restraint that explores the dangerous territory between mentorship and desire.", 
+      amazonUrl: "https://www.amazon.com/Playing-Fire-Dark-Academia-Romance-Restraint-ebook/dp/B0F99HK62", 
+      publishDate: "2024", 
+      series: "Dark Academia", 
+      cover: playingWithFireCover,
+      rating: 4.5,
+      genre: "Dark Academia Romance"
+    },
+    { 
+      id: 2, 
+      title: "Control and Release", 
+      fullTitle: "Control and Release: A Dark Academia Romance",
+      description: "Control and Release is an electrifying exploration of forbidden attraction and the intricate dance of power dynamics in academia. When boundaries blur between professor and student, passion becomes a dangerous game of control.", 
+      amazonUrl: "https://www.amazon.com/Control-Release-Ava-Blackwood-ebook/dp/B0F9FQMW9L", 
+      publishDate: "2024", 
+      series: "Dark Academia", 
+      cover: controlAndReleaseCover,
+      rating: 4.3,
+      genre: "Dark Academia Romance"
+    },
+    { 
+      id: 3, 
+      title: "Preludes of Desire", 
+      fullTitle: "Preludes of Desire: A Dark Academia Romance",
+      description: "Seventeen-year-old piano prodigy Evelina Moreau has always used her music to control the world around her. But when she meets her enigmatic composition professor, she discovers that some melodies are too dangerous to play.", 
+      amazonUrl: "https://www.amazon.com/Preludes-Desire-Ava-Blackwood/dp/B0F91VK6GX", 
+      publishDate: "2024", 
+      series: "Dark Academia", 
+      cover: preludesOfDesireCover,
+      rating: 4.4,
+      genre: "Dark Academia Romance"
+    },
+    { 
       id: 4, 
       title: "En Pointe", 
       fullTitle: "En Pointe: Romance Edition",
@@ -129,11 +245,25 @@ const booksData = {
       cover: underSurgicalLightsCover,
       rating: 4.2,
       genre: "Medical Romance"
+    },
+    { 
+      id: 6, 
+      title: "Scrubs and Seduction", 
+      fullTitle: "Scrubs and Seduction: A Medical Romance",
+      description: "A dark-academia erotic romance—equal parts emotional slow burn and intoxicating obsession.", 
+      amazonUrl: "https://a.co/d/cSwTWBb", 
+      publishDate: "2025", 
+      series: "Medical Romance", 
+      cover: ScrubsandSeductionCover,
+      rating: 4.2,
+      genre: "Medical Romance"
     }
+
+
   ],
   sports: [
     { 
-      id: 6, 
+      id: 7, 
       title: "Volley of Temptation", 
       fullTitle: "Volley of Temptation: A Dark-Academia Sports Romance",
       description: "A dark academia sports romance that explores the tension between competition and desire on the volleyball court. When winning becomes secondary to the game of hearts, every serve is a shot at love.", 
@@ -145,7 +275,7 @@ const booksData = {
       genre: "Sports Romance"
     }
   ]
-};
+}; */
 
 // --- Newsletter Signup Component ---
 const NewsletterSignup = ({ variant, className }) => {
@@ -857,7 +987,7 @@ function App() {
         {/* Footer Content */}
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div>
-            <h3 className="text-2xl font-serif font-bold mb-4 text-white">Ava Blackwood</h3>
+            <h3 className="text-lg font-semibold mb-4 text-white">Ava Blackwood</h3>
             <p className="text-gray-300 mb-4">
               Crafting tales of passion, power, and forbidden desire in the shadows of academia.
             </p>
