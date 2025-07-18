@@ -207,13 +207,14 @@ No visible text or logos. Emotionally evocative, intimate, and poetic.
   `.trim();
 
   const primaryPrompt = `
-Hyper-realistic, cinematic shadows and shallow depth of field.
-A moody, poetic scene drawn from Ava Blackwood’s world—steeped in atmosphere and longing.
-Main focus: ${imageSceneDescription.trim()}, a quiet metaphor for restrained desire.
-Secondary detail: ${gestureDetail}, capturing a moment of intimacy without exposure.
-The frame is textured with candlelight, aged books, soft lace, and the hush of something just passed.
-Style: Ethereal romanticism with vintage sensuality—rich tones, soft light, and emotional gravity.
-No nudity, no overt body parts, no watermarks or text—only the suggestion of touch, the weight of silence, and the tension between what’s felt and what’s left unsaid.
+Hyper-realistic, with cinematic softness and shallow depth of field.
+A luminous, intimate moment from Ava Blackwood’s world—tender, suggestive, and quietly captivating.
+Main focus: ${imageSceneDescription.trim()}, a subtle metaphor for unspoken longing.
+Also present: ${gestureDetail}, a fleeting gesture hinting at closeness and desire, never explicit.
+Surrounded by textures of warm candlelight, worn books, delicate lace, and the lingering hush of a personal reverie.
+Style: Romantic realism with soft vintage tones—elegant, feminine, emotionally charged.
+No nudity, no explicit content, no watermarks or visible text.
+Just warmth, suggestion, and the beauty of what remains unsaid.
   `.trim();
 
   console.log(`Generating image with primary prompt: "${primaryPrompt}"`);
