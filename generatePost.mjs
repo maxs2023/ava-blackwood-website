@@ -13,15 +13,100 @@ const sanityClient = createClient({
   token: process.env.SANITY_API_WRITE_TOKEN,
 });
 
-// --- Helper Function to create a URL-friendly slug ---
+// --- Helper Functions ---
+
 function createSlug(title) {
   return title
     .toLowerCase()
-    .replace(/\s+/g, '-') // Replace spaces with -
-    .replace(/[^\w-]+/g, '') // Remove all non-word chars
-    .replace(/--+/g, '-') // Replace multiple - with single -
-    .replace(/^-+/, '') // Trim - from start of text
-    .replace(/-+$/, ''); // Trim - from end of text
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+}
+
+/**
+ * NEW: This function converts the AI's structured response into
+ * Sanity's Portable Text format, including rich formatting.
+ */
+function formatBodyForSanity(bodyArray) {
+  const portableTextBody = [];
+
+  // Helper to parse **bold** and *italic* text from a string
+  const parseIn-lineFormatting = (text) => {
+    const children = [];
+    // Regex to find **bold** or *italic* text
+    const regex = /(\*\*.*?\*\*)|(\*.*?\*)/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      // Add plain text before the match
+      if (match.index > lastIndex) {
+        children.push({ _type: 'span', text: text.substring(lastIndex, match.index) });
+      }
+      
+      const matchedText = match[0];
+      const marks = [];
+      let content = '';
+
+      if (matchedText.startsWith('**')) {
+        marks.push('strong');
+        content = matchedText.substring(2, matchedText.length - 2);
+      } else if (matchedText.startsWith('*')) {
+        marks.push('em');
+        content = matchedText.substring(1, matchedText.length - 1);
+      }
+      
+      children.push({ _type: 'span', text: content, marks });
+      lastIndex = regex.lastIndex;
+    }
+
+    // Add any remaining plain text
+    if (lastIndex < text.length) {
+      children.push({ _type: 'span', text: text.substring(lastIndex) });
+    }
+    
+    return children;
+  };
+
+  for (const block of bodyArray) {
+    switch (block.type) {
+      case 'heading':
+        portableTextBody.push({
+          _type: 'block',
+          style: `h${block.level || 2}`,
+          children: [{ _type: 'span', text: block.content }],
+        });
+        break;
+      case 'paragraph':
+        portableTextBody.push({
+          _type: 'block',
+          style: 'normal',
+          children: parseIn-lineFormatting(block.content),
+        });
+        break;
+      case 'blockquote':
+         portableTextBody.push({
+          _type: 'block',
+          style: 'blockquote',
+          children: [{ _type: 'span', text: block.content }],
+        });
+        break;
+      case 'list':
+        for (const item of block.items) {
+          portableTextBody.push({
+            _type: 'block',
+            style: 'normal',
+            listItem: 'bullet',
+            level: 1,
+            children: parseIn-lineFormatting(item),
+          });
+        }
+        break;
+    }
+  }
+  return portableTextBody;
 }
 
 // --- Main Script Logic ---
@@ -29,28 +114,40 @@ function createSlug(title) {
 async function generateAndPublish() {
   console.log('Starting content generation process...');
   let postContent;
+  let plainTextBodyForSocial;
 
   // --- Part 1: Generate and Publish Blog Post to Sanity ---
   try {
-    // 1a. Fetch the default author reference from Sanity
     console.log("Fetching default author 'Ava Blackwood'...");
     const authors = await sanityClient.fetch(`*[_type == "author" && name == "Ava Blackwood"]`);
     if (!authors || authors.length === 0) {
-      throw new Error("Could not find author 'Ava Blackwood' in Sanity. Please create this author in the Studio.");
+      throw new Error("Could not find author 'Ava Blackwood' in Sanity.");
     }
     const authorRef = { _type: 'reference', _ref: authors[0]._id };
     console.log(`Found author with reference ID: ${authorRef._ref}`);
 
-    // 1b. Generate blog content with AI
-    console.log('Generating full blog post...');
+    console.log('Generating rich, formatted blog post...');
     const blogPostPrompt = `
       You are Ava Blackwood, an author of dark academia and spicy romance novels.
-      Your writing style is evocative, atmospheric, and explores themes of forbidden desire, power dynamics, and intellectual intimacy.
-      Your tone is sophisticated, mysterious, and offers genuine insights into romance.
+      Your writing style is evocative, atmospheric, and explores themes of forbidden desire and intellectual intimacy.
+      Your tone is sophisticated and offers genuine insights into romance.
+
       Generate a new, unique blog post as a guide for real-world romance.
-      It needs a catchy, intriguing title. The body should be 3-4 paragraphs long.
-      Do not use markdown. The body must be a single block of text.
-      Respond with a JSON object with two keys: "title" and "body".
+      The post must have a catchy title and a body.
+      The body must be an array of JSON objects, following this structure:
+      - Use at least one "heading" of level 2.
+      - Use multiple "paragraph" blocks. In the content for paragraphs, use markdown for emphasis: **bold** for strong points and *italic* for nuanced thoughts.
+      - Include one "blockquote" for an impactful statement.
+      - Include one "list" with at least 3 bullet points for actionable advice.
+
+      The final output must be a single, valid JSON object with two keys: "title" and "body".
+      Example body structure:
+      "body": [
+        { "type": "heading", "level": 2, "content": "The Art of a Lingering Gaze" },
+        { "type": "paragraph", "content": "Before the first touch, there is the *first look*. It’s a conversation without words, a secret shared across a crowded room. Mastering this is **essential**." },
+        { "type": "blockquote", "content": "The most profound connections are built in the silences we dare to share." },
+        { "type": "list", "items": ["Hold their gaze a second longer.", "Let a small, private smile touch your lips.", "Look away, then look back."] }
+      ]
     `;
 
     const aiResponse = await fetch(
@@ -70,15 +167,20 @@ async function generateAndPublish() {
     postContent = JSON.parse(jsonString);
 
     console.log(`Generated Blog Title: ${postContent.title}`);
+    
+    // Convert the structured body into Sanity's Portable Text format
+    const formattedBody = formatBodyForSanity(postContent.body);
+    
+    // Create a plain text version for the social media prompt
+    plainTextBodyForSocial = postContent.body.map(block => block.content || (block.items && block.items.join(' '))).join('\n');
 
-    // 1c. Format the post document to match the Sanity schema
     const slug = createSlug(postContent.title);
     const postDocument = {
       _type: 'post',
       title: postContent.title,
       slug: { _type: 'slug', current: slug },
       author: authorRef,
-      body: [{ _type: 'block', style: 'normal', children: [{ _type: 'span', text: postContent.body }] }],
+      body: formattedBody, // Use the new richly formatted body
       publishedAt: new Date().toISOString(),
     };
 
@@ -86,7 +188,6 @@ async function generateAndPublish() {
     const result = await sanityClient.create(postDocument);
     console.log('Successfully created Sanity post with ID:', result._id);
     
-    // Use the modern method for setting GitHub Actions outputs
     const GITHUB_OUTPUT = process.env.GITHUB_OUTPUT;
     if (GITHUB_OUTPUT) {
       appendFileSync(GITHUB_OUTPUT, `new_post_id=${result._id}\n`);
@@ -104,13 +205,13 @@ async function generateAndPublish() {
       console.log('Generating social media post...');
       const socialPostPrompt = `
         You are a social media manager for romance author Ava Blackwood.
-        Create a short, catchy social media post (for Twitter/X or Instagram) based on her latest blog post.
+        Create a short, catchy social media post based on her latest blog post.
         The tone should be intriguing and sophisticated.
-        Encourage people to read the full post (without explicitly saying "click the link").
+        Encourage people to read the full post on the blog.
         Include 3-4 relevant hashtags like #DarkAcademia, #SpicyRomance, #ForbiddenLove, #RomanceBooks, #AvaBlackwood.
 
         Blog Post Title: "${postContent.title}"
-        Blog Post Body: "${postContent.body}"
+        Blog Post Content Summary: "${plainTextBodyForSocial}"
 
         Based on this, generate a JSON object with one key: "social_post_text".
       `;
