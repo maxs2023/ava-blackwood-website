@@ -114,7 +114,7 @@ async function generateAndPublish() {
   try {
     console.log('Generating rich, formatted blog post text...');
     const blogPostPrompt = `
-      YYou are Ava Blackwood, an author of dark academia and **spicy romance** novels.
+      You are Ava Blackwood, an author of dark academia and **spicy romance** novels.
       Your writing style is evocative, atmospheric, and sensual. It explores themes of forbidden desire, power dynamics, intellectual intimacy, and raw vulnerability.
       Your tone is sophisticated and mysterious, offering genuine insights into the **psychology of intense passion**.
 
@@ -223,7 +223,7 @@ async function generateAndPublish() {
       console.log('Successfully set output for verification step.');
     }
 
-    // Social Media Post Generation
+    // --- Part 4: Social Media Post Generation ---
     plainTextBodyForSocial = postContent.body.map(block => block.content || (block.items && block.items.join(' '))).join('\n');
     
     console.log('Generating social media post...');
@@ -255,20 +255,28 @@ async function generateAndPublish() {
     
     console.log('Generated Social Post:', socialPost.social_post_text);
     
-    console.log('Sending post to social media webhook...');
-    const webhookResponse = await fetch(process.env.SOCIAL_MEDIA_WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: socialPost.social_post_text }),
-    });
+    // --- FIXED: Check if the webhook URL exists before trying to send ---
+    if (process.env.SOCIAL_MEDIA_WEBHOOK_URL) {
+      console.log('Sending post to social media webhook...');
+      const webhookResponse = await fetch(process.env.SOCIAL_MEDIA_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: socialPost.social_post_text }),
+      });
     
-    if (!webhookResponse.ok) throw new Error(`Webhook failed with status: ${webhookResponse.status}`);
-    
-    console.log('Successfully sent post to webhook.');
+      if (!webhookResponse.ok) {
+        // Log a warning instead of throwing an error to not fail the whole job
+        console.warn(`Webhook failed with status: ${webhookResponse.status}`);
+      } else {
+        console.log('Successfully sent post to webhook.');
+      }
+    } else {
+      console.log('SOCIAL_MEDIA_WEBHOOK_URL not set. Skipping social media post.');
+    }
 
   } catch (error) {
-    console.error('Failed during final publishing steps:', error);
-    process.exit(1);
+    // We log the error but don't exit with 1, because the main goal (Sanity post) was successful.
+    console.error('Failed during final publishing/social media steps:', error);
   }
 }
 
