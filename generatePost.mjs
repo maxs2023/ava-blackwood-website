@@ -207,14 +207,13 @@ No visible text or logos. Emotionally evocative, intimate, and poetic.
   `.trim();
 
   const primaryPrompt = `
-Hyper-realistic, cinematic lighting and shallow depth of field.
-A sensual, symbolic vignette in Ava Blackwood’s world.
-Main focus: ${imageSceneDescription.trim()}—a metaphor for desire.
-Also present: ${gestureDetail}, evoking intimacy without explicitness.
-Set among textures of old books,lace, and quiet aftermath.
-Style: Artful intimacy in chiaroscuro lighting. 
-No nudity, no explicit body parts, no watermarks or visible text.
-Only suggestion, tension, and emotional gravity.
+Hyper-realistic, cinematic shadows and shallow depth of field.
+A moody, poetic scene drawn from Ava Blackwood’s world—steeped in atmosphere and longing.
+Main focus: ${imageSceneDescription.trim()}, a quiet metaphor for restrained desire.
+Secondary detail: ${gestureDetail}, capturing a moment of intimacy without exposure.
+The frame is textured with candlelight, aged books, soft lace, and the hush of something just passed.
+Style: Ethereal romanticism with vintage sensuality—rich tones, soft light, and emotional gravity.
+No nudity, no overt body parts, no watermarks or text—only the suggestion of touch, the weight of silence, and the tension between what’s felt and what’s left unsaid.
   `.trim();
 
   console.log(`Generating image with primary prompt: "${primaryPrompt}"`);
