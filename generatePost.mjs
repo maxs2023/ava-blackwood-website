@@ -111,7 +111,7 @@ async function generateAndPublish() {
   // --- Part 1: Generate Blog Post Text via Gemini ---
   try {
     console.log('Generating blog post with Gemini...');
-    const blogPostPrompt = `You are Ava Blackwood, an author of dark academia and spicy romance novels...`; // Keep your actual prompt here
+    const blogPostPrompt = `You are Ava Blackwood, an author of dark academia and spicy romance novels...`; // Your actual blog prompt
 
     const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
       method: 'POST',
@@ -130,9 +130,9 @@ async function generateAndPublish() {
     process.exit(1);
   }
 
-  // --- Part 2: Generate Thematic Image via OpenAI DALL·E 3 ---
+  // --- Part 2: Generate Image with Fallback using OpenAI DALL·E 3 ---
   try {
-    const symbolicParagraphs = postContent.body
+    const lastParagraphs = postContent.body
       .filter(block => block.type === 'paragraph')
       .slice(-3)
       .map(block => block.content)
@@ -144,32 +144,28 @@ async function generateAndPublish() {
       'a silk ribbon tangled on a closed book',
       'a lipstick-smeared wine glass near torn poetry',
       'a velvet choker coiled around a dried rose',
-      'an open letter stained with perfume',
     ];
     const fallbackScene = sensualObjects[Math.floor(Math.random() * sensualObjects.length)];
-    const matchedSymbol = symbolicParagraphs.match(/(a|an) ([^.]{10,80}?)[\.,;]/i);
-    const imageSceneDescription = matchedSymbol ? matchedSymbol[0] : fallbackScene;
+    const matchedSymbol = lastParagraphs.match(/(a|an) ([^.]{10,80}?)[\.,;]/i);
+    const sceneDescription = matchedSymbol ? matchedSymbol[0] : fallbackScene;
 
     const humanDetails = [
       'a woman’s silhouette behind sheer curtains',
-      'a wrist wrapped in black lace',
-      'fingers tracing the spine of a book',
-      'a partially open mouth in candlelight',
-      'a pair of bare feet stepping onto cold stone',
+      'a wrist wrapped in lace',
+      'fingers tracing a dusty bookshelf',
+      'a collarbone lit by candlelight',
     ];
     const gestureDetail = humanDetails[Math.floor(Math.random() * humanDetails.length)];
 
-    const imagePrompt = `
-Dark-academia sensual still life in moody cinematic light.
-Scene: ${imageSceneDescription.trim()} and ${gestureDetail}, softly implied.
-Textures: velvet, candle wax, antique leather, glass, silk.
-Atmosphere: intimate, poetic, shadowed. Romantic and emotionally charged.
-No nudity. No explicit content. No text or logos.
+    let imagePrompt = `
+Dark-academia sensual still life in cinematic shadowed light.
+Scene: ${sceneDescription.trim()} with ${gestureDetail}, softly implied.
+Elements: candlelight, velvet, leather-bound books, silk, shadows.
+Moody and atmospheric. No nudity, no explicit content, no text.
 `.trim();
 
-    console.log(`Generating image with DALL·E 3 prompt: "${imagePrompt}"`);
-
-    const dalleResponse = await fetch("https://api.openai.com/v1/images/generations", {
+    let imageUrl;
+    let dalleResponse = await fetch("https://api.openai.com/v1/images/generations", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -183,12 +179,36 @@ No nudity. No explicit content. No text or logos.
       }),
     });
 
-    if (!dalleResponse.ok) throw new Error(`OpenAI DALL·E error: ${await dalleResponse.text()}`);
-    const dalleResult = await dalleResponse.json();
-    const imageUrl = dalleResult.data[0].url;
+    let dalleResult = await dalleResponse.json();
+    if (dalleResult?.data?.[0]?.url) {
+      imageUrl = dalleResult.data[0].url;
+    } else {
+      console.warn("Primary prompt failed. Using fallback image prompt...");
+      const fallbackPrompt = `
+Still life in dark academia style. A closed book on a velvet cloth beside a flickering candle. A single silk glove rests nearby. No people. Poetic atmosphere.
+      `.trim();
+
+      dalleResponse = await fetch("https://api.openai.com/v1/images/generations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          prompt: fallbackPrompt,
+          n: 1,
+          size: "1024x1024",
+          model: "dall-e-3"
+        }),
+      });
+
+      const fallbackResult = await dalleResponse.json();
+      if (!fallbackResult?.data?.[0]?.url) throw new Error("Fallback prompt failed.");
+      imageUrl = fallbackResult.data[0].url;
+    }
 
     const imageDownloadResponse = await fetch(imageUrl);
-    if (!imageDownloadResponse.ok) throw new Error(`Failed to download image from DALL·E 3`);
+    if (!imageDownloadResponse.ok) throw new Error(`Failed to download image from: ${imageUrl}`);
     const imageBuffer = await imageDownloadResponse.arrayBuffer();
 
     console.log("Uploading image to Sanity...");
@@ -196,15 +216,13 @@ No nudity. No explicit content. No text or logos.
       filename: `${createSlug(postContent.title)}.png`,
       contentType: "image/png"
     });
-    console.log("Successfully uploaded image asset with ID:", imageAsset._id);
+    console.log("Image uploaded successfully. Asset ID:", imageAsset._id);
   } catch (error) {
     console.error("Image generation/upload failed:", error);
     process.exit(1);
   }
 
-  // --- Part 3: Publish to Sanity (Add this if needed)
-  // This part would contain your logic for creating the document and pushing it to your CMS
-
+  // --- Part 3: Publish post and image (your existing logic here) ---
 }
 
 generateAndPublish();
