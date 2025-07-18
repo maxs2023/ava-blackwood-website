@@ -18,6 +18,8 @@ import preludesOfDesireCover from './assets/Beneath the Scholar\'s Veil.jpg'
 import enPointeCover from './assets/En Pointe.jpg'
 import underSurgicalLightsCover from './assets/Under Surgical Lights.jpg'
 import volleyOfTemptationCover from './assets/Volley of Temptation.jpg'
+import veilsOfDevotionCover from './assets/Veils of Devotion.jpg'
+import boundByBriefsCover from './assets/Bound by Briefs.jpg'
 
 // Import author profile photo
 import authorPhoto from './assets/authorprofilephoto.png'
@@ -115,6 +117,18 @@ const booksData = {
       cover: enPointeCover,
       rating: 4.6,
       genre: "Romance"
+    },
+    { 
+      id: 7, 
+      title: "Veils of Devotion", 
+      fullTitle: "Veils of Devotion: A Dark Academia Romance",
+      description: "In the shadowed halls of an ancient seminary, forbidden desires bloom between sacred vows and scholarly pursuits. A tale of spiritual awakening and passionate surrender that challenges the boundaries between devotion and desire.", 
+      amazonUrl: "https://www.amazon.com/Veils-Devotion-Ava-Blackwood/dp/B0F9VD8K2L", 
+      publishDate: "2024", 
+      series: "Dark Academia", 
+      cover: veilsOfDevotionCover,
+      rating: 4.2,
+      genre: "Dark Academia Romance"
     }
   ],
   medical: [
@@ -143,6 +157,20 @@ const booksData = {
       cover: volleyOfTemptationCover,
       rating: 4.1,
       genre: "Sports Romance"
+    }
+  ],
+  legal: [
+    { 
+      id: 8, 
+      title: "Bound by Briefs", 
+      fullTitle: "Bound by Briefs: A Legal Romance",
+      description: "High-powered attorney Alexandra Stone has never lost a case, but when she faces off against her former law school rival in the courtroom, she discovers that some battles are worth losing. A passionate legal romance where justice and desire collide.", 
+      amazonUrl: "https://www.amazon.com/Bound-Briefs-Ava-Blackwood/dp/B0F9BB7L9M", 
+      publishDate: "2024", 
+      series: "Legal Romance", 
+      cover: boundByBriefsCover,
+      rating: 4.3,
+      genre: "Legal Romance"
     }
   ]
 };
@@ -386,7 +414,8 @@ function App() {
     return [
       ...booksData.darkAcademia,
       ...booksData.medical,
-      ...booksData.sports
+      ...booksData.sports,
+      ...booksData.legal
     ];
   };
 
@@ -521,6 +550,13 @@ function App() {
               className={selectedGenre === 'sports' ? 'bg-primary text-white' : 'text-gray-700 border-gray-300 hover:text-burgundy'}
             >
               Sports Romance ({booksData.sports.length})
+            </Button>
+            <Button
+              variant={selectedGenre === 'legal' ? 'default' : 'outline'}
+              onClick={() => setSelectedGenre('legal')}
+              className={selectedGenre === 'legal' ? 'bg-primary text-white' : 'text-gray-700 border-gray-300 hover:text-burgundy'}
+            >
+              Legal Romance ({booksData.legal.length})
             </Button>
           </div>
         </div>
