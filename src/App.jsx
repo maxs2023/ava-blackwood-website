@@ -173,14 +173,14 @@ const booksData = {
   ]
 };
 
-// Flatten all books for easier access
+/* // Flatten all books for easier access
 const allBooks = [
   ...booksData.darkAcademia,
   ...booksData.medical,
   ...booksData.sports,
   ...booksData.legal
 ];
-
+ */
 /* // --- Book Data ---
 const booksData = {
   darkAcademia: [
