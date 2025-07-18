@@ -780,6 +780,7 @@ function App() {
       </div>
     </div>
   );
+  
   const BlogPage = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -919,44 +920,6 @@ function App() {
     );
   };
   
-
-    return (
-      <div className="min-h-screen py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-5xl font-serif text-burgundy mb-4">From the Desk of Ava Blackwood</h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Musings on writing, romance, and the shadows in between.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-            {posts.map((post) => (
-              <Card key={post._id} className="flex flex-col hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="text-2xl font-serif text-burgundy line-clamp-2">{post.title}</CardTitle>
-                  <CardDescription className="text-xs text-gray-500">
-                    {new Date(post.publishedAt).toLocaleDateString()}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  {/* This is a preview, so it doesn't need full formatting */}
-                  <p className="text-gray-700 text-sm line-clamp-4">A look inside the latest musings from Ava Blackwood...</p>
-                </CardContent>
-                <div className="p-6 pt-0 mt-auto">
-                  <Button variant="link" onClick={() => handlePostClick(post)} className="p-0 text-burgundy font-semibold hover:text-burgundy/80">
-                    Read More &rarr;
-                  </Button>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
- */
-
   const ContactPage = () => ( <div><ContactForm /></div> );
   
   // --- Footer Component ---
