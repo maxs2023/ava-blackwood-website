@@ -161,7 +161,8 @@ async function generateAndPublish() {
     const lastParagraph = postContent.body.filter(block => block.type === 'paragraph').pop();
     const imageSceneDescription = lastParagraph ? lastParagraph.content : 'A single crimson lipstick stain on a porcelain coffee cup';
     
-    const imagePrompt = `Photorealistic, dark academia aesthetic, moody cinematic lighting, shallow depth of field. A close-up shot of: ${imageSceneDescription}. The style is sophisticated, sensual, and mysterious, fitting for a dark romance author.`;
+    // MODIFIED: Added negative constraints directly into the prompt.
+    const imagePrompt = `Photorealistic, dark academia aesthetic, moody cinematic lighting, shallow depth of field. A close-up shot of: ${imageSceneDescription}. The style is sophisticated, sensual, and mysterious. **Crucially, the image must contain no text, words, letters, or watermarks.**`;
     console.log(`Generating image with prompt: "${imagePrompt}"`);
 
     const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
@@ -169,10 +170,10 @@ async function generateAndPublish() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           instances: [{ prompt: imagePrompt }], 
+          // MODIFIED: Removed the unsupported 'negativePrompt' parameter.
           parameters: { 
             "sampleCount": 1,
-            "aspectRatio": "16:9",
-            "negativePrompt": "text, words, letters, writing, watermark, signature, font, logo"
+            "aspectRatio": "16:9"
           } 
         }),
     });
