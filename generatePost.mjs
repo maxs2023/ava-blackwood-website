@@ -1,4 +1,3 @@
-// generatePost.mjs
 import { createClient } from '@sanity/client';
 import fetch from 'node-fetch';
 import { appendFileSync } from 'fs';
@@ -107,13 +106,12 @@ function formatBodyForSanity(bodyArray) {
 async function generateAndPublish() {
   console.log('Starting content generation process...');
   let postContent;
-  let plainTextBodyForSocial;
   let imageAsset;
 
-  // --- Part 1: Generate Blog Post Text ---
+  // --- Part 1: Generate Blog Post Text via Gemini ---
   try {
-    console.log('Generating rich, formatted blog post text...');
-    const blogPostPrompt = `...`; // (Prompt unchanged for brevity)
+    console.log('Generating blog post with Gemini...');
+    const blogPostPrompt = `You are Ava Blackwood, an author of dark academia and spicy romance novels...`; // Keep your actual prompt here
 
     const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
       method: 'POST',
@@ -132,7 +130,7 @@ async function generateAndPublish() {
     process.exit(1);
   }
 
-  // --- Part 2: Generate Thematic Image using OpenAI DALL·E 3 ---
+  // --- Part 2: Generate Thematic Image via OpenAI DALL·E 3 ---
   try {
     const symbolicParagraphs = postContent.body
       .filter(block => block.type === 'paragraph')
@@ -204,12 +202,9 @@ No nudity. No explicit content. No text or logos.
     process.exit(1);
   }
 
-  // --- Part 3: Publish to Sanity & Social Media ---
-  try {
-    // [Unchanged logic for Sanity publishing and social media generation]
-  } catch (error) {
-    console.error('Failed during final publishing/social media steps:', error);
-  }
+  // --- Part 3: Publish to Sanity (Add this if needed)
+  // This part would contain your logic for creating the document and pushing it to your CMS
+
 }
 
 generateAndPublish();
