@@ -156,7 +156,7 @@ async function generateAndPublish() {
     process.exit(1);
   }
   
-  // --- Part 2: Generate Thematic Image using OpenAI DALL·E 3 ---
+  // --- Part 2: Generate Thematic Image ---
 try {
   const symbolicParagraphs = postContent.body
     .filter(block => block.type === 'paragraph')
@@ -166,11 +166,13 @@ try {
 
   const sensualObjects = [
     'a bitten fig on a velvet napkin',
-    'a black lace glove beside a crystal glass',
-    'a silk ribbon tangled on a closed book',
+    'a lace glove resting beside a crystal decanter',
+    'a single black stocking draped over a candle stub',
+    'a corset ribbon left untied on a leather-bound book',
     'a lipstick-smeared wine glass near torn poetry',
-    'a velvet choker coiled around a dried rose',
-    'an open letter stained with perfume',
+    'reading glasses tangled with a silk scarf',
+    'a velvet choker coiled on a handwritten letter',
+    'a single red rose on a bed of old parchment'
   ];
   const fallbackScene = sensualObjects[Math.floor(Math.random() * sensualObjects.length)];
 
@@ -178,53 +180,71 @@ try {
   const imageSceneDescription = matchedSymbol ? matchedSymbol[0] : fallbackScene;
 
   const humanDetails = [
-    'a woman’s silhouette against rain-streaked glass',
-    'a hand delicately brushing a velvet curtain',
-    'lips slightly parted in a moment of anticipation',
-    'a collarbone lit by flickering candlelight',
-    'a wrist wrapped in black lace near a fallen book',
+    'a woman’s silhouette outlined by candlelight',
+    'a hand loosely holding an antique key',
+    'a blurred jawline tilted in reflection',
+    'fingers pausing on a leather journal',
+    'a neck adorned with a velvet ribbon',
+    'a shadow of parted lips on fogged glass',
+    'a wrist wrapped in lace near a glass of wine',
+    'a collarbone brushed by loose hair'
   ];
   const gestureDetail = humanDetails[Math.floor(Math.random() * humanDetails.length)];
 
-  const imagePrompt = `
-Dark-academia, sensual still life in cinematic lighting.
-Focus: ${imageSceneDescription.trim()}.
-Also includes: ${gestureDetail}, softly implied.
-Textures: candlelight, velvet, antique books, silk, shadows.
-Style: photorealistic, intimate, moody. Suggestive, not explicit.
-No nudity. No text, words, or logos.
-`.trim();
+  const safePrompt = `
+Photorealistic still life, cinematic lighting, dark academia mood.
+Focus: ${fallbackScene}.
+Textural setting: antique books, candlelight, silk, and shadow. 
+No people, no body parts. Only suggestion through objects and mood.
+No visible text or logos. Emotionally evocative, intimate, and poetic.
+  `.trim();
 
-  console.log(`Generating image with DALL·E 3 prompt: "${imagePrompt}"`);
+  const primaryPrompt = `
+Hyper-realistic, cinematic shadows and shallow depth of field.
+A dark, symbolic vignette in Ava Blackwood’s world.
+Main focus: ${imageSceneDescription.trim()}—a metaphor for desire.
+Also present: ${gestureDetail}, evoking intimacy without explicitness.
+Set among textures of old books, candlelight, lace, and quiet aftermath.
+Style: dark academia with sensual undertones. 
+No nudity, no explicit body parts, no watermarks or visible text.
+Only suggestion, tension, and emotional gravity.
+  `.trim();
 
-  const dalleResponse = await fetch("https://api.openai.com/v1/images/generations", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      prompt: imagePrompt,
-      n: 1,
-      size: "1024x1024",
-      model: "dall-e-3",
-      response_format: "b64_json"
-    }),
-  });
+  console.log(`Generating image with primary prompt: "${primaryPrompt}"`);
 
-  if (!dalleResponse.ok) throw new Error(`OpenAI DALL·E error: ${await dalleResponse.text()}`);
-  const dalleResult = await dalleResponse.json();
-  const base64ImageData = dalleResult.data[0].b64_json;
+  const tryImageGeneration = async (promptToTry) => {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        instances: [{ prompt: promptToTry }],
+        parameters: {
+          "sampleCount": 1,
+          "aspectRatio": "16:9"
+        }
+      }),
+    });
+    return response.ok ? await response.json() : null;
+  };
 
-  console.log("Uploading image to Sanity...");
-  const imageBuffer = Buffer.from(base64ImageData, "base64");
-  imageAsset = await sanityClient.assets.upload("image", imageBuffer, {
+  let imageResult = await tryImageGeneration(primaryPrompt);
+  if (!imageResult) {
+    console.warn('Primary image prompt failed or was rejected. Trying safe fallback...');
+    imageResult = await tryImageGeneration(safePrompt);
+    if (!imageResult) throw new Error('Both primary and fallback prompts failed Gemini compliance.');
+  }
+
+  const base64ImageData = imageResult.predictions[0].bytesBase64Encoded;
+
+  console.log('Image generated, now uploading to Sanity...');
+  const imageBuffer = Buffer.from(base64ImageData, 'base64');
+  imageAsset = await sanityClient.assets.upload('image', imageBuffer, {
     filename: `${createSlug(postContent.title)}.png`,
-    contentType: "image/png"
+    contentType: 'image/png'
   });
-  console.log("Successfully uploaded image asset with ID:", imageAsset._id);
+  console.log('Successfully uploaded image asset with ID:', imageAsset._id);
 } catch (error) {
-  console.error("Image generation/upload failed:", error);
+  console.error('Failed during image generation or upload:', error);
   process.exit(1);
 }
 
