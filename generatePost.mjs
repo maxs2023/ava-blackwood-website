@@ -207,12 +207,12 @@ No visible text or logos. Emotionally evocative, intimate, and poetic.
   `.trim();
 
   const primaryPrompt = `
-Hyper-realistic, cinematic shadows and shallow depth of field.
-A moody, poetic scene drawn from Ava Blackwood’s world—steeped in atmosphere and longing.
-Main focus: ${imageSceneDescription.trim()}, a quiet metaphor for restrained desire.
-Secondary detail: ${gestureDetail}, capturing a moment of intimacy without exposure.
-Style: Artful intimacy with soft lighing and cinematic focus with European elegance.
-No nudity, no overt body parts, no watermarks or text—only the suggestion of touch, the weight of silence, and the tension between what’s felt and what’s left unsaid.
+Hyper-realistic with cinematic shadows and a shallow depth of field.  
+A moody, poetic scene from Ava Blackwood’s world—suffused with longing and quiet tension.  
+Main focus: ${imageSceneDescription.trim()}, rendered as a subtle metaphor for restrained desire.  
+Secondary detail: ${gestureDetail}, evoking intimacy through implication, never exposure.  
+Style: Artful intimacy in soft, directional lighting—framed with European elegance and cinematic precision.  
+No nudity, no overt body parts, no watermarks or text—only the *suggestion* of touch, the *gravity* of stillness, and the *space* between anticipation and memory.
   `.trim();
 
   console.log(`Generating image with primary prompt: "${primaryPrompt}"`);
