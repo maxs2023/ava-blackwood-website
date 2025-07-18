@@ -1,0 +1,72 @@
+# .github/workflows/daily-post-and-build.yml
+
+name: Generate and Publish Daily Content
+
+on:
+  # This schedule runs the job every day at 10:00 AM UTC.
+  # Use https://crontab.guru to customize your schedule.
+  schedule:
+    - cron: '0 10 * * *'
+  
+  # This allows you to run the workflow manually from the Actions tab on GitHub
+  workflow_dispatch:
+
+jobs:
+  generate-and-publish:
+    runs-on: ubuntu-latest
+
+    # This allows one step to pass the new post's ID to the next step
+    outputs:
+      new_post_id: ${{ steps.generate.outputs.new_post_id }}
+
+    steps:
+      # 1. Check out your repository's code
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # 2. Set up Node.js so we can run our script
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. Install the necessary packages
+      - name: Install Dependencies
+        run: npm install @sanity/client node-fetch
+
+      # 4. Run the generation and publishing script
+      - name: Generate and Publish Content
+        id: generate # Give this step an ID to reference its output
+        run: node generatePost.mjs
+        env:
+          # These secrets are configured in your GitHub repository settings
+          SANITY_API_WRITE_TOKEN: ${{ secrets.SANITY_API_WRITE_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SOCIAL_MEDIA_WEBHOOK_URL: ${{ secrets.SOCIAL_MEDIA_WEBHOOK_URL }}
+
+  verify-post:
+    # This job runs only after the 'generate-and-publish' job is successful
+    needs: generate-and-publish
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install @sanity/client
+
+      # 5. Verify the generated post against the schema
+      - name: Verify Post Content and Formatting
+        run: node verifyPost.mjs
+        env:
+          # --- FIXED: This now correctly accesses the output from the previous job ---
+          NEW_POST_ID: ${{ needs.generate-and-publish.outputs.new_post_id }}
+          SANITY_API_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
