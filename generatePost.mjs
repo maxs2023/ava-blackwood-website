@@ -167,7 +167,14 @@ async function generateAndPublish() {
     const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ instances: [{ prompt: imagePrompt }], parameters: { "sampleCount": 1 } }),
+        body: JSON.stringify({ 
+          instances: [{ prompt: imagePrompt }], 
+          parameters: { 
+            "sampleCount": 1,
+            "aspectRatio": "16:9",
+            "negativePrompt": "text, words, letters, writing, watermark, signature, font, logo"
+          } 
+        }),
     });
     
     if (!imageResponse.ok) throw new Error(`Imagen API Error: ${await imageResponse.text()}`);
