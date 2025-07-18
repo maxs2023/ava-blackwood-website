@@ -33,7 +33,8 @@ function formatBodyForSanity(bodyArray) {
   const portableTextBody = [];
 
   // Helper to parse **bold** and *italic* text from a string
-  const parseIn-lineFormatting = (text) => {
+  // --- FIXED: Renamed function to use camelCase ---
+  const parseInlineFormatting = (text) => {
     const children = [];
     // Regex to find **bold** or *italic* text
     const regex = /(\*\*.*?\*\*)|(\*.*?\*)/g;
@@ -83,7 +84,8 @@ function formatBodyForSanity(bodyArray) {
         portableTextBody.push({
           _type: 'block',
           style: 'normal',
-          children: parseIn-lineFormatting(block.content),
+          // --- FIXED: Called the correctly named function ---
+          children: parseInlineFormatting(block.content),
         });
         break;
       case 'blockquote':
@@ -100,7 +102,8 @@ function formatBodyForSanity(bodyArray) {
             style: 'normal',
             listItem: 'bullet',
             level: 1,
-            children: parseIn-lineFormatting(item),
+            // --- FIXED: Called the correctly named function ---
+            children: parseInlineFormatting(item),
           });
         }
         break;
