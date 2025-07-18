@@ -166,60 +166,74 @@ try {
 
   const sensualObjects = [
     'a bitten fig on a velvet napkin',
-    'lace panties draped over a crystal decanter',
-    'a single black stocking coiled beside a candle stub',
-    'a crimson corset half-unlaced atop a leather chair',
-    'a lipstick-smeared wine glass next to a torn book page',
-    'a pair of reading glasses entangled with a silk bra on a mahogany desk',
-    'a velvet choker tangled around a spilled bottle of ink',
-    'a black lace glove gripping a single red rose, its petals bruised'
+    'a lace glove resting beside a crystal decanter',
+    'a single black stocking draped over a candle stub',
+    'a corset ribbon left untied on a leather-bound book',
+    'a lipstick-smeared wine glass near torn poetry',
+    'reading glasses tangled with a silk scarf',
+    'a velvet choker coiled on a handwritten letter',
+    'a single red rose on a bed of old parchment'
   ];
   const fallbackScene = sensualObjects[Math.floor(Math.random() * sensualObjects.length)];
 
-  // Extract potential symbolic imagery from last few paragraphs
   const matchedSymbol = symbolicParagraphs.match(/(a|an) ([^.]{10,80}?)[\.,;]/i);
   const imageSceneDescription = matchedSymbol ? matchedSymbol[0] : fallbackScene;
 
   const humanDetails = [
-    'a woman’s bare back lit by flickering candlelight',
-    'parted lips captured in soft shadow',
-    'a man’s hand gripping the edge of a velvet chair',
-    'tangled fingers clutching a worn book',
-    'an exposed collarbone kissed by candle wax',
-    'thighs beneath silk, with a garter slipping down',
-    'a hand wrapped in black lace resting on warm skin',
-    'a face partially obscured by tousled hair and longing',
+    'a woman’s silhouette outlined by candlelight',
+    'a hand loosely holding an antique key',
+    'a blurred jawline tilted in reflection',
+    'fingers pausing on a leather journal',
+    'a neck adorned with a velvet ribbon',
+    'a shadow of parted lips on fogged glass',
+    'a wrist wrapped in lace near a glass of wine',
+    'a collarbone brushed by loose hair'
   ];
   const gestureDetail = humanDetails[Math.floor(Math.random() * humanDetails.length)];
 
-  const imagePrompt = `
-Hyper-realistic, cinematic lighting with chiaroscuro shadows and shallow depth of field.
-A dark, sensual scene in the world of Ava Blackwood.
-The focal point: ${imageSceneDescription.trim()}—an object of forbidden desire.
-Also in frame: ${gestureDetail}, adding human presence and erotic tension.
-Surrounding textures suggest intimacy and aftermath—rumpled silk sheets, broken wine glass, candle wax on leather, or lace abandoned on mahogany.
-No nudity, no explicit sex. Only suggestion, anticipation, and emotional resonance.
-Visual aesthetic: dark academia meets sensual gothic—refined, moody, and intimate.
-No visible text, letters, logos, or watermarks.
-Only one emotionally charged frame, captured at the edge of confession.
-`.trim();
+  const safePrompt = `
+Photorealistic still life, cinematic lighting, dark academia mood.
+Focus: ${fallbackScene}.
+Textural setting: antique books, candlelight, silk, and shadow. 
+No people, no body parts. Only suggestion through objects and mood.
+No visible text or logos. Emotionally evocative, intimate, and poetic.
+  `.trim();
 
-  console.log(`Generating image with prompt: "${imagePrompt}"`);
+  const primaryPrompt = `
+Hyper-realistic, cinematic shadows and shallow depth of field.
+A dark, symbolic vignette in Ava Blackwood’s world.
+Main focus: ${imageSceneDescription.trim()}—a metaphor for desire.
+Also present: ${gestureDetail}, evoking intimacy without explicitness.
+Set among textures of old books, candlelight, lace, and quiet aftermath.
+Style: dark academia with sensual undertones. 
+No nudity, no explicit body parts, no watermarks or visible text.
+Only suggestion, tension, and emotional gravity.
+  `.trim();
 
-  const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
+  console.log(`Generating image with primary prompt: "${primaryPrompt}"`);
+
+  const tryImageGeneration = async (promptToTry) => {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        instances: [{ prompt: imagePrompt }], 
-        parameters: { 
+      body: JSON.stringify({
+        instances: [{ prompt: promptToTry }],
+        parameters: {
           "sampleCount": 1,
           "aspectRatio": "16:9"
-        } 
+        }
       }),
-  });
+    });
+    return response.ok ? await response.json() : null;
+  };
 
-  if (!imageResponse.ok) throw new Error(`Imagen API Error: ${await imageResponse.text()}`);
-  const imageResult = await imageResponse.json();
+  let imageResult = await tryImageGeneration(primaryPrompt);
+  if (!imageResult) {
+    console.warn('Primary image prompt failed or was rejected. Trying safe fallback...');
+    imageResult = await tryImageGeneration(safePrompt);
+    if (!imageResult) throw new Error('Both primary and fallback prompts failed Gemini compliance.');
+  }
+
   const base64ImageData = imageResult.predictions[0].bytesBase64Encoded;
 
   console.log('Image generated, now uploading to Sanity...');
