@@ -155,32 +155,42 @@ async function generateAndPublish() {
     console.error('Failed during blog post text generation:', error);
     process.exit(1);
   }
-
+  
   // --- Part 2: Generate Thematic Image ---
   try {
-    const lastParagraph = postContent.body.filter(block => block.type === 'paragraph').pop();
-    const symbolicParagraph = postContent.body
+    const symbolicParagraphs = postContent.body
       .filter(block => block.type === 'paragraph')
-      .slice(-2)
+      .slice(-3)
       .map(block => block.content)
       .join(' ');
-    
-    // Fallback symbolic image seed if none exists
-    const fallbackScene = 'a single crimson lipstick stain on a porcelain coffee cup';
-    
-    // Extract a poetic, symbolic image seed using regex for common sensual symbols
-    const matchedSymbol = symbolicParagraph.match(/a ([^.]*?)\.(?=\s|$)/i);
-    const imageSceneDescription = matchedSymbol ? matchedSymbol[0] : fallbackScene;   
-    
-    // MODIFIED: Added negative constraints directly into the prompt.
+
+    const sensualObjects = [
+      'a bitten fig on a velvet napkin',
+      'lace panties draped over a crystal decanter',
+      'a single black stocking coiled beside a candle stub',
+      'a crimson corset half-unlaced atop a leather chair',
+      'a lipstick-smeared wine glass next to a torn book page',
+      'a pair of reading glasses entangled with a silk bra on a mahogany desk',
+      'a velvet choker tangled around a spilled bottle of ink',
+      'a black lace glove gripping a single red rose, its petals bruised'
+    ];
+
+    const fallbackScene = sensualObjects[Math.floor(Math.random() * sensualObjects.length)];
+
+    // Attempt to extract an evocative image symbol from the last paragraphs
+    const matchedSymbol = symbolicParagraphs.match(/(a|an) ([^.]{10,80}?)[\.,;]/i);
+    const imageSceneDescription = matchedSymbol ? matchedSymbol[0] : fallbackScene;
+
     const imagePrompt = `
-      Photorealistic, moody cinematic lighting, shallow depth of field. 
-      A sensual, symbolic still-life scene: ${imageSceneDescription.trim()}.
-      The aesthetic is dark academia—textured, evocative, and rich with emotional undertones. 
-      Focus on intimate symbolism, unresolved tension, and visual storytelling. 
-      This is Ava Blackwood’s world: *desire draped in shadows, intellect edged with longing*. 
-      No visible text, letters, or watermarks. One distinct object or pairing per frame.
-      `.trim();
+Photorealistic, cinematic chiaroscuro lighting with sensual shadows and a shallow depth of field.
+A symbolic and erotically charged still-life scene: ${imageSceneDescription.trim()}.
+Surrounding objects evoke intimacy and aftermath—rumpled silk sheets, broken wine glasses, lace on velvet, candle wax dripped over old books, an unbuttoned collar.
+The tone is rich with tension and unspoken longing, like a secret just confessed.
+Styling is dark academia—textured, mysterious, and emotionally raw.
+No human figures. No visible text, letters, or watermarks.
+One emotionally resonant image of *forbidden desire* and *intellectual intimacy*.
+    `.trim();
+
     console.log(`Generating image with prompt: "${imagePrompt}"`);
 
     const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
@@ -188,14 +198,13 @@ async function generateAndPublish() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           instances: [{ prompt: imagePrompt }], 
-          // MODIFIED: Removed the unsupported 'negativePrompt' parameter.
           parameters: { 
             "sampleCount": 1,
             "aspectRatio": "16:9"
           } 
         }),
     });
-    
+
     if (!imageResponse.ok) throw new Error(`Imagen API Error: ${await imageResponse.text()}`);
     const imageResult = await imageResponse.json();
     const base64ImageData = imageResult.predictions[0].bytesBase64Encoded;
@@ -211,6 +220,7 @@ async function generateAndPublish() {
     console.error('Failed during image generation or upload:', error);
     process.exit(1);
   }
+
 
   // --- Part 3: Publish to Sanity & Social Media ---
   try {
