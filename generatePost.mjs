@@ -86,7 +86,7 @@ async function generateAndPublish() {
     const result = await sanityClient.create(postDocument);
     console.log('Successfully created Sanity post with ID:', result._id);
     
-    // --- FIXED: Use the modern method for setting GitHub Actions outputs ---
+    // Use the modern method for setting GitHub Actions outputs
     const GITHUB_OUTPUT = process.env.GITHUB_OUTPUT;
     if (GITHUB_OUTPUT) {
       appendFileSync(GITHUB_OUTPUT, `new_post_id=${result._id}\n`);

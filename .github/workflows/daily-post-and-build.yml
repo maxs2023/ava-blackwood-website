@@ -67,6 +67,5 @@ jobs:
       - name: Verify Post Content and Formatting
         run: node verifyPost.mjs
         env:
-          # --- FIXED: This now correctly accesses the output from the previous job ---
           NEW_POST_ID: ${{ needs.generate-and-publish.outputs.new_post_id }}
           SANITY_API_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
