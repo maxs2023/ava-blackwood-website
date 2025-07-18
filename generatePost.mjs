@@ -25,15 +25,24 @@ function createSlug(title) {
     .replace(/-+$/, '');
 }
 
+// Helper function to generate a short, unique key
+function generateKey(length = 12) {
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+}
+
 /**
  * NEW: This function converts the AI's structured response into
- * Sanity's Portable Text format, including rich formatting.
+ * Sanity's Portable Text format, including rich formatting and unique keys.
  */
 function formatBodyForSanity(bodyArray) {
   const portableTextBody = [];
 
   // Helper to parse **bold** and *italic* text from a string
-  // --- FIXED: Renamed function to use camelCase ---
   const parseInlineFormatting = (text) => {
     const children = [];
     // Regex to find **bold** or *italic* text
@@ -44,7 +53,7 @@ function formatBodyForSanity(bodyArray) {
     while ((match = regex.exec(text)) !== null) {
       // Add plain text before the match
       if (match.index > lastIndex) {
-        children.push({ _type: 'span', text: text.substring(lastIndex, match.index) });
+        children.push({ _type: 'span', text: text.substring(lastIndex, match.index), _key: generateKey() });
       }
       
       const matchedText = match[0];
@@ -59,13 +68,13 @@ function formatBodyForSanity(bodyArray) {
         content = matchedText.substring(1, matchedText.length - 1);
       }
       
-      children.push({ _type: 'span', text: content, marks });
+      children.push({ _type: 'span', text: content, marks, _key: generateKey() });
       lastIndex = regex.lastIndex;
     }
 
     // Add any remaining plain text
     if (lastIndex < text.length) {
-      children.push({ _type: 'span', text: text.substring(lastIndex) });
+      children.push({ _type: 'span', text: text.substring(lastIndex), _key: generateKey() });
     }
     
     return children;
@@ -77,14 +86,15 @@ function formatBodyForSanity(bodyArray) {
         portableTextBody.push({
           _type: 'block',
           style: `h${block.level || 2}`,
-          children: [{ _type: 'span', text: block.content }],
+          _key: generateKey(),
+          children: [{ _type: 'span', text: block.content, _key: generateKey() }],
         });
         break;
       case 'paragraph':
         portableTextBody.push({
           _type: 'block',
           style: 'normal',
-          // --- FIXED: Called the correctly named function ---
+          _key: generateKey(),
           children: parseInlineFormatting(block.content),
         });
         break;
@@ -92,7 +102,8 @@ function formatBodyForSanity(bodyArray) {
          portableTextBody.push({
           _type: 'block',
           style: 'blockquote',
-          children: [{ _type: 'span', text: block.content }],
+          _key: generateKey(),
+          children: [{ _type: 'span', text: block.content, _key: generateKey() }],
         });
         break;
       case 'list':
@@ -102,7 +113,7 @@ function formatBodyForSanity(bodyArray) {
             style: 'normal',
             listItem: 'bullet',
             level: 1,
-            // --- FIXED: Called the correctly named function ---
+            _key: generateKey(),
             children: parseInlineFormatting(item),
           });
         }
