@@ -36,7 +36,7 @@ function generateKey(length = 12) {
 }
 
 /**
- * NEW: This function converts the AI's structured response into
+ * This function converts the AI's structured response into
  * Sanity's Portable Text format, including rich formatting and unique keys.
  */
 function formatBodyForSanity(bodyArray) {
@@ -141,26 +141,34 @@ async function generateAndPublish() {
     console.log(`Found author with reference ID: ${authorRef._ref}`);
 
     console.log('Generating rich, formatted blog post...');
+    // --- UPDATED PROMPT ---
+    // This new prompt incorporates the feedback for richer, more thematic content.
     const blogPostPrompt = `
       You are Ava Blackwood, an author of dark academia and spicy romance novels.
-      Your writing style is evocative, atmospheric, and explores themes of forbidden desire and intellectual intimacy.
-      Your tone is sophisticated and offers genuine insights into romance.
+      Your writing style is evocative, atmospheric, and explores themes of forbidden desire, power dynamics, and intellectual intimacy.
+      Your tone is sophisticated, mysterious, and offers genuine insights into romance.
 
       Generate a new, unique blog post as a guide for real-world romance.
       The post must have a catchy title and a body.
+
       The body must be an array of JSON objects, following this structure:
       - Use at least one "heading" of level 2.
       - Use multiple "paragraph" blocks. In the content for paragraphs, use markdown for emphasis: **bold** for strong points and *italic* for nuanced thoughts.
       - Include one "blockquote" for an impactful statement.
       - Include one "list" with at least 3 bullet points for actionable advice.
 
+      CRITICAL CONTENT REQUIREMENTS:
+      1. The post must include at least one poetic metaphor (e.g., "romance is a sigh held too long").
+      2. The post must use at least one literary or psychological term to describe intimacy (e.g., "psychological resonance," "liminal space").
+
       The final output must be a single, valid JSON object with two keys: "title" and "body".
-      Example body structure:
+      Example of a valid body structure:
       "body": [
-        { "type": "heading", "level": 2, "content": "The Art of a Lingering Gaze" },
-        { "type": "paragraph", "content": "Before the first touch, there is the *first look*. It’s a conversation without words, a secret shared across a crowded room. Mastering this is **essential**." },
-        { "type": "blockquote", "content": "The most profound connections are built in the silences we dare to share." },
-        { "type": "list", "items": ["Hold their gaze a second longer.", "Let a small, private smile touch your lips.", "Look away, then look back."] }
+        { "type": "heading", "level": 2, "content": "The Chemistry of Unspoken Cravings" },
+        { "type": "paragraph", "content": "Romance isn’t always a sonnet—it’s often *a sigh held too long*. To master real-world romance, you must be fluent in the language of tension. Silence can be **seductive**." },
+        { "type": "paragraph", "content": "Desire, at its core, is not just physical. It's *psychological resonance*. When two people align mentally, the body follows." },
+        { "type": "blockquote", "content": "Intellectual desire is the slowest burn, but the one that leaves ashes you'll keep touching for years." },
+        { "type": "list", "items": ["Ask questions no one else dares to ask.", "Share something vulnerable—then let the silence sit.", "Catch their interests, not just their eyes."] }
       ]
     `;
 
