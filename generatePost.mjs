@@ -180,21 +180,28 @@ try {
   const imageSceneDescription = matchedSymbol ? matchedSymbol[0] : fallbackScene;
 
   const humanDetails = [
-    'a woman’s silhouette outlined by candlelight',
-    'a hand loosely holding an antique key',
-    'a blurred jawline tilted in reflection',
-    'fingers pausing on a leather journal',
-    'a neck adorned with a velvet ribbon',
-    'a shadow of parted lips on fogged glass',
-    'a wrist wrapped in lace near a glass of wine',
-    'a collarbone brushed by loose hair'
+    'a bare shoulder touched by morning light',
+    'a thigh emerging beneath a fallen silk slip',
+    'fingers slipping slowly into a velvet glove',
+    'a nape exposed as hair is gathered high',
+    'lips parted under the flicker of candlelight',
+    'knees drawn close beneath moonlit linen',
+    'the hollow of a collarbone dusted with shimmer',
+    'an ankle flexed as a heel dangles midair',
+    'a curved back traced by strands of undone hair',
+    'eyes glancing sideways in a mirror’s hush',
+    'a wrist resting limp over tangled sheets',
+    'hips shifting beneath a half-buttoned blouse',
+    'a strand of pearls trailing down bare skin',
+    'the pale inside of a forearm near red lipstick',
+    'a flushed cheek brushing a crystal glass'
   ];
   const gestureDetail = humanDetails[Math.floor(Math.random() * humanDetails.length)];
 
   const safePrompt = `
 Photorealistic still life, cinematic lighting, dark academia mood.
 Focus: ${fallbackScene}.
-Textural setting: antique books, candlelight, silk, and shadow. 
+Textural setting: antique books, silk, and shadow. 
 No people, no body parts. Only suggestion through objects and mood.
 No visible text or logos. Emotionally evocative, intimate, and poetic.
   `.trim();
@@ -204,7 +211,7 @@ Hyper-realistic, cinematic shadows and shallow depth of field.
 A dark, symbolic vignette in Ava Blackwood’s world.
 Main focus: ${imageSceneDescription.trim()}—a metaphor for desire.
 Also present: ${gestureDetail}, evoking intimacy without explicitness.
-Set among textures of old books, candlelight, lace, and quiet aftermath.
+Set among textures of old books,lace, and quiet aftermath.
 Style: dark academia with sensual undertones. 
 No nudity, no explicit body parts, no watermarks or visible text.
 Only suggestion, tension, and emotional gravity.
