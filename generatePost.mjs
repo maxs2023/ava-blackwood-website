@@ -207,12 +207,12 @@ No visible text or logos. Emotionally evocative, intimate, and poetic.
   `.trim();
 
   const primaryPrompt = `
-Hyper-realistic, cinematic shadows and shallow depth of field.
-A dark, symbolic vignette in Ava Blackwood’s world.
+Hyper-realistic, cinematic lighting and shallow depth of field.
+A sensual, symbolic vignette in Ava Blackwood’s world.
 Main focus: ${imageSceneDescription.trim()}—a metaphor for desire.
 Also present: ${gestureDetail}, evoking intimacy without explicitness.
 Set among textures of old books,lace, and quiet aftermath.
-Style: dark academia with sensual undertones. 
+Style: Artful intimacy in chiaroscuro lighting. 
 No nudity, no explicit body parts, no watermarks or visible text.
 Only suggestion, tension, and emotional gravity.
   `.trim();
