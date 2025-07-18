@@ -159,10 +159,28 @@ async function generateAndPublish() {
   // --- Part 2: Generate Thematic Image ---
   try {
     const lastParagraph = postContent.body.filter(block => block.type === 'paragraph').pop();
-    const imageSceneDescription = lastParagraph ? lastParagraph.content : 'A single crimson lipstick stain on a porcelain coffee cup';
+    const symbolicParagraph = postContent.body
+      .filter(block => block.type === 'paragraph')
+      .slice(-2)
+      .map(block => block.content)
+      .join(' ');
+    
+    // Fallback symbolic image seed if none exists
+    const fallbackScene = 'a single crimson lipstick stain on a porcelain coffee cup';
+    
+    // Extract a poetic, symbolic image seed using regex for common sensual symbols
+    const matchedSymbol = symbolicParagraph.match(/a ([^.]*?)\.(?=\s|$)/i);
+    const imageSceneDescription = matchedSymbol ? matchedSymbol[0] : fallbackScene;   
     
     // MODIFIED: Added negative constraints directly into the prompt.
-    const imagePrompt = `Photorealistic, dark academia aesthetic, moody cinematic lighting, shallow depth of field. A close-up shot of: ${imageSceneDescription}. The style is sophisticated, sensual, and mysterious. **Crucially, the image must contain no text, words, letters, or watermarks.**`;
+    const imagePrompt = `
+      Photorealistic, moody cinematic lighting, shallow depth of field. 
+      A sensual, symbolic still-life scene: ${imageSceneDescription.trim()}.
+      The aesthetic is dark academia—textured, evocative, and rich with emotional undertones. 
+      Focus on intimate symbolism, unresolved tension, and visual storytelling. 
+      This is Ava Blackwood’s world: *desire draped in shadows, intellect edged with longing*. 
+      No visible text, letters, or watermarks. One distinct object or pairing per frame.
+      `.trim();
     console.log(`Generating image with prompt: "${imagePrompt}"`);
 
     const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
