@@ -129,25 +129,11 @@ const booksData = {
       cover: underSurgicalLightsCover,
       rating: 4.2,
       genre: "Medical Romance"
-    },
-    { 
-      id: 6, 
-      title: "Scrubs and Seduction", 
-      fullTitle: "Scrubs and Seduction: A Medical Romance",
-      description: "A dark-academia erotic romance—equal parts emotional slow burn and intoxicating obsession.", 
-      amazonUrl: "https://a.co/d/cSwTWBb", 
-      publishDate: "2025", 
-      series: "Medical Romance", 
-      cover: ScrubsandSeductionCover,
-      rating: 4.2,
-      genre: "Medical Romance"
     }
-
-
   ],
   sports: [
     { 
-      id: 7, 
+      id: 6, 
       title: "Volley of Temptation", 
       fullTitle: "Volley of Temptation: A Dark-Academia Sports Romance",
       description: "A dark academia sports romance that explores the tension between competition and desire on the volleyball court. When winning becomes secondary to the game of hearts, every serve is a shot at love.", 
@@ -159,7 +145,7 @@ const booksData = {
       genre: "Sports Romance"
     }
   ]
-}; 
+};
 
 // --- Newsletter Signup Component ---
 const NewsletterSignup = ({ variant, className }) => {
@@ -871,7 +857,7 @@ function App() {
         {/* Footer Content */}
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Ava Blackwood</h3>
+            <h3 className="text-2xl font-serif font-bold mb-4 text-white">Ava Blackwood</h3>
             <p className="text-gray-300 mb-4">
               Crafting tales of passion, power, and forbidden desire in the shadows of academia.
             </p>
