@@ -211,8 +211,7 @@ Hyper-realistic, cinematic shadows and shallow depth of field.
 A moody, poetic scene drawn from Ava Blackwood’s world—steeped in atmosphere and longing.
 Main focus: ${imageSceneDescription.trim()}, a quiet metaphor for restrained desire.
 Secondary detail: ${gestureDetail}, capturing a moment of intimacy without exposure.
-The frame is textured with candlelight or aged books or soft lace, and the hush of something just passed.
-Style: Cinematic soft focus with European elegance.
+Style: Artful intimacy in chiaroscuro lighting.
 No nudity, no overt body parts, no watermarks or text—only the suggestion of touch, the weight of silence, and the tension between what’s felt and what’s left unsaid.
   `.trim();
 
