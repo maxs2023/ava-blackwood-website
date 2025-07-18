@@ -115,18 +115,6 @@ const booksData = {
       cover: enPointeCover,
       rating: 4.6,
       genre: "Romance"
-    },
-    { 
-      id: 7, 
-      title: "Veils of Devotion", 
-      fullTitle: "Veils of Devotion: A Dark Academia Romance",
-      description: "In the shadowed halls of an ancient seminary, forbidden desires bloom between sacred vows and scholarly pursuits. A tale of spiritual awakening and passionate surrender that challenges the boundaries between devotion and desire.", 
-      amazonUrl: "https://www.amazon.com/Veils-Devotion-Ava-Blackwood/dp/B0F9VD8K2L", 
-      publishDate: "2024", 
-      series: "Dark Academia", 
-      cover: veilsOfDevotionCover,
-      rating: 4.2,
-      genre: "Dark Academia Romance"
     }
   ],
   medical: [
@@ -155,20 +143,6 @@ const booksData = {
       cover: volleyOfTemptationCover,
       rating: 4.1,
       genre: "Sports Romance"
-    }
-  ],
-  legal: [
-    { 
-      id: 8, 
-      title: "Bound by Briefs", 
-      fullTitle: "Bound by Briefs: A Legal Romance",
-      description: "High-powered attorney Alexandra Stone has never lost a case, but when she faces off against her former law school rival in the courtroom, she discovers that some battles are worth losing. A passionate legal romance where justice and desire collide.", 
-      amazonUrl: "https://www.amazon.com/Bound-Briefs-Ava-Blackwood/dp/B0F9BB7L9M", 
-      publishDate: "2024", 
-      series: "Legal Romance", 
-      cover: boundByBriefsCover,
-      rating: 4.3,
-      genre: "Legal Romance"
     }
   ]
 };
