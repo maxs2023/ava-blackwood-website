@@ -157,69 +157,82 @@ async function generateAndPublish() {
   }
   
   // --- Part 2: Generate Thematic Image ---
-  try {
-    const symbolicParagraphs = postContent.body
-      .filter(block => block.type === 'paragraph')
-      .slice(-3)
-      .map(block => block.content)
-      .join(' ');
+try {
+  const symbolicParagraphs = postContent.body
+    .filter(block => block.type === 'paragraph')
+    .slice(-3)
+    .map(block => block.content)
+    .join(' ');
 
-    const sensualObjects = [
-      'a bitten fig on a velvet napkin',
-      'lace panties draped over a crystal decanter',
-      'a single black stocking coiled beside a candle stub',
-      'a crimson corset half-unlaced atop a leather chair',
-      'a lipstick-smeared wine glass next to a torn book page',
-      'a pair of reading glasses entangled with a silk bra on a mahogany desk',
-      'a velvet choker tangled around a spilled bottle of ink',
-      'a black lace glove gripping a single red rose, its petals bruised'
-    ];
+  const sensualObjects = [
+    'a bitten fig on a velvet napkin',
+    'lace panties draped over a crystal decanter',
+    'a single black stocking coiled beside a candle stub',
+    'a crimson corset half-unlaced atop a leather chair',
+    'a lipstick-smeared wine glass next to a torn book page',
+    'a pair of reading glasses entangled with a silk bra on a mahogany desk',
+    'a velvet choker tangled around a spilled bottle of ink',
+    'a black lace glove gripping a single red rose, its petals bruised'
+  ];
+  const fallbackScene = sensualObjects[Math.floor(Math.random() * sensualObjects.length)];
 
-    const fallbackScene = sensualObjects[Math.floor(Math.random() * sensualObjects.length)];
+  // Extract potential symbolic imagery from last few paragraphs
+  const matchedSymbol = symbolicParagraphs.match(/(a|an) ([^.]{10,80}?)[\.,;]/i);
+  const imageSceneDescription = matchedSymbol ? matchedSymbol[0] : fallbackScene;
 
-    // Attempt to extract an evocative image symbol from the last paragraphs
-    const matchedSymbol = symbolicParagraphs.match(/(a|an) ([^.]{10,80}?)[\.,;]/i);
-    const imageSceneDescription = matchedSymbol ? matchedSymbol[0] : fallbackScene;
+  const humanDetails = [
+    'a woman’s bare back lit by flickering candlelight',
+    'parted lips captured in soft shadow',
+    'a man’s hand gripping the edge of a velvet chair',
+    'tangled fingers clutching a worn book',
+    'an exposed collarbone kissed by candle wax',
+    'thighs beneath silk, with a garter slipping down',
+    'a hand wrapped in black lace resting on warm skin',
+    'a face partially obscured by tousled hair and longing',
+  ];
+  const gestureDetail = humanDetails[Math.floor(Math.random() * humanDetails.length)];
 
-    const imagePrompt = `
-Photorealistic, cinematic chiaroscuro lighting with sensual shadows and a shallow depth of field.
-A symbolic and erotically charged still-life scene: ${imageSceneDescription.trim()}.
-Surrounding objects evoke intimacy and aftermath—rumpled silk sheets, broken wine glasses, lace on velvet, candle wax dripped over old books, an unbuttoned collar.
-The tone is rich with tension and unspoken longing, like a secret just confessed.
-Styling is dark academia—textured, mysterious, and emotionally raw.
-No human figures. No visible text, letters, or watermarks.
-One emotionally resonant image of *forbidden desire* and *intellectual intimacy*.
-    `.trim();
+  const imagePrompt = `
+Hyper-realistic, cinematic lighting with chiaroscuro shadows and shallow depth of field.
+A dark, sensual scene in the world of Ava Blackwood.
+The focal point: ${imageSceneDescription.trim()}—an object of forbidden desire.
+Also in frame: ${gestureDetail}, adding human presence and erotic tension.
+Surrounding textures suggest intimacy and aftermath—rumpled silk sheets, broken wine glass, candle wax on leather, or lace abandoned on mahogany.
+No nudity, no explicit sex. Only suggestion, anticipation, and emotional resonance.
+Visual aesthetic: dark academia meets sensual gothic—refined, moody, and intimate.
+No visible text, letters, logos, or watermarks.
+Only one emotionally charged frame, captured at the edge of confession.
+`.trim();
 
-    console.log(`Generating image with prompt: "${imagePrompt}"`);
+  console.log(`Generating image with prompt: "${imagePrompt}"`);
 
-    const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          instances: [{ prompt: imagePrompt }], 
-          parameters: { 
-            "sampleCount": 1,
-            "aspectRatio": "16:9"
-          } 
-        }),
-    });
+  const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        instances: [{ prompt: imagePrompt }], 
+        parameters: { 
+          "sampleCount": 1,
+          "aspectRatio": "16:9"
+        } 
+      }),
+  });
 
-    if (!imageResponse.ok) throw new Error(`Imagen API Error: ${await imageResponse.text()}`);
-    const imageResult = await imageResponse.json();
-    const base64ImageData = imageResult.predictions[0].bytesBase64Encoded;
+  if (!imageResponse.ok) throw new Error(`Imagen API Error: ${await imageResponse.text()}`);
+  const imageResult = await imageResponse.json();
+  const base64ImageData = imageResult.predictions[0].bytesBase64Encoded;
 
-    console.log('Image generated, now uploading to Sanity...');
-    const imageBuffer = Buffer.from(base64ImageData, 'base64');
-    imageAsset = await sanityClient.assets.upload('image', imageBuffer, {
-      filename: `${createSlug(postContent.title)}.png`,
-      contentType: 'image/png'
-    });
-    console.log('Successfully uploaded image asset with ID:', imageAsset._id);
-  } catch (error) {
-    console.error('Failed during image generation or upload:', error);
-    process.exit(1);
-  }
+  console.log('Image generated, now uploading to Sanity...');
+  const imageBuffer = Buffer.from(base64ImageData, 'base64');
+  imageAsset = await sanityClient.assets.upload('image', imageBuffer, {
+    filename: `${createSlug(postContent.title)}.png`,
+    contentType: 'image/png'
+  });
+  console.log('Successfully uploaded image asset with ID:', imageAsset._id);
+} catch (error) {
+  console.error('Failed during image generation or upload:', error);
+  process.exit(1);
+}
 
 
   // --- Part 3: Publish to Sanity & Social Media ---
