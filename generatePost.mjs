@@ -114,23 +114,22 @@ async function generateAndPublish() {
   try {
     console.log('Generating rich, formatted blog post text...');
     const blogPostPrompt = `
-      You are Ava Blackwood, an author of dark academia and **spicy romance** novels.
-      Your writing style is evocative, atmospheric, and sensual. It explores themes of forbidden desire, power dynamics, intellectual intimacy, and raw vulnerability.
-      Your tone is sophisticated and mysterious, offering genuine insights into the **psychology of intense passion**.
+      You are Ava Blackwood, an author of dark academia and spicy romance novels. Your style is evocative, atmospheric, and sensual, exploring themes of forbidden desire, power dynamics, and intellectual intimacy. Your tone is sophisticated and mysterious.
 
-      Generate a new, unique blog post as a guide for real-world romance and intimacy.
-      The post must have a catchy, provocative title.
-      The body must be an array of JSON objects, following this structure:
-      - Use at least one "heading" of level 2.
-      - Use multiple "paragraph" blocks. In these paragraphs, use evocative language focusing on **sensory details** (the scent of skin, the heat of a touch, a sharp intake of breath) and the **emotional aftermath of intimacy**. Use markdown for emphasis: **bold** for intense points and *italic* for sensual thoughts.
-      - Include one "blockquote" for a powerful, slightly risqué statement about desire.
-      - Include one "list" with at least 3 bullet points for actionable, spicy advice.
+      Generate a new, unique blog post as a guide for real-world romance and intimacy. The post must have a catchy, provocative title and a structured body.
+
+      The body must be an array of JSON objects with this structure:
+      - At least one "heading" of level 2.
+      - Multiple "paragraph" blocks with markdown for emphasis: **bold** for intense points and *italic* for sensual thoughts.
+      - One "blockquote" for a powerful statement about desire.
+      - One "list" with 3 bullet points for actionable, spicy advice.
 
       CRITICAL CONTENT REQUIREMENTS:
-      1. The post must include at least one poetic metaphor for physical desire (e.g., "desire is a fever that breaks in the dark").
-      2. The post must use sophisticated language to describe the **tension and release** inherent in a passionate connection, without using explicit terms. Focus on the *feeling*, not the act.
+      1. Include one poetic metaphor for physical desire (e.g., "desire is a fever that breaks in the dark").
+      2. Use one literary or psychological term to describe intimacy (e.g., "psychological resonance," "liminal space").
+      3. **The final paragraph must describe a single, evocative, symbolic object or scene that captures the entire post's theme (e.g., a crimson lipstick stain on a porcelain coffee cup, a single black stocking draped over a leather-bound book). This will be used to generate an image.**
 
-      The final output must be a single, valid JSON object with two keys: "title" and "body".
+      The final output must be a single, valid JSON object with keys: "title" and "body".
       Example of a valid body structure:
       "body": [
         { "type": "heading", "level": 2, "content": "The Art of the Unraveling" },
