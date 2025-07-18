@@ -1,0 +1,9 @@
+Add Cover Image: Place the new book cover image file into the src/assets folder.
+
+Import Image: Add an import statement for the new cover image at the top of App.jsx.
+
+Update Data Object: Add the new book's information to the booksData object. If it's a new genre, create a new array for it.
+
+Update "All Books" Logic: If you created a new genre, add it to the getAllBooks function's return array.
+
+Update UI Filter: If you created a new genre, add a new Button to the filter list on the BooksPage component.
