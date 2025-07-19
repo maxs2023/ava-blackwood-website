@@ -231,7 +231,7 @@ No visible text or logos. Emotionally evocative, intimate, and poetic.
 
   const primaryPrompt = `
 Hyper-realistic with cinematic shadows and a shallow depth of field.  
-A moody, poetic scene suffused with longing and quiet tension.  
+A sensational, poetic, scene suffused with longing and quiet tension.  
 Main focus: ${imageSceneDescription.trim()}, rendered as a subtle metaphor for restrained desire.  
 Secondary detail: ${gestureDetail}, evoking intimacy through implication, never exposure.  
 Style: Artful intimacy in soft, directional lighting—framed with European elegance and cinematic precision.  
