@@ -311,7 +311,7 @@ Style: Artful intimacy in soft, directional lighting—framed with European eleg
 
     console.log('Publishing document with image to Sanity...');
     const result = await sanityClient.create(postDocument);
-    const blogPostUrl = `https://avablackwood.com/blog/${slug}`;
+    const blogPostUrl = `https://www.avablackwood.com/blog/${slug}`;
     console.log('Successfully created Sanity post with ID:', result._id);
     
     const GITHUB_OUTPUT = process.env.GITHUB_OUTPUT;
@@ -329,8 +329,8 @@ Style: Artful intimacy in soft, directional lighting—framed with European eleg
       Create a short, catchy, and intriguing social media post based on her latest blog post.
       The tone should be sophisticated and tempting.
       Hint at the spicy advice in the post to encourage clicks.
-      Include 3 relevant hashtags like #SpicyRomance, #RomanceAuthor, #AvaBlackwood.
       *** Include this link at the end: [Link to blog post]
+      Include 3 relevant hashtags like #SpicyRomance, #RomanceAuthor, #AvaBlackwood.
       *** Keep the output text under 280 characters for posting on X.
 
       Blog Post Title: "${postContent.title}"
