@@ -30,25 +30,6 @@ import BlogPost from './BlogPost.jsx';
 
 // set up router
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-function App() {
-  return (
-    <Router>
-      <div className="min-h-screen bg-background">
-        <Analytics />
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/books" element={<BooksPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/blog" element={<BlogList />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
-        </Routes>
-        <Footer />
-      </div>
-    </Router>
-  );
-}
 export default App;
 
 // --- Analytics Component ----
