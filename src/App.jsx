@@ -30,7 +30,7 @@ import BlogPost from './BlogPost.jsx';
 
 // set up router
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-export default App;
+// export default App;  // removed to avoid multiple default exports
 
 // --- Analytics Component ----
 const Analytics = () => {
