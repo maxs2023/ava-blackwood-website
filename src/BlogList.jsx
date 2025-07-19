@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card.jsx';
-import sanityClient from '../sanityClient.js';
+import sanityClient from './sanityClient.js';
 
 const BlogList = () => {
   const [posts, setPosts] = useState([]);

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button } from '@/components/ui/card.jsx';
-import sanityClient from '../sanityClient.js';
+import sanityClient from './sanityClient.js';
 import { PortableText } from '@portabletext/react';
 import { Calendar, User } from 'lucide-react';
 
