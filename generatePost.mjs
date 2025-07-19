@@ -132,7 +132,7 @@ async function generateAndPublish() {
 
   The body must be an array of JSON objects with this structure:
   - At least one "heading" of level 2.
-  - Multiple "paragraph" blocks with markdown for emphasis: **bold** for intense points and *italic* for sensual thoughts.
+  - One or two "paragraph" blocks with markdown for emphasis: **bold** for intense points and *italic* for sensual thoughts.
   - One "blockquote" for a powerful statement about desire.
   - One "list" with 3 bullet points for actionable, spicy advice.
 
@@ -221,7 +221,7 @@ No visible text or logos. Emotionally evocative, intimate, and poetic.
 
   const primaryPrompt = `
 Hyper-realistic with cinematic shadows and a shallow depth of field.  
-A moody, poetic scene from Ava Blackwood’s world—suffused with longing and quiet tension.  
+A moody, poetic scene suffused with longing and quiet tension.  
 Main focus: ${imageSceneDescription.trim()}, rendered as a subtle metaphor for restrained desire.  
 Secondary detail: ${gestureDetail}, evoking intimacy through implication, never exposure.  
 Style: Artful intimacy in soft, directional lighting—framed with European elegance and cinematic precision.  
