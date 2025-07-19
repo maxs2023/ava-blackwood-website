@@ -311,6 +311,7 @@ Style: Artful intimacy in soft, directional lighting—framed with European eleg
 
     console.log('Publishing document with image to Sanity...');
     const result = await sanityClient.create(postDocument);
+    const blogPostUrl = `https://avablackwood.com/blog/${slug}`;
     console.log('Successfully created Sanity post with ID:', result._id);
     
     const GITHUB_OUTPUT = process.env.GITHUB_OUTPUT;
@@ -329,6 +330,7 @@ Style: Artful intimacy in soft, directional lighting—framed with European eleg
       The tone should be sophisticated and tempting.
       Hint at the spicy advice in the post to encourage clicks.
       Include 3 relevant hashtags like #SpicyRomance, #RomanceAuthor, #AvaBlackwood.
+      *** Include this link at the end: [Link to blog post]
       *** Keep the output text under 280 characters for posting on X.
 
       Blog Post Title: "${postContent.title}"
@@ -349,6 +351,14 @@ Style: Artful intimacy in soft, directional lighting—framed with European eleg
     const socialGeneratedText = socialResult.candidates[0].content.parts[0].text;
     const socialJsonString = socialGeneratedText.match(/```json\n([\s\S]*?)\n```/)[1];
     const socialPost = JSON.parse(socialJsonString);
+    if (socialPost.social_post_text.includes('[Link to blog post]')) {
+      socialPost.social_post_text = socialPost.social_post_text.replace('[Link to blog post]', blogPostUrl);
+    } else {
+      // If no placeholder, append the link at the end (if still under 280 chars)
+      const withLink = `${socialPost.social_post_text} ${blogPostUrl}`;
+      socialPost.social_post_text = withLink.length <= 280 ? withLink : socialPost.social_post_text;
+    }
+    
     
     console.log('Generated Social Post:', socialPost.social_post_text);
     

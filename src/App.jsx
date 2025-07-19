@@ -24,6 +24,33 @@ import boundByBriefsCover from './assets/Bound by Briefs.jpg'
 // Import author profile photo
 import authorPhoto from './assets/authorprofilephoto.png'
 
+// Import helper for post links
+import BlogList from './pages/BlogList.jsx';
+import BlogPost from './pages/BlogPost.jsx';
+
+// set up router
+import { BrowserRouter as Router, Routes, Route, useNavigate, useParams } from 'react-router-dom';
+function App() {
+  return (
+    <Router>
+      <div className="min-h-screen bg-background">
+        <Analytics />
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/books" element={<BooksPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/blog" element={<BlogList />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+        </Routes>
+        <Footer />
+      </div>
+    </Router>
+  );
+}
+
+
 // --- Analytics Component ----
 const Analytics = () => {
   // IMPORTANT: Replace with your actual Google Analytics Measurement ID
