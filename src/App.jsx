@@ -8,7 +8,7 @@ import { BookOpen, Mail, ExternalLink, Calendar, User, Heart, Send, Star, Award,
 import './App.css'
 
 // --- ADDED: Import the Sanity client and PortableText component ---
-import sanityClient from './sanityClient.js'
+import sanityClient from '../sanityClient.js'
 import { PortableText } from '@portabletext/react'
 
 // Import book cover images
