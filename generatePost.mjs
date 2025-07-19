@@ -230,12 +230,11 @@ No visible text or logos. Emotionally evocative, intimate, and poetic.
   `.trim();
 
   const primaryPrompt = `
-Hyper-realistic with cinematic shadows and shallow depth of field.  
-A moody, intimate scene steeped in unspoken desire and breath-held stillness.  
-Main focus: ${imageSceneDescription.trim()}, a visual metaphor for longing—felt more than seen.  
-Secondary detail: ${gestureDetail}, capturing the nearness of skin.  
-Style: Seductive realism in soft, directional lighting—European elegance rendered with tactile precision and emotional heat.  
-No nudity, no explicit body parts, no watermarks or text—only the *implication* of touch, the *tension* of withheld impulse, and the *aura* of intimacy suspended in time.
+Hyper-realistic with cinematic shadows and a shallow depth of field.  
+A moody, poetic scene suffused with longing and quiet tension.  
+Main focus: ${imageSceneDescription.trim()}, rendered as a subtle metaphor for restrained desire.  
+Secondary detail: ${gestureDetail}, evoking intimacy through implication, never exposure.  
+Style: Artful intimacy in soft, directional lighting—framed with European elegance and cinematic precision.  
   `.trim();
 
   console.log(`Generating image with primary prompt: "${primaryPrompt}"`);
