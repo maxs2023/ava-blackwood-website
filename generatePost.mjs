@@ -262,7 +262,14 @@ No nudity, no explicit body parts, no watermarks or text—only the *implication
     if (!imageResult) throw new Error('Both primary and fallback prompts failed Gemini compliance.');
   }
 
+  if (!imageResult?.predictions || imageResult.predictions.length === 0) {
+    console.error("Image generation failed: no predictions returned.");
+    console.log("Full response:", JSON.stringify(imageResult, null, 2));
+    throw new Error("No image predictions available from Gemini.");
+  }
+  
   const base64ImageData = imageResult.predictions[0].bytesBase64Encoded;
+ 
 
   console.log('Image generated, now uploading to Sanity...');
   const imageBuffer = Buffer.from(base64ImageData, 'base64');
