@@ -323,7 +323,7 @@ No nudity, no explicit body parts, no watermarks or text—only the *implication
       The tone should be sophisticated and tempting.
       Hint at the spicy advice in the post to encourage clicks.
       Include 3 relevant hashtags like #SpicyRomance, #RomanceAuthor, #AvaBlackwood.
-      Keep the output text under 280 characters.
+      *** Keep the output text under 280 characters for posting on X.
 
       Blog Post Title: "${postContent.title}"
       Blog Post Content Summary: "${plainTextBodyForSocial}"
