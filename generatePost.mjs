@@ -322,7 +322,8 @@ No nudity, no explicit body parts, no watermarks or text—only the *implication
       Create a short, catchy, and intriguing social media post based on her latest blog post.
       The tone should be sophisticated and tempting.
       Hint at the spicy advice in the post to encourage clicks.
-      Include 3-4 relevant hashtags like #SpicyRomance, #RomanceAuthor, #BookTok, #AvaBlackwood.
+      Include 3 relevant hashtags like #SpicyRomance, #RomanceAuthor, #AvaBlackwood.
+      Keep the output text under 280 characters.
 
       Blog Post Title: "${postContent.title}"
       Blog Post Content Summary: "${plainTextBodyForSocial}"
