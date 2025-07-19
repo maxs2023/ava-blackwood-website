@@ -1000,5 +1000,4 @@ function App() {
   );
 }
 
-export { ContactForm, NewsletterSignup };
 export default App;
