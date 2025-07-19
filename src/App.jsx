@@ -25,11 +25,11 @@ import boundByBriefsCover from './assets/Bound by Briefs.jpg'
 import authorPhoto from './assets/authorprofilephoto.png'
 
 // Import helper for post links
-import BlogList from './pages/BlogList.jsx';
-import BlogPost from './pages/BlogPost.jsx';
+import BlogList from './BlogList.jsx';
+import BlogPost from './BlogPost.jsx';
 
 // set up router
-import { BrowserRouter as Router, Routes, Route, useNavigate, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 function App() {
   return (
     <Router>
@@ -49,7 +49,7 @@ function App() {
     </Router>
   );
 }
-
+export default App;
 
 // --- Analytics Component ----
 const Analytics = () => {
