@@ -160,6 +160,16 @@ async function generateAndPublish() {
 
     if (!aiResponse.ok) throw new Error(`Gemini API Error (Text): ${await aiResponse.text()}`);
     const aiResult = await aiResponse.json();
+    // ✅ Guard against missing or malformed content
+    if (
+      !aiResult?.candidates ||
+      !aiResult.candidates[0]?.content?.parts ||
+      !aiResult.candidates[0].content.parts[0]?.text
+    ) {
+      console.error("Invalid Gemini content response:", JSON.stringify(aiResult, null, 2));
+      throw new Error("Gemini API response malformed or incomplete");
+    }
+
     const generatedText = aiResult.candidates[0].content.parts[0].text;
     const jsonString = generatedText.match(/```json\n([\s\S]*?)\n```/)[1];
     postContent = JSON.parse(jsonString);
