@@ -226,7 +226,6 @@ Main focus: ${imageSceneDescription.trim()}, a visual metaphor for longing—fel
 Secondary detail: ${gestureDetail}, capturing the nearness of skin, the pause before surrender.  
 Style: Seductive realism in soft, directional lighting—European elegance rendered with tactile precision and emotional heat.  
 No nudity, no explicit body parts, no watermarks or text—only the *implication* of touch, the *tension* of withheld impulse, and the *aura* of intimacy suspended in time.
-
   `.trim();
 
   console.log(`Generating image with primary prompt: "${primaryPrompt}"`);
