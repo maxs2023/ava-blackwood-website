@@ -6,7 +6,7 @@ import { appendFileSync } from 'fs';
 // --- Configuration ---
 
 const sanityClient = createClient({
-  projectId: '8vo1vk23',
+  projectId: process.env.SANITY_PROJECT_ID,
   dataset: 'production',
   apiVersion: '2024-07-18',
   useCdn: false,

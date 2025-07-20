@@ -1,15 +1,8 @@
 import { createClient } from '@sanity/client';
 
 export default createClient({
-  // Find this in your sanity.config.js file or at manage.sanity.io
-  projectId: '8vo1vk23', 
-  
-  // The name of your dataset, usually "production"
-  dataset: 'production', 
-  
-  // Use the current date for the API version
-  apiVersion: '2025-07-17', 
-  
-  // Set to `true` for faster 'read' performance
-  useCdn: true, 
+  projectId: process.env.REACT_APP_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID,
+  dataset: 'production',
+  apiVersion: '2025-07-17',
+  useCdn: true,
 });
