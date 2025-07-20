@@ -40,7 +40,7 @@ jobs:
         id: generate # Give this step an ID to reference its output
         run: node generatePost.mjs
         env:
-          # These secrets are configured in your GitHub repository settings
+          SANITY_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID }}
           SANITY_API_WRITE_TOKEN: ${{ secrets.SANITY_API_WRITE_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SOCIAL_MEDIA_WEBHOOK_URL: ${{ secrets.SOCIAL_MEDIA_WEBHOOK_URL }}
@@ -68,4 +68,5 @@ jobs:
         run: node verifyPost.mjs
         env:
           NEW_POST_ID: ${{ needs.generate-and-publish.outputs.new_post_id }}
+          SANITY_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID }}
           SANITY_API_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
