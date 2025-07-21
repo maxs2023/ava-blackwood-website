@@ -3,7 +3,7 @@ import { createClient } from '@sanity/client';
 import fetch from 'node-fetch';
 import { appendFileSync } from 'fs';
 
-// --- Configuration --
+// --- Configuration ---
 
 const sanityClient = createClient({
   projectId: process.env.SANITY_PROJECT_ID,
