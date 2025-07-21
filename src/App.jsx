@@ -16,15 +16,8 @@ import { PortableText } from '@portabletext/react';
 import BlogList from './BlogList.jsx';
 import BlogPost from './BlogPost.jsx';
 
-// --- Import Assets ---
-import playingWithFireCover from './assets/Playing with Fire.jpg';
-import controlAndReleaseCover from './assets/Control and Release.jpg';
-import preludesOfDesireCover from './assets/Beneath the Scholar\'s Veil.jpg';
-import enPointeCover from './assets/En Pointe.jpg';
-import underSurgicalLightsCover from './assets/Under Surgical Lights.jpg';
-import volleyOfTemptationCover from './assets/Volley of Temptation.jpg';
-import veilsOfDevotionCover from './assets/Veils of Devotion.jpg';
-import boundByBriefsCover from './assets/Bound by Briefs.jpg';
+// --- Import App Data ---
+import { allBooks } from './booksData.js'; // <-- IMPORT a_llBooks HERE
 import authorPhoto from './assets/authorprofilephoto.png';
 
 // --- Analytics Component ---
@@ -57,115 +50,6 @@ const sanitizeInput = (input) => {
   if (typeof input !== 'string') return '';
   return input.trim().replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 };
-
-// --- Book Data ---
-const booksData = {
-    darkAcademia: [
-    { 
-      id: 1, 
-      title: "Playing with Fire", 
-      fullTitle: "Playing with Fire: A Dark-Academia Romance of Power, Desire, and Restraint",
-      description: "Delve into Playing with Fire, where the forbidden allure of a professor-student romance ignites amidst the storied halls of Blackwood Academy. A Dark-Academia Romance of Power, Desire, and Restraint that explores the dangerous territory between mentorship and desire.", 
-      amazonUrl: "https://a.co/d/0PVhMQQ", 
-      publishDate: "2024", 
-      series: "Dark Academia", 
-      cover: playingWithFireCover,
-      rating: 4.5,
-      genre: "Dark Academia Romance"
-    },
-    { 
-      id: 2, 
-      title: "Control and Release", 
-      fullTitle: "Control and Release: A Dark Academia Romance",
-      description: "Control and Release is an electrifying exploration of forbidden attraction and the intricate dance of power dynamics in academia. When boundaries blur between professor and student, passion becomes a dangerous game of control.", 
-      amazonUrl: "https://www.amazon.com/Control-Release-Ava-Blackwood-ebook/dp/B0F9FQMW9L", 
-      publishDate: "2024", 
-      series: "Dark Academia", 
-      cover: controlAndReleaseCover,
-      rating: 4.3,
-      genre: "Dark Academia Romance"
-    },
-    { 
-      id: 3, 
-      title: "Preludes of Desire", 
-      fullTitle: "Preludes of Desire: A Dark Academia Romance",
-      description: "Seventeen-year-old piano prodigy Evelina Moreau has always used her music to control the world around her. But when she meets her enigmatic composition professor, she discovers that some melodies are too dangerous to play.", 
-      amazonUrl: "https://www.amazon.com/Preludes-Desire-Ava-Blackwood/dp/B0F91VK6GX", 
-      publishDate: "2024", 
-      series: "Dark Academia", 
-      cover: preludesOfDesireCover,
-      rating: 4.4,
-      genre: "Dark Academia Romance"
-    },
-    { 
-      id: 4, 
-      title: "En Pointe", 
-      fullTitle: "En Pointe: Romance Edition",
-      description: "En Pointe is a story of passion, ambition, and forbidden love set against the backdrop of the illustrious Opéra Garnier. When ballet meets desire, every movement becomes a dance of seduction.", 
-      amazonUrl: "https://www.amazon.com/En-Pointe-Ava-Blackwood-ebook/dp/B0F9PQNGSG", 
-      publishDate: "2024", 
-      series: "Standalone", 
-      cover: enPointeCover,
-      rating: 4.6,
-      genre: "Romance"
-    },
-    { 
-      id: 7, 
-      title: "Veils of Devotion", 
-      fullTitle: "Veils of Devotion: A Dark Academia Romance",
-      description: "In the shadowed halls of an ancient seminary, forbidden desires bloom between sacred vows and scholarly pursuits. A tale of spiritual awakening and passionate surrender that challenges the boundaries between devotion and desire.", 
-      amazonUrl: "https://www.amazon.com/Veils-Devotion-Ava-Blackwood/dp/B0F9VD8K2L", 
-      publishDate: "2024", 
-      series: "Dark Academia", 
-      cover: veilsOfDevotionCover,
-      rating: 4.2,
-      genre: "Dark Academia Romance"
-    }
-  ],
-  medical: [
-    { 
-      id: 5, 
-      title: "Under Surgical Lights", 
-      fullTitle: "Under Surgical Lights: A Medical Romance",
-      description: "A provocative medical romance exploring power dynamics in the high-stakes world of surgery. When Dr. Sarah Chen meets the enigmatic Chief of Surgery, their professional relationship becomes dangerously personal.", 
-      amazonUrl: "https://www.amazon.com/Under-Surgical-Lights-Ava-Blackwood/dp/B0F9FTLSC3", 
-      publishDate: "2024", 
-      series: "Medical Romance", 
-      cover: underSurgicalLightsCover,
-      rating: 4.2,
-      genre: "Medical Romance"
-    }
-  ],
-  sports: [
-    { 
-      id: 6, 
-      title: "Volley of Temptation", 
-      fullTitle: "Volley of Temptation: A Dark-Academia Sports Romance",
-      description: "A dark academia sports romance that explores the tension between competition and desire on the volleyball court. When winning becomes secondary to the game of hearts, every serve is a shot at love.", 
-      amazonUrl: "https://www.amazon.com/Volley-Temptation-Romance-Ava-Blackwood-ebook/dp/B0F9Q1K3GD", 
-      publishDate: "2024", 
-      series: "Dark Academia Sports", 
-      cover: volleyOfTemptationCover,
-      rating: 4.1,
-      genre: "Sports Romance"
-    }
-  ],
-  legal: [
-    { 
-      id: 8, 
-      title: "Bound by Briefs", 
-      fullTitle: "Bound by Briefs: A Legal Romance",
-      description: "High-powered attorney Alexandra Stone has never lost a case, but when she faces off against her former law school rival in the courtroom, she discovers that some battles are worth losing. A passionate legal romance where justice and desire collide.", 
-      amazonUrl: "https://a.co/d/1pJZNfn", 
-      publishDate: "2024", 
-      series: "Legal Romance", 
-      cover: boundByBriefsCover,
-      rating: 4.3,
-      genre: "Legal Romance"
-    }
-  ]
-};
-const getAllBooks = () => [...booksData.darkAcademia, ...booksData.medical, ...booksData.sports, ...booksData.legal];
 
 // --- Reusable Components ---
 const NewsletterSignup = ({ variant, className }) => {
@@ -286,6 +170,11 @@ const HomePage = () => {
         window.open(book.amazonUrl, '_blank');
     };
     
+    // Use the first book from the imported list as the hero book
+    const heroBook = allBooks[0];
+    // Use the first 3 books for the featured section
+    const featuredBooks = allBooks.slice(0, 3);
+
     return (
         <div className="min-h-screen">
           <section className="hero-section py-20 px-4">
@@ -299,9 +188,9 @@ const HomePage = () => {
                 <div className="flex justify-center">
                   <div className="book-card bg-white p-4 rounded-lg shadow-2xl max-w-sm">
                     <div className="w-full h-80 bg-gray-100 rounded-md overflow-hidden">
-                      <img src={booksData.darkAcademia[0].cover} alt="Latest Book" className="w-full h-full object-contain"/>
+                      <img src={heroBook.cover} alt="Latest Book" className="w-full h-full object-contain"/>
                     </div>
-                    <h3 className="text-xl font-serif text-burgundy mt-4 text-center">{booksData.darkAcademia[0].title}</h3>
+                    <h3 className="text-xl font-serif text-burgundy mt-4 text-center">{heroBook.title}</h3>
                   </div>
                 </div>
               </div>
@@ -311,7 +200,7 @@ const HomePage = () => {
             <div className="max-w-7xl mx-auto">
               <h2 className="text-4xl font-serif text-burgundy text-center mb-12">Featured Books</h2>
               <div className="grid md:grid-cols-3 gap-8">
-                {booksData.darkAcademia.slice(0, 3).map((book) => (
+                {featuredBooks.map((book) => (
                   <Card key={book.id} className="book-card cursor-pointer">
                     <CardContent className="p-6">
                       <div className="w-full h-64 bg-gray-100 rounded-md overflow-hidden mb-4">
@@ -334,10 +223,15 @@ const HomePage = () => {
 
 const BooksPage = () => {
     const [selectedGenre, setSelectedGenre] = useState('all');
+    
+    // Dynamically generate the list of unique genres from the book data
+    const genres = ['all', ...new Set(allBooks.map(book => book.genre))];
+
     const getFilteredBooks = () => {
-        if (selectedGenre === 'all') return getAllBooks();
-        return booksData[selectedGenre] || [];
+        if (selectedGenre === 'all') return allBooks;
+        return allBooks.filter(book => book.genre === selectedGenre);
     };
+
     const handleAmazonClick = (book) => {
         trackEvent('click_amazon_link', { book_title: book.title });
         window.open(book.amazonUrl, '_blank');
@@ -351,9 +245,15 @@ const BooksPage = () => {
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">Explore my collection of dark academia romances, medical dramas, and sports romances.</p>
             </div>
             <div className="flex justify-center flex-wrap gap-2 mb-8">
-              {['all', 'darkAcademia', 'medical', 'sports', 'legal'].map(genre => (
-                  <Button key={genre} variant={selectedGenre === genre ? 'default' : 'outline'} onClick={() => setSelectedGenre(genre)} className={selectedGenre === genre ? 'bg-primary text-white' : 'text-gray-700 border-gray-300 hover:text-burgundy'}>
-                      {genre.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} ({genre === 'all' ? getAllBooks().length : booksData[genre].length})
+              {genres.map(genre => (
+                  <Button 
+                    key={genre} 
+                    variant={selectedGenre === genre ? 'default' : 'outline'} 
+                    onClick={() => setSelectedGenre(genre)} 
+                    className={selectedGenre === genre ? 'bg-primary text-white' : 'text-gray-700 border-gray-300 hover:text-burgundy'}
+                  >
+                      {genre.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} 
+                      ({genre === 'all' ? allBooks.length : allBooks.filter(b => b.genre === genre).length})
                   </Button>
               ))}
             </div>
@@ -396,7 +296,7 @@ const AboutPage = () => (
                     <div className="sticky top-24">
                         <img src={authorPhoto} alt="Ava Blackwood" className="w-full rounded-lg shadow-2xl"/>
                         <div className="mt-8 space-y-4">
-                            <div className="flex items-center gap-3 text-gray-700"><BookOpen size={20} className="text-burgundy" /><span>{getAllBooks().length} Published Books</span></div>
+                            <div className="flex items-center gap-3 text-gray-700"><BookOpen size={20} className="text-burgundy" /><span>{allBooks.length} Published Books</span></div>
                             <div className="flex items-center gap-3 text-gray-700"><Award size={20} className="text-burgundy" /><span>Dark Academia Specialist</span></div>
                             <div className="flex items-center gap-3 text-gray-700"><Pen size={20} className="text-burgundy" /><span>Romance Author</span></div>
                         </div>
