@@ -356,32 +356,49 @@ const ContactPage = () => {
 };
 
 const Footer = () => (
-    <footer className="burgundy-section py-16 px-4 mt-16">
-        <div className="max-w-7xl mx-auto">
-            <div className="mb-12"><NewsletterSignup variant="footer" /></div>
-            <div className="grid md:grid-cols-3 gap-8 mb-8">
-                <div>
-                    <h3 className="text-lg font-semibold mb-4 text-white">Ava Blackwood</h3>
-                    <p className="text-gray-300">Crafting tales of passion, power, and forbidden desire.</p>
-                </div>
-                <div>
-                    <h4 className="text-lg font-semibold mb-4 text-white">Quick Links</h4>
-                    <ul className="space-y-2">
-                        {['/', '/books', '/about', '/blog', '/contact'].map(path => (
-                            <li key={path}><Link to={path} className="text-gray-300 hover:text-white transition-colors capitalize">{path.substring(1) || 'home'}</Link></li>
-                        ))}
-                    </ul>
-                </div>
-                <div>
-                    <h4 className="text-lg font-semibold mb-4 text-white">Connect</h4>
-                    <div className="flex items-center gap-2 text-gray-300"><Mail size={16} /><span className="text-sm">Subscribers get first access</span></div>
-                </div>
-            </div>
-            <div className="border-t border-gray-600 pt-8 text-center text-gray-300">
-                <p>&copy; {new Date().getFullYear()} Ava Blackwood. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+  <footer className="burgundy-section py-16 px-4 mt-16">
+      <div className="max-w-7xl mx-auto">
+          {/* Main footer content area */}
+          <div className="grid md:grid-cols-2 gap-12 mb-12">
+              
+              {/* Left Side: Author Info & Links */}
+              <div className="space-y-8">
+                  <div>
+                      <h3 className="text-2xl font-serif font-bold text-white mb-2">Ava Blackwood</h3>
+                      <p className="text-gray-300 max-w-md">
+                          Crafting tales of passion, power, and forbidden desire.
+                      </p>
+                  </div>
+                  <div>
+                      <h4 className="text-lg font-semibold mb-4 text-white">Quick Links</h4>
+                      <ul className="space-y-2">
+                          {['/', '/books', '/about', '/blog', '/contact'].map(path => (
+                              <li key={path}>
+                                  <Link 
+                                      to={path} 
+                                      className="text-gray-300 underline hover:no-underline hover:text-white transition-colors capitalize"
+                                  >
+                                      {path.substring(1) || 'home'}
+                                  </Link>
+                              </li>
+                          ))}
+                      </ul>
+                  </div>
+              </div>
+
+              {/* Right Side: Newsletter Signup */}
+              <div>
+                  <NewsletterSignup variant="footer" />
+              </div>
+
+          </div>
+
+          {/* Bottom copyright bar */}
+          <div className="border-t border-gray-600 pt-8 text-center text-gray-400">
+              <p>&copy; {new Date().getFullYear()} Ava Blackwood. All rights reserved.</p>
+          </div>
+      </div>
+  </footer>
 );
 
 // --- Main App Component ---
