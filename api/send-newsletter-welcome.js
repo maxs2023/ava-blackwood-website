@@ -107,10 +107,15 @@ export default async function handler(req, res) {
         html: `<p>New subscriber: ${email}</p>`,
     });
 
-    await Promise.allSettled([welcomeEmailPromise, notificationEmailPromise]);
-
-    // --- Step 3: Return success response ---
-    return res.status(200).json({ success: true, data: supabaseData });
+    try {
+      await Promise.all([welcomeEmailPromise, notificationEmailPromise]);
+      return res.status(200).json({ success: true, data: supabaseData });
+    } catch (emailError) {
+      console.error('Email delivery failed:', emailError);
+      return res.status(500).json({ 
+        error: 'Failed to send confirmation email. Please try again.' 
+      });
+    }
 
   } catch (error) {
     console.error('Unhandled Server Error in newsletter handler:', error);

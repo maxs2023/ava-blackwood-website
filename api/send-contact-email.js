@@ -74,11 +74,11 @@ export default async function handler(req, res) {
         `,
       });
     } catch (emailError) {
-      // Log the email error for monitoring but don't fail the request
       console.error('Resend failed to send contact notification:', emailError);
+      return res.status(500).json({ 
+        error: 'Failed to send your message. Please try again.' 
+      });
     }
-
-    // --- Step 3: Return success response ---
     return res.status(200).json({ success: true, data: supabaseData });
 
   } catch (error) {
