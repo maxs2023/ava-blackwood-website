@@ -2,7 +2,7 @@
 
 // You'll need to import your existing sanity client.
 // Make sure the path is correct relative to the api folder.
-import sanityClient from '../src/sanityClient.js'; 
+import sanityClient from '../../src/sanityClient.js'; 
 
 export default async function handler(req, res) {
   // Get the slug from the request URL (e.g., "my-first-post")
