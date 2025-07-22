@@ -369,7 +369,7 @@ No human figures. No visible text, letters, or watermarks.
       // The payload now includes both the text and the public URL of the image from Sanity.
       const webhookPayload = {
         text: socialPost.social_post_text,
-        image_url: imageAsset.url // The public URL from the Sanity asset object
+        image_url: imageAsset.url, // The public URL from the Sanity asset object
         slug: slug
       };
 
