@@ -355,7 +355,6 @@ No human figures. No visible text, letters, or watermarks.
     if (socialPost.social_post_text.includes('[Link to blog post]')) {
       socialPost.social_post_text = socialPost.social_post_text.replace('[Link to blog post]', blogPostUrl);
     } else {
-      // If no placeholder, append the link at the end (if still under 280 chars)
       const withLink = `${socialPost.social_post_text} ${blogPostUrl}`;
       socialPost.social_post_text = withLink.length <= 280 ? withLink : socialPost.social_post_text;
     }
@@ -363,27 +362,36 @@ No human figures. No visible text, letters, or watermarks.
     
     console.log('Generated Social Post:', socialPost.social_post_text);
     
-    // --- FIXED: Check if the webhook URL exists before trying to send ---
     if (process.env.SOCIAL_MEDIA_WEBHOOK_URL) {
       console.log('Sending post to social media webhook...');
+      
+      // ✨ --- REVISED PAYLOAD --- ✨
+      // The payload now includes both the text and the public URL of the image from Sanity.
+      const webhookPayload = {
+        text: socialPost.social_post_text,
+        image_url: imageAsset.url // The public URL from the Sanity asset object
+      };
+
+      // ✨ Note: The key 'image_url' is a common convention for services like Zapier or IFTTT.
+      // You may need to change this key to 'media_url', 'picture', 'photo_url', etc.,
+      // depending on the requirements of your specific webhook receiver.
+
       const webhookResponse = await fetch(process.env.SOCIAL_MEDIA_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: socialPost.social_post_text }),
+        body: JSON.stringify(webhookPayload),
       });
     
       if (!webhookResponse.ok) {
-        // Log a warning instead of throwing an error to not fail the whole job
         console.warn(`Webhook failed with status: ${webhookResponse.status}`);
       } else {
-        console.log('Successfully sent post to webhook.');
+        console.log('Successfully sent post with image to webhook.');
       }
     } else {
       console.log('SOCIAL_MEDIA_WEBHOOK_URL not set. Skipping social media post.');
     }
 
   } catch (error) {
-    // We log the error but don't exit with 1, because the main goal (Sanity post) was successful.
     console.error('Failed during final publishing/social media steps:', error);
   }
 }
