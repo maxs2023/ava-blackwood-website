@@ -141,14 +141,21 @@ async function generateAndPublish() {
   2. Use one literary or psychological term to describe intimacy (e.g., "psychological resonance," "liminal space").
   3. **The final paragraph must describe a single, evocative, symbolic object or scene that captures the entire post's theme (e.g., a crimson lipstick stain on a porcelain coffee cup, a single black stocking draped over a leather-bound book). This will be used to generate an image.**
 
+  BASED ON THE FINAL PARAGRAPH, CREATE A DEDICATED IMAGE PROMPT.
+  The prompt should be a VISUAL, CONCRETE description of a still-life scene under 15 words (e.g., "A single black stocking draped over a leather-bound book").
+
   The final output must be a single, valid JSON object with keys: "title" and "body".
   Example of a valid body structure:
-  "body": [
-    { "type": "heading", "level": 2, "content": "The Art of the Unraveling" },
-    { "type": "paragraph", "content": "True intimacy isn't about control; it's about the exquisite moment of **surrender**. It’s the sharp intake of breath before a touch, the heat that blooms on the skin where fingers have lingered. *Desire is a fever that breaks in the dark*, leaving you remade." },
-    { "type": "blockquote", "content": "The most seductive thing you can wear is the look in your eyes when you're about to lose control." },
-    { "type": "list", "items": ["Use a whisper instead of a command.", "Trace the line of their collarbone with one finger.", "Describe what you want, leaving the how to their imagination."] }
-  ]
+  {
+    "title": "Some Title",
+    "body": [
+      { "type": "heading", "level": 2, "content": "The Art of the Unraveling" },
+      { "type": "paragraph", "content": "True intimacy isn't about control; it's about the exquisite moment of **surrender**. It’s the sharp intake of breath before a touch, the heat that blooms on the skin where fingers have lingered. *Desire is a fever that breaks in the dark*, leaving you remade." },
+      { "type": "blockquote", "content": "The most seductive thing you can wear is the look in your eyes when you're about to lose control." },
+      { "type": "list", "items": ["Use a whisper instead of a command.", "Trace the line of their collarbone with one finger.", "Describe what you want, leaving the how to their imagination."] }
+    ],
+    "image_prompt": "A crimson lipstick stain on a porcelain coffee cup."
+  }
 `;
 
 
@@ -180,108 +187,60 @@ async function generateAndPublish() {
   }
   
   // --- Part 2: Generate Thematic Image ---
-try {
-  const symbolicParagraphs = postContent.body
-    .filter(block => block.type === 'paragraph')
-    .slice(-3)
-    .map(block => block.content)
-    .join(' ');
+  try {
+    // Use the new, dedicated image prompt from the AI response.
+    const imageSceneDescription = postContent.image_prompt;
 
-  const sensualObjects = [
-    'a bitten fig on a velvet napkin',
-    'a lace glove resting beside a crystal decanter',
-    'a single black stocking draped over a candle stub',
-    'a corset ribbon left untied on a leather-bound book',
-    'a lipstick-smeared wine glass near torn poetry',
-    'reading glasses tangled with a silk scarf',
-    'a velvet choker coiled on a handwritten letter',
-    'a single red rose on a bed of old parchment'
-  ];
-  const fallbackScene = sensualObjects[Math.floor(Math.random() * sensualObjects.length)];
+    if (!imageSceneDescription) {
+      throw new Error("AI response did not include the required 'image_prompt' field.");
+    }
+    
+    const primaryPrompt = `
+      Photorealistic still life, dark academia aesthetic, cinematic lighting with deep shadows.
+      Focus on: ${imageSceneDescription}.
+      The scene should feel intimate, evocative, and poetic.
+      No people, no text, no logos. Emphasis on texture and mood.
+    `.trim();
 
-  const matchedSymbol = symbolicParagraphs.match(/(a|an) ([^.]{10,80}?)[\.,;]/i);
-  const imageSceneDescription = matchedSymbol ? matchedSymbol[0] : fallbackScene;
+    console.log(`Generating image with prompt: "${primaryPrompt}"`);
 
-  const humanDetails = [
-    'a bare shoulder touched by morning light',
-    'a thigh emerging beneath a fallen silk slip',
-    'fingers slipping slowly into a velvet glove',
-    'a nape exposed as hair is gathered high',
-    'lips parted under the flicker of candlelight',
-    'knees drawn close beneath moonlit linen',
-    'the hollow of a collarbone dusted with shimmer',
-    'an ankle flexed as a heel dangles midair',
-    'a curved back traced by strands of undone hair',
-    'eyes glancing sideways in a mirror’s hush',
-    'a wrist resting limp over tangled sheets',
-    'hips shifting beneath a half-buttoned blouse',
-    'a strand of pearls trailing down bare skin',
-    'the pale inside of a forearm near red lipstick',
-    'a flushed cheek brushing a crystal glass'
-  ];
-  const gestureDetail = humanDetails[Math.floor(Math.random() * humanDetails.length)];
-
-  const safePrompt = `
-Photorealistic still life, cinematic lighting, dark academia mood.
-Focus: ${fallbackScene}.
-Textural setting: antique books, silk, and shadow. 
-No people, no body parts. Only suggestion through objects and mood.
-No visible text or logos. Emotionally evocative, intimate, and poetic.
-  `.trim();
-
-  const primaryPrompt = `
-Hyper-realistic with cinematic shadows and a shallow depth of field.  
-A sensational, poetic, scene suffused with longing and quiet tension.  
-Main focus: ${imageSceneDescription.trim()}, rendered as a subtle metaphor for restrained desire.  
-Secondary detail: ${gestureDetail}, evoking intimacy through implication, never exposure.  
-Style: Artful intimacy in soft, directional lighting—framed with European elegance and cinematic precision.  
-No human figures. No visible text, letters, or watermarks.
-  `.trim();
-
-  console.log(`Generating image with primary prompt: "${primaryPrompt}"`);
-
-  const tryImageGeneration = async (promptToTry) => {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
+    const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        instances: [{ prompt: promptToTry }],
+        instances: [{ prompt: primaryPrompt }],
         parameters: {
           "sampleCount": 1,
           "aspectRatio": "16:9"
         }
       }),
     });
-    return response.ok ? await response.json() : null;
-  };
+    
+    if (!imageResponse.ok) {
+      console.error("Imagen API Error:", await imageResponse.text());
+      throw new Error(`Imagen API failed with status: ${imageResponse.status}`);
+    }
 
-  let imageResult = await tryImageGeneration(primaryPrompt);
-  if (!imageResult) {
-    console.warn('Primary image prompt failed or was rejected. Trying safe fallback...');
-    imageResult = await tryImageGeneration(safePrompt);
-    if (!imageResult) throw new Error('Both primary and fallback prompts failed Gemini compliance.');
+    const imageResult = await imageResponse.json();
+
+    if (!imageResult?.predictions || imageResult.predictions.length === 0) {
+      console.error("Image generation failed: no predictions returned.", JSON.stringify(imageResult, null, 2));
+      throw new Error("No image predictions available from Gemini.");
+    }
+    
+    const base64ImageData = imageResult.predictions[0].bytesBase64Encoded;
+
+    console.log('Image generated, now uploading to Sanity...');
+    const imageBuffer = Buffer.from(base64ImageData, 'base64');
+    imageAsset = await sanityClient.assets.upload('image', imageBuffer, {
+      filename: `${createSlug(postContent.title)}.png`,
+      contentType: 'image/png'
+    });
+    console.log('Successfully uploaded image asset with ID:', imageAsset._id);
+  } catch (error) {
+    console.error('Failed during image generation or upload:', error);
+    process.exit(1);
   }
-
-  if (!imageResult?.predictions || imageResult.predictions.length === 0) {
-    console.error("Image generation failed: no predictions returned.");
-    console.log("Full response:", JSON.stringify(imageResult, null, 2));
-    throw new Error("No image predictions available from Gemini.");
-  }
-  
-  const base64ImageData = imageResult.predictions[0].bytesBase64Encoded;
- 
-
-  console.log('Image generated, now uploading to Sanity...');
-  const imageBuffer = Buffer.from(base64ImageData, 'base64');
-  imageAsset = await sanityClient.assets.upload('image', imageBuffer, {
-    filename: `${createSlug(postContent.title)}.png`,
-    contentType: 'image/png'
-  });
-  console.log('Successfully uploaded image asset with ID:', imageAsset._id);
-} catch (error) {
-  console.error('Failed during image generation or upload:', error);
-  process.exit(1);
-}
 
 
   // --- Part 3: Publish to Sanity & Social Media ---
