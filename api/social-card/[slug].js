@@ -1,17 +1,17 @@
 // File: /api/social-card/[slug].js
-
-// --- MODIFICATION: Change this import ---
 import { sanityClientServer } from '../../src/sanity.server.js'; 
 
 export default async function handler(req, res) {
   const { slug } = req.query;
+
+  // --- DEBUG LOG 1 --
+  console.log(`Step 1: Function triggered for slug: ${slug}`);
 
   if (!slug) {
     return res.status(400).send('Missing slug');
   }
 
   try {
-    // --- MODIFICATION: Use the server client ---
     const post = await sanityClientServer.fetch(
       `*[_type == "post" && slug.current == $slug][0]{
          title,
@@ -19,13 +19,20 @@ export default async function handler(req, res) {
        }`,
       { slug }
     );
-    
-    // ... the rest of the file remains exactly the same
+
+    // --- DEBUG LOG 2 ---
+    console.log('Step 2: Post data received from Sanity:', JSON.stringify(post, null, 2));
+
     if (!post) {
+      // --- DEBUG LOG 3 ---
+      console.log('Step 3: Post not found for this slug. The function will now exit with a 404.');
       return res.status(404).send('Post not found');
     }
 
     const finalUrl = `https://www.avablackwood.com/blog/${slug}`;
+    
+    // --- DEBUG LOG 4 ---
+    console.log('Step 4: Post found! Generating and sending HTML redirect page.');
 
     const html = `
       <!DOCTYPE html>
@@ -55,7 +62,8 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'text/html');
     res.status(200).send(html);
   } catch (error) {
-    console.error('Error fetching post from Sanity:', error);
+    // This will now catch any other errors
+    console.error('CRITICAL ERROR:', error);
     res.status(500).send('Internal Server Error');
   }
 }
