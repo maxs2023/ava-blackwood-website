@@ -370,6 +370,7 @@ No human figures. No visible text, letters, or watermarks.
       const webhookPayload = {
         text: socialPost.social_post_text,
         image_url: imageAsset.url // The public URL from the Sanity asset object
+        slug: slug
       };
 
       // ✨ Note: The key 'image_url' is a common convention for services like Zapier or IFTTT.
