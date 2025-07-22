@@ -1,8 +1,7 @@
 // src/BlogPost.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-// --- MODIFICATION: Import Helmet ---
-import { Helmet } from 'react-helmet-async';
+// --- MODIFICATION: No longer need to import Helmet ---
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card.jsx';
 import sanityClient from './sanityClient.js';
 import { PortableText } from '@portabletext/react';
@@ -46,24 +45,19 @@ const BlogPost = () => {
   if (loading) return <div className="text-center py-20 text-gray-600">Loading post...</div>;
   if (!post) return <div className="text-center py-20 text-red-500">Post not found.</div>;
 
-  // --- MODIFICATION: The return is now wrapped in a React Fragment <> to include Helmet ---
   return (
     <>
-      {/* --- MODIFICATION: Add Helmet to manage the page head --- */}
-      <Helmet>
-        <title>{`${post.title} | Ava Blackwood`}</title>
-        <meta name="description" content={`Read the blog post "${post.title}" by Ava Blackwood.`} />
+      {/* --- MODIFICATION: Replaced Helmet with native React 19 metadata tags --- */}
+      <title>{`${post.title} | Ava Blackwood`}</title>
+      <meta name="description" content={`Read the blog post "${post.title}" by Ava Blackwood.`} />
+      {post.mainImageUrl && (
+        <meta property="og:image" content={post.mainImageUrl} />
+      )}
+      <meta property="og:title" content={post.title} />
+      <meta property="og:description" content="A blog post by Ava Blackwood" />
+      <meta property="og:type" content="article" />
 
-        {/* --- THIS IS THE CRITICAL TAG FOR SOCIAL MEDIA CARDS --- */}
-        {post.mainImageUrl && (
-          <meta property="og:image" content={post.mainImageUrl} />
-        )}
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content="A blog post by Ava Blackwood" />
-        <meta property="og:type" content="article" />
-      </Helmet>
-
-      {/* Your existing JSX for displaying the post remains unchanged */}
+      {/* The rest of your component's JSX remains the same */}
       <div className="min-h-screen py-12 px-4 bg-muted">
         <div className="max-w-3xl mx-auto">
           <Link to="/blog" className="text-burgundy text-sm font-semibold hover:underline mb-8 inline-block">
