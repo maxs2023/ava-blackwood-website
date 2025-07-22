@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input.jsx';
 import { Badge } from '@/components/ui/badge.jsx';
 import { Textarea } from '@/components/ui/textarea.jsx';
-import { BookOpen, Mail, ExternalLink, Calendar, User, Send, Star, Award, Coffee, Pen } from 'lucide-react';
+// --- MODIFICATION: Added Menu and X icons for the mobile menu button ---
+import { BookOpen, Mail, ExternalLink, Calendar, User, Send, Star, Award, Coffee, Pen, Menu, X } from 'lucide-react';
 import './App.css';
 
 // --- Import Sanity and PortableText ---
@@ -17,7 +18,7 @@ import BlogList from './BlogList.jsx';
 import BlogPost from './BlogPost.jsx';
 
 // --- Import App Data ---
-import { allBooks } from './booksData.js'; // <-- IMPORT a_llBooks HERE
+import { allBooks } from './booksData.js';
 import authorPhoto from './assets/authorprofilephoto.png';
 
 // --- Analytics Component ---
@@ -122,10 +123,13 @@ const SubmitStatusMessage = ({ status }) => {
     return <div className={`${messages[status].color} text-center text-sm`}>{messages[status].text}</div>;
 };
 
-// --- Page Components (defined within App.jsx) ---
 
+// --- REVISED NAVIGATION COMPONENT ---
 const Navigation = () => {
     const location = useLocation();
+    // --- MODIFICATION: State to manage mobile menu visibility ---
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
     const navLinks = [
         { path: '/', label: 'Home' },
         { path: '/books', label: 'Books' },
@@ -138,9 +142,11 @@ const Navigation = () => {
         <nav className="bg-white shadow-sm border-b border-border sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
-                    <Link to="/" className="text-2xl font-serif text-burgundy font-bold">
+                    <Link to="/" className="text-2xl font-serif text-burgundy font-bold" onClick={() => setIsMobileMenuOpen(false)}>
                         Ava Blackwood
                     </Link>
+
+                    {/* Desktop Menu */}
                     <div className="hidden md:block">
                         <div className="ml-10 flex items-baseline space-x-8">
                             {navLinks.map(({ path, label }) => (
@@ -158,11 +164,46 @@ const Navigation = () => {
                             ))}
                         </div>
                     </div>
+
+                    {/* --- MODIFICATION: Hamburger Button for mobile --- */}
+                    <div className="md:hidden flex items-center">
+                        <Button
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            variant="ghost"
+                            size="icon"
+                        >
+                            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                            <span className="sr-only">Open main menu</span>
+                        </Button>
+                    </div>
                 </div>
             </div>
+
+            {/* --- MODIFICATION: Mobile Menu Panel --- */}
+            {isMobileMenuOpen && (
+                <div className="md:hidden" id="mobile-menu">
+                    <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                        {navLinks.map(({ path, label }) => (
+                            <Link
+                                key={path}
+                                to={path}
+                                onClick={() => setIsMobileMenuOpen(false)} // Close menu on link click
+                                className={`block px-3 py-2 rounded-md text-base font-medium capitalize ${
+                                    location.pathname === path
+                                        ? 'bg-accent text-accent-foreground'
+                                        : 'text-gray-700 hover:bg-gray-100'
+                                }`}
+                            >
+                                {label}
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
         </nav>
     );
 };
+
 
 const HomePage = () => {
     const handleAmazonClick = (book) => {
