@@ -139,10 +139,10 @@ async function generateAndPublish() {
   CRITICAL CONTENT REQUIREMENTS:
   1. Include one poetic metaphor for physical desire (e.g., "desire is a fever that breaks in the dark").
   2. Use one literary or psychological term to describe intimacy (e.g., "psychological resonance," "liminal space").
-  3. **The final paragraph must describe a single, evocative, symbolic object or scene that captures the entire post's theme (e.g., a crimson lipstick stain on a porcelain coffee cup, a single black stocking draped over a leather-bound book). This will be used to generate an image.**
+  3. **The final paragraph must describe a single, evocative, symbolic object or scene that captures the entire post's theme (e.g., a crimson lipstick stain on a porcelain coffee cup, a leg with smooth stocking, or a woman's back with perfect curve). This will be used to generate an image.**
 
   BASED ON THE FINAL PARAGRAPH, CREATE A DEDICATED IMAGE PROMPT.
-  The prompt should be a VISUAL, CONCRETE description of a still-life scene under 15 words (e.g., "A single black stocking draped over a leather-bound book").
+  The prompt should be a VISUAL, CONCRETE description of a still-life or person scene under 15 words (e.g., "A single black stocking draped over a leather-bound book").
 
   The final output must be a single, valid JSON object with keys: "title" and "body".
   Example of a valid body structure:
