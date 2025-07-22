@@ -1,7 +1,9 @@
 // src/BlogPost.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button } from '@/components/ui/card.jsx';
+// --- MODIFICATION: Import Helmet ---
+import { Helmet } from 'react-helmet-async';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card.jsx';
 import sanityClient from './sanityClient.js';
 import { PortableText } from '@portabletext/react';
 import { Calendar, User } from 'lucide-react';
@@ -44,31 +46,49 @@ const BlogPost = () => {
   if (loading) return <div className="text-center py-20 text-gray-600">Loading post...</div>;
   if (!post) return <div className="text-center py-20 text-red-500">Post not found.</div>;
 
+  // --- MODIFICATION: The return is now wrapped in a React Fragment <> to include Helmet ---
   return (
-    <div className="min-h-screen py-12 px-4 bg-muted">
-      <div className="max-w-3xl mx-auto">
-        <Link to="/blog" className="text-burgundy text-sm font-semibold hover:underline mb-8 inline-block">
-          ← Back to Blog
-        </Link>
-        <Card className="bg-white overflow-hidden">
-          {post.mainImageUrl && (
-            <img src={post.mainImageUrl} alt={post.title} className="w-full aspect-video object-cover" />
-          )}
-          <CardHeader>
-            <CardTitle className="text-4xl font-serif text-burgundy">{post.title}</CardTitle>
-            <CardDescription className="flex items-center gap-4 text-sm text-gray-500 pt-2">
-              {post.author?.name && <span className="flex items-center gap-2"><User size={14} /> {post.author.name}</span>}
-              {post.publishedAt && <span className="flex items-center gap-2"><Calendar size={14} /> {new Date(post.publishedAt).toLocaleDateString()}</span>}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="blog-content text-lg text-gray-700 leading-relaxed space-y-4">
-              <PortableText value={post.body} components={ptComponents} />
-            </div>
-          </CardContent>
-        </Card>
+    <>
+      {/* --- MODIFICATION: Add Helmet to manage the page head --- */}
+      <Helmet>
+        <title>{`${post.title} | Ava Blackwood`}</title>
+        <meta name="description" content={`Read the blog post "${post.title}" by Ava Blackwood.`} />
+
+        {/* --- THIS IS THE CRITICAL TAG FOR SOCIAL MEDIA CARDS --- */}
+        {post.mainImageUrl && (
+          <meta property="og:image" content={post.mainImageUrl} />
+        )}
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content="A blog post by Ava Blackwood" />
+        <meta property="og:type" content="article" />
+      </Helmet>
+
+      {/* Your existing JSX for displaying the post remains unchanged */}
+      <div className="min-h-screen py-12 px-4 bg-muted">
+        <div className="max-w-3xl mx-auto">
+          <Link to="/blog" className="text-burgundy text-sm font-semibold hover:underline mb-8 inline-block">
+            ← Back to Blog
+          </Link>
+          <Card className="bg-white overflow-hidden">
+            {post.mainImageUrl && (
+              <img src={post.mainImageUrl} alt={post.title} className="w-full aspect-video object-cover" />
+            )}
+            <CardHeader>
+              <CardTitle className="text-4xl font-serif text-burgundy">{post.title}</CardTitle>
+              <CardDescription className="flex items-center gap-4 text-sm text-gray-500 pt-2">
+                {post.author?.name && <span className="flex items-center gap-2"><User size={14} /> {post.author.name}</span>}
+                {post.publishedAt && <span className="flex items-center gap-2"><Calendar size={14} /> {new Date(post.publishedAt).toLocaleDateString()}</span>}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="blog-content text-lg text-gray-700 leading-relaxed space-y-4">
+                <PortableText value={post.body} components={ptComponents} />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
