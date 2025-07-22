@@ -1,11 +1,9 @@
 // File: /api/social-card/[slug].js
 
-// You'll need to import your existing sanity client.
-// Make sure the path is correct relative to the api folder.
-import sanityClient from '../../src/sanityClient.js'; 
+// --- MODIFICATION: Change this import ---
+import { sanityClientServer } from '../../src/sanity.server.js'; 
 
 export default async function handler(req, res) {
-  // Get the slug from the request URL (e.g., "my-first-post")
   const { slug } = req.query;
 
   if (!slug) {
@@ -13,23 +11,22 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Fetch the post data from Sanity using the slug
-    const post = await sanityClient.fetch(
+    // --- MODIFICATION: Use the server client ---
+    const post = await sanityClientServer.fetch(
       `*[_type == "post" && slug.current == $slug][0]{
          title,
          "imageUrl": mainImage.asset->url
        }`,
       { slug }
     );
-
+    
+    // ... the rest of the file remains exactly the same
     if (!post) {
       return res.status(404).send('Post not found');
     }
 
-    // This is the final destination URL for real users
     const finalUrl = `https://www.avablackwood.com/blog/${slug}`;
 
-    // We generate a simple HTML page with the necessary meta tags
     const html = `
       <!DOCTYPE html>
       <html>
@@ -55,7 +52,6 @@ export default async function handler(req, res) {
       </html>
     `;
 
-    // Send the HTML response
     res.setHeader('Content-Type', 'text/html');
     res.status(200).send(html);
   } catch (error) {
