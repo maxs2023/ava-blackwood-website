@@ -1,9 +1,0 @@
-{
-  "buildCommand": "rm -rf node_modules && npm install && npm run build",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
-}
