@@ -8,10 +8,10 @@
     "build": "npx vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "test:social": "node scripts/test-social-media.js",
-    "create:post": "node scripts/create-blog-post.js",
-    "create:example": "node scripts/create-blog-post.js --example",
-    "deploy:test": "npm run test:social && vercel --prod"
+    // "test:social": "node scripts/test-social-media.js",
+    // "create:post": "node scripts/create-blog-post.js",
+    // "create:example": "node scripts/create-blog-post.js --example",
+    // "deploy:test": "npm run test:social && vercel --prod"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
