@@ -2,11 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "functions": {
-    "api/blog/[slug].js": {
-      "runtime": "@vercel/edge"
-    }
-  },
+
   "rewrites": [
     {
       "source": "/blog/:slug",
