@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm build",
+  "buildCommand": "node node_modules/vite/bin/vite.js build",
   "outputDirectory": "dist",
 
   "rewrites": [
