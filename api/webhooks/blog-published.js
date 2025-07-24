@@ -1,7 +1,7 @@
-// Fixed webhook endpoint - uses server-side Sanity client
+// Complete self-contained webhook for blog publishing
 import { createClient } from '@sanity/client';
 
-// Create server-side Sanity client directly in the webhook
+// Create Sanity client directly in the webhook
 const sanityClient = createClient({
   projectId: process.env.SANITY_PROJECT_ID || '8vo1vk23',
   dataset: 'production',
@@ -10,7 +10,7 @@ const sanityClient = createClient({
   token: process.env.SANITY_API_WRITE_TOKEN,
 });
 
-// Simplified AutomatedSocialPoster for serverless environment
+// Self-contained automation logic
 class AutomatedSocialPoster {
   constructor(config = {}) {
     this.config = {

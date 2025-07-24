@@ -1,7 +1,161 @@
-// api/webhooks/trigger-social-post.js
-import AutomatedSocialPoster from '../../src/automation/AutomatedSocialPoster.js';
+// Manual trigger endpoint for social media posts - self-contained
+import { createClient } from '@sanity/client';
+
+// Create Sanity client directly in the webhook
+const sanityClient = createClient({
+  projectId: process.env.SANITY_PROJECT_ID || '8vo1vk23',
+  dataset: 'production',
+  apiVersion: '2025-07-17',
+  useCdn: false,
+  token: process.env.SANITY_API_WRITE_TOKEN,
+});
+
+// Self-contained automation logic (duplicate from blog-published.js for independence)
+class AutomatedSocialPoster {
+  constructor(config = {}) {
+    this.config = {
+      baseUrl: 'https://www.avablackwood.com',
+      zapierWebhookUrl: config.zapierWebhookUrl || process.env.ZAPIER_WEBHOOK_URL,
+      ...config
+    };
+  }
+
+  async getBlogPost(slug) {
+    const post = await sanityClient.fetch(`*[_type == "post" && slug.current == $slug][0]{
+      _id,
+      title,
+      slug,
+      publishedAt,
+      "mainImageUrl": mainImage.asset->url,
+      "excerpt": pt::text(body[0...3]),
+      body,
+      author->{name}
+    }`, { slug });
+
+    return post;
+  }
+
+  createExcerpt(post, maxLength = 150) {
+    if (post.excerpt && post.excerpt.trim()) {
+      const cleanExcerpt = post.excerpt
+        .replace(/\n/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      if (cleanExcerpt.length > maxLength) {
+        return cleanExcerpt.substring(0, maxLength).trim() + '...';
+      }
+      return cleanExcerpt;
+    }
+    
+    return `Explore the depths of desire and forbidden attraction in this captivating piece from Ava Blackwood's collection.`;
+  }
+
+  generateTwitterContent(post) {
+    const postUrl = `${this.config.baseUrl}/blog/${post.slug.current}`;
+    const excerpt = this.createExcerpt(post, 100);
+
+    return `🖤 ${post.title}
+
+${excerpt}
+
+The art of seduction lives in the pause before the touch...
+
+Read more: ${postUrl}
+
+#DarkAcademia #Romance #BlogPost #AvaBlackwood`;
+  }
+
+  formatForZapier(post) {
+    const postUrl = `${this.config.baseUrl}/blog/${post.slug.current}`;
+    const excerpt = this.createExcerpt(post, 120);
+
+    return {
+      title: post.title,
+      content: this.generateTwitterContent(post),
+      image_url: post.mainImageUrl,
+      link_url: postUrl,
+      blog_post: {
+        id: post._id,
+        title: post.title,
+        slug: post.slug.current,
+        excerpt: excerpt,
+        published_at: post.publishedAt,
+        author: post.author?.name || 'Ava Blackwood',
+        image_url: post.mainImageUrl,
+        blog_url: postUrl
+      },
+      social_card_url: `${this.config.baseUrl}/api/social-card/${post.slug.current}`,
+    };
+  }
+
+  async sendToZapier(post) {
+    if (!this.config.zapierWebhookUrl) {
+      throw new Error('Zapier webhook URL not configured');
+    }
+
+    const zapierData = this.formatForZapier(post);
+
+    try {
+      const response = await fetch(this.config.zapierWebhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(zapierData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Zapier webhook failed: ${response.statusText}`);
+      }
+
+      return {
+        success: true,
+        message: 'Successfully sent to Zapier',
+        data: zapierData
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        data: zapierData
+      };
+    }
+  }
+
+  async automatePost(slug) {
+    try {
+      const post = await this.getBlogPost(slug);
+
+      if (!post) {
+        throw new Error('No blog post found');
+      }
+
+      const results = {
+        success: true,
+        post: {
+          title: post.title,
+          slug: post.slug.current,
+          imageUrl: post.mainImageUrl,
+          blogUrl: `${this.config.baseUrl}/blog/${post.slug.current}`,
+          socialCardUrl: `${this.config.baseUrl}/api/social-card/${post.slug.current}`,
+          publishedAt: post.publishedAt
+        },
+        zapier: await this.sendToZapier(post)
+      };
+
+      return results;
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+}
 
 export default async function handler(req, res) {
+  // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -11,28 +165,38 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.setHeader('Allow', ['POST']);
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   try {
     const { slug, useZapier = true, useDirectPosting = false, platforms = ['twitter'] } = req.body;
 
-    const socialPoster = new AutomatedSocialPoster();
-    
-    const result = await socialPoster.automatePost({
-      useZapier,
-      useDirectPosting,
-      platforms,
-      slug
-    });
+    if (!slug) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required parameter: slug'
+      });
+    }
 
-    res.json({
+    console.log(`📱 Manual social media trigger for slug: ${slug}`);
+
+    const socialPoster = new AutomatedSocialPoster({
+      zapierWebhookUrl: process.env.ZAPIER_WEBHOOK_URL
+    });
+    
+    const result = await socialPoster.automatePost(slug);
+
+    console.log('🚀 Manual trigger result:', JSON.stringify(result, null, 2));
+
+    res.status(200).json({
       success: true,
-      message: 'Social media post triggered',
+      message: 'Social media post triggered successfully',
       data: result
     });
 
   } catch (error) {
+    console.error('❌ Manual trigger error:', error);
     res.status(500).json({
       success: false,
       error: error.message
