@@ -1,5 +1,5 @@
 // src/automation/AutomatedSocialPoster.js
-import sanityClient from '../sanityClient.js';
+import sanityClient from './sanityClient.js';
 
 class AutomatedSocialPoster {
   constructor(config = {}) {

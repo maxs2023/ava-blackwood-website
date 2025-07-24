@@ -9,3 +9,4 @@
 *.key
 *.pem
 config/secrets.json
+.vercel

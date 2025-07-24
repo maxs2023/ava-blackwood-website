@@ -1,4 +1,6 @@
 // src/BlogPost.jsx
+import { Share2, Twitter, Facebook, Linkedin, Copy, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button.jsx';
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 // --- MODIFICATION: No longer need to import Helmet ---
@@ -77,6 +79,53 @@ const BlogPost = () => {
             <CardContent>
               <div className="blog-content text-lg text-gray-700 leading-relaxed space-y-4">
                 <PortableText value={post.body} components={ptComponents} />
+              </div>
+              {/* Social Media Sharing Section */}
+              <div className="mt-12 pt-8 border-t border-gray-200">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center gap-2">
+                    <Share2 size={20} className="text-burgundy" />
+                    <span className="text-lg font-semibold text-burgundy">Share this post</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleShare('twitter')}
+                      className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300"
+                    >
+                      <Twitter size={16} />
+                      Twitter
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleShare('facebook')}
+                      className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-600"
+                    >
+                      <Facebook size={16} />
+                      Facebook
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleShare('linkedin')}
+                      className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-700"
+                    >
+                      <Linkedin size={16} />
+                      LinkedIn
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={copyToClipboard}
+                      className="flex items-center gap-2 hover:bg-gray-50"
+                    >
+                      {copied ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
+                      {copied ? 'Copied!' : 'Copy Link'}
+                    </Button>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
