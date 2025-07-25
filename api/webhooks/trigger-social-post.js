@@ -10,7 +10,7 @@ const sanityClient = createClient({
   token: process.env.SANITY_API_WRITE_TOKEN,
 });
 
-// Direct X Poster with OAuth 1.0a
+// Direct X Poster with improved OAuth 1.0a for X API v2
 class DirectXPoster {
   constructor() {
     this.apiKey = process.env.X_API_KEY;
@@ -19,23 +19,25 @@ class DirectXPoster {
     this.accessTokenSecret = process.env.X_ACCESS_TOKEN_SECRET;
   }
 
-  // Generate OAuth 1.0a signature
-  generateOAuthSignature(method, url, params, tokenSecret = '') {
-    // Sort parameters
-    const sortedParams = Object.keys(params)
+  // Generate OAuth 1.0a signature (improved for X API v2)
+  generateOAuthSignature(method, url, oauthParams) {
+    // Sort OAuth parameters only (no JSON body for X API v2)
+    const sortedParams = Object.keys(oauthParams)
       .sort()
-      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+      .map(key => `${this.percentEncode(key)}=${this.percentEncode(oauthParams[key])}`)
       .join('&');
 
     // Create signature base string
     const signatureBaseString = [
       method.toUpperCase(),
-      encodeURIComponent(url),
-      encodeURIComponent(sortedParams)
+      this.percentEncode(url),
+      this.percentEncode(sortedParams)
     ].join('&');
 
+    console.log('🔐 OAuth signature base string:', signatureBaseString);
+
     // Create signing key
-    const signingKey = `${encodeURIComponent(this.apiSecret)}&${encodeURIComponent(tokenSecret)}`;
+    const signingKey = `${this.percentEncode(this.apiSecret)}&${this.percentEncode(this.accessTokenSecret)}`;
 
     // Generate signature
     const signature = crypto
@@ -46,31 +48,42 @@ class DirectXPoster {
     return signature;
   }
 
-  // Generate OAuth 1.0a header
-  generateOAuthHeader(method, url, bodyParams = {}) {
+  // Proper percent encoding for OAuth
+  percentEncode(str) {
+    return encodeURIComponent(str)
+      .replace(/!/g, '%21')
+      .replace(/'/g, '%27')
+      .replace(/\(/g, '%28')
+      .replace(/\)/g, '%29')
+      .replace(/\*/g, '%2A');
+  }
+
+  // Generate OAuth 1.0a header (X API v2 compatible)
+  generateOAuthHeader(method, url) {
     const timestamp = Math.floor(Date.now() / 1000);
     const nonce = crypto.randomBytes(16).toString('hex');
 
+    // OAuth parameters only (no JSON body content)
     const oauthParams = {
       oauth_consumer_key: this.apiKey,
       oauth_nonce: nonce,
       oauth_signature_method: 'HMAC-SHA1',
-      oauth_timestamp: timestamp,
+      oauth_timestamp: timestamp.toString(),
       oauth_token: this.accessToken,
       oauth_version: '1.0'
     };
 
-    // Combine OAuth params with body params for signature
-    const allParams = { ...oauthParams, ...bodyParams };
-
-    // Generate signature
-    const signature = this.generateOAuthSignature(method, url, allParams, this.accessTokenSecret);
+    // Generate signature using only OAuth params
+    const signature = this.generateOAuthSignature(method, url, oauthParams);
     oauthParams.oauth_signature = signature;
 
     // Build authorization header
     const authHeader = 'OAuth ' + Object.keys(oauthParams)
-      .map(key => `${encodeURIComponent(key)}="${encodeURIComponent(oauthParams[key])}"`)
+      .sort()
+      .map(key => `${this.percentEncode(key)}="${this.percentEncode(oauthParams[key])}"`)
       .join(', ');
+
+    console.log('🔑 OAuth header generated:', authHeader.substring(0, 100) + '...');
 
     return authHeader;
   }
@@ -81,14 +94,16 @@ class DirectXPoster {
         throw new Error('X OAuth 1.0a credentials not configured');
       }
 
-      console.log('🐦 Posting to X with OAuth 1.0a:', content.substring(0, 50) + '...');
+      console.log('🐦 Posting to X with improved OAuth 1.0a:', content.substring(0, 50) + '...');
 
       const url = 'https://api.twitter.com/2/tweets';
       const method = 'POST';
       const tweetData = { text: content };
 
-      // Generate OAuth header
-      const authHeader = this.generateOAuthHeader(method, url, tweetData);
+      // Generate OAuth header (without including JSON body in signature)
+      const authHeader = this.generateOAuthHeader(method, url);
+
+      console.log('📡 Making request to X API...');
 
       const response = await fetch(url, {
         method: method,
@@ -99,21 +114,24 @@ class DirectXPoster {
         body: JSON.stringify(tweetData)
       });
 
+      console.log('📊 X API response status:', response.status);
+
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ X API Error:', errorText);
+        console.error('❌ X API Error Response:', errorText);
         throw new Error(`Tweet failed: ${response.status} - ${errorText}`);
       }
 
       const result = await response.json();
-      console.log('✅ Successfully posted to X:', result.data.id);
+      console.log('✅ Successfully posted to X:', result.data?.id || 'Tweet created');
       
       return {
         success: true,
-        tweetId: result.data.id,
-        tweetUrl: `https://twitter.com/user/status/${result.data.id}`,
+        tweetId: result.data?.id,
+        tweetUrl: result.data?.id ? `https://twitter.com/user/status/${result.data.id}` : null,
         message: 'Successfully posted to X',
-        platform: 'x'
+        platform: 'x',
+        response: result
       };
 
     } catch (error) {
