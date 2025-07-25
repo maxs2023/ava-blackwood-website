@@ -1,134 +1,266 @@
-// src/BlogPost.jsx
-import { Share2, Twitter, Facebook, Linkedin, Copy, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button.jsx';
+// Fixed BlogPost.jsx with copyToClipboard function
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-// --- MODIFICATION: No longer need to import Helmet ---
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card.jsx';
+import { Button } from '@/components/ui/button.jsx';
 import sanityClient from './sanityClient.js';
 import { PortableText } from '@portabletext/react';
-import { Calendar, User } from 'lucide-react';
+import { Calendar, User, Share2, Copy, Check } from 'lucide-react';
 
 const BlogPost = () => {
   const { slug } = useParams();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  // Add the missing copyToClipboard function
+  const copyToClipboard = async (text) => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        // Use the modern Clipboard API if available
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for older browsers or non-secure contexts
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+      }
+      
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+      return true;
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      return false;
+    }
+  };
+
+  // Share functionality
+  const handleShare = async () => {
+    const url = window.location.href;
+    const title = post?.title || 'Blog Post';
+    
+    if (navigator.share) {
+      // Use native sharing if available
+      try {
+        await navigator.share({
+          title: title,
+          text: `Check out this blog post: ${title}`,
+          url: url,
+        });
+      } catch (err) {
+        // If native sharing fails, fall back to copying URL
+        copyToClipboard(url);
+      }
+    } else {
+      // Fall back to copying URL to clipboard
+      copyToClipboard(url);
+    }
+  };
 
   const ptComponents = {
     block: {
       h2: ({ children }) => <h2 className="text-2xl font-serif font-bold my-6 text-burgundy">{children}</h2>,
+      h3: ({ children }) => <h3 className="text-xl font-serif font-bold my-4 text-burgundy">{children}</h3>,
       blockquote: ({ children }) => <blockquote className="border-l-4 border-accent pl-4 italic my-6 text-gray-600">{children}</blockquote>,
+      normal: ({ children }) => <p className="mb-4 leading-relaxed">{children}</p>,
     },
     list: {
       bullet: ({ children }) => <ul className="list-disc pl-5 my-6 space-y-2 text-gray-700">{children}</ul>,
+      number: ({ children }) => <ol className="list-decimal pl-5 my-6 space-y-2 text-gray-700">{children}</ol>,
     },
     listItem: {
       bullet: ({ children }) => <li className="leading-relaxed">{children}</li>,
+      number: ({ children }) => <li className="leading-relaxed">{children}</li>,
     },
     marks: {
       strong: ({ children }) => <strong className="font-bold text-burgundy">{children}</strong>,
       em: ({ children }) => <em className="italic">{children}</em>,
+      underline: ({ children }) => <u>{children}</u>,
+      code: ({ children }) => <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{children}</code>,
     },
   };
 
   useEffect(() => {
-    sanityClient.fetch(`*[_type == "post" && slug.current == $slug][0]{
-      title,
-      publishedAt,
-      body,
-      "mainImageUrl": mainImage.asset->url,
-      author->{name}
-    }`, { slug }).then(data => {
-      setPost(data);
-      setLoading(false);
-    });
+    const fetchPost = async () => {
+      try {
+        const data = await sanityClient.fetch(`*[_type == "post" && slug.current == $slug][0]{
+          title,
+          publishedAt,
+          body,
+          "mainImageUrl": mainImage.asset->url,
+          author->{name},
+          "excerpt": pt::text(body[0...3])
+        }`, { slug });
+        
+        setPost(data);
+      } catch (error) {
+        console.error('Error fetching post:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (slug) {
+      fetchPost();
+    }
   }, [slug]);
 
-  if (loading) return <div className="text-center py-20 text-gray-600">Loading post...</div>;
-  if (!post) return <div className="text-center py-20 text-red-500">Post not found.</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen py-12 px-4 bg-muted">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center py-20 text-gray-600">
+            <div className="animate-pulse">Loading post...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="min-h-screen py-12 px-4 bg-muted">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center py-20">
+            <h1 className="text-2xl font-bold text-red-500 mb-4">Post not found</h1>
+            <p className="text-gray-600 mb-8">The blog post you're looking for doesn't exist or has been removed.</p>
+            <Link to="/blog" className="text-burgundy hover:underline">
+              ← Back to Blog
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
-      {/* --- MODIFICATION: Replaced Helmet with native React 19 metadata tags --- */}
+      {/* SEO Meta Tags */}
       <title>{`${post.title} | Ava Blackwood`}</title>
-      <meta name="description" content={`Read the blog post "${post.title}" by Ava Blackwood.`} />
+      <meta name="description" content={post.excerpt || `Read the blog post "${post.title}" by Ava Blackwood.`} />
       {post.mainImageUrl && (
         <meta property="og:image" content={post.mainImageUrl} />
       )}
       <meta property="og:title" content={post.title} />
-      <meta property="og:description" content="A blog post by Ava Blackwood" />
+      <meta property="og:description" content={post.excerpt || "A blog post by Ava Blackwood"} />
       <meta property="og:type" content="article" />
+      <meta property="og:url" content={window.location.href} />
 
-      {/* The rest of your component's JSX remains the same */}
       <div className="min-h-screen py-12 px-4 bg-muted">
         <div className="max-w-3xl mx-auto">
-          <Link to="/blog" className="text-burgundy text-sm font-semibold hover:underline mb-8 inline-block">
+          <Link 
+            to="/blog" 
+            className="text-burgundy text-sm font-semibold hover:underline mb-8 inline-block"
+          >
             ← Back to Blog
           </Link>
-          <Card className="bg-white overflow-hidden">
+          
+          <Card className="bg-white overflow-hidden shadow-lg">
             {post.mainImageUrl && (
-              <img src={post.mainImageUrl} alt={post.title} className="w-full aspect-video object-cover" />
+              <div className="w-full aspect-video overflow-hidden">
+                <img 
+                  src={post.mainImageUrl} 
+                  alt={post.title} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
             )}
-            <CardHeader>
-              <CardTitle className="text-4xl font-serif text-burgundy">{post.title}</CardTitle>
-              <CardDescription className="flex items-center gap-4 text-sm text-gray-500 pt-2">
-                {post.author?.name && <span className="flex items-center gap-2"><User size={14} /> {post.author.name}</span>}
-                {post.publishedAt && <span className="flex items-center gap-2"><Calendar size={14} /> {new Date(post.publishedAt).toLocaleDateString()}</span>}
+            
+            <CardHeader className="pb-4">
+              <CardTitle className="text-4xl font-serif text-burgundy leading-tight">
+                {post.title}
+              </CardTitle>
+              
+              <CardDescription className="flex items-center justify-between pt-4">
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                  {post.author?.name && (
+                    <span className="flex items-center gap-2">
+                      <User size={14} /> 
+                      {post.author.name}
+                    </span>
+                  )}
+                  {post.publishedAt && (
+                    <span className="flex items-center gap-2">
+                      <Calendar size={14} /> 
+                      {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </span>
+                  )}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleShare}
+                  className="flex items-center gap-2"
+                >
+                  {copySuccess ? (
+                    <>
+                      <Check size={14} />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Share2 size={14} />
+                      Share
+                    </>
+                  )}
+                </Button>
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="blog-content text-lg text-gray-700 leading-relaxed space-y-4">
-                <PortableText value={post.body} components={ptComponents} />
+            
+            <CardContent className="pt-0">
+              <div className="blog-content text-lg text-gray-700 leading-relaxed">
+                {post.body && post.body.length > 0 ? (
+                  <PortableText value={post.body} components={ptComponents} />
+                ) : (
+                  <p className="text-gray-500 italic">No content available for this post.</p>
+                )}
               </div>
-              {/* Social Media Sharing Section */}
+              
+              {/* Social sharing section */}
               <div className="mt-12 pt-8 border-t border-gray-200">
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                  <div className="flex items-center gap-2">
-                    <Share2 size={20} className="text-burgundy" />
-                    <span className="text-lg font-semibold text-burgundy">Share this post</span>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-burgundy mb-2">
+                      Enjoyed this post?
+                    </h3>
+                    <p className="text-gray-600 text-sm">
+                      Share it with others who might find it interesting.
+                    </p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleShare('twitter')}
-                      className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300"
-                    >
-                      <Twitter size={16} />
-                      Twitter
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleShare('facebook')}
-                      className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-600"
-                    >
-                      <Facebook size={16} />
-                      Facebook
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleShare('linkedin')}
-                      className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-700"
-                    >
-                      <Linkedin size={16} />
-                      LinkedIn
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={copyToClipboard}
-                      className="flex items-center gap-2 hover:bg-gray-50"
-                    >
-                      {copied ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
-                      {copied ? 'Copied!' : 'Copy Link'}
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={handleShare}
+                    className="bg-burgundy hover:bg-burgundy/90 text-white"
+                  >
+                    <Share2 size={16} className="mr-2" />
+                    Share Post
+                  </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
+          
+          {/* Related posts or back to blog section */}
+          <div className="mt-8 text-center">
+            <Link 
+              to="/blog" 
+              className="inline-flex items-center text-burgundy hover:underline font-medium"
+            >
+              ← Read more blog posts
+            </Link>
+          </div>
         </div>
       </div>
     </>
