@@ -90,7 +90,57 @@ class DirectXPoster {
     return authHeader;
   }
 
-  async postToX(content) {
+  async uploadImage(imageUrl) {
+    try {
+      console.log('📸 Downloading image from:', imageUrl);
+      
+      // Download the image
+      const imageResponse = await fetch(imageUrl);
+      if (!imageResponse.ok) {
+        throw new Error(`Failed to download image: ${imageResponse.status}`);
+      }
+      
+      const imageBuffer = await imageResponse.arrayBuffer();
+      const base64Image = Buffer.from(imageBuffer).toString('base64');
+      
+      console.log('📤 Uploading image to X...');
+      
+      // Upload to X media endpoint
+      const uploadUrl = 'https://upload.twitter.com/1.1/media/upload.json';
+      const method = 'POST';
+      
+      // Generate OAuth header for media upload
+      const authHeader = this.generateOAuthHeader(method, uploadUrl);
+      
+      const formData = new FormData();
+      formData.append('media_data', base64Image);
+      
+      const uploadResponse = await fetch(uploadUrl, {
+        method: method,
+        headers: {
+          'Authorization': authHeader,
+        },
+        body: formData
+      });
+      
+      if (!uploadResponse.ok) {
+        const errorText = await uploadResponse.text();
+        console.error('❌ Image upload failed:', errorText);
+        throw new Error(`Image upload failed: ${uploadResponse.status}`);
+      }
+      
+      const uploadResult = await uploadResponse.json();
+      console.log('✅ Image uploaded successfully, media_id:', uploadResult.media_id_string);
+      
+      return uploadResult.media_id_string;
+      
+    } catch (error) {
+      console.error('❌ Image upload error:', error.message);
+      throw error;
+    }
+  }
+
+  async postToX(content, imageUrl = null) {
     try {
       if (!this.apiKey || !this.apiSecret || !this.accessToken || !this.accessTokenSecret) {
         throw new Error('X OAuth 1.0a credentials not configured');
@@ -101,6 +151,17 @@ class DirectXPoster {
       const url = 'https://api.twitter.com/2/tweets';
       const method = 'POST';
       const tweetData = { text: content };
+
+      // Upload image if provided
+      if (imageUrl) {
+        try {
+          const mediaId = await this.uploadImage(imageUrl);
+          tweetData.media = { media_ids: [mediaId] };
+          console.log('📸 Image attached to tweet');
+        } catch (imageError) {
+          console.warn('⚠️ Image upload failed, posting without image:', imageError.message);
+        }
+      }
 
       // Generate OAuth header (without including JSON body in signature)
       const authHeader = this.generateOAuthHeader(method, url);
@@ -335,7 +396,7 @@ ${postUrl}
 
   async postDirectlyToX(post) {
     const content = await this.generateXContent(post);
-    return await this.xPoster.postToX(content);
+    return await this.xPoster.postToX(content, post.mainImageUrl);
   }
 
   async automatePost(slug, options = {}) {
