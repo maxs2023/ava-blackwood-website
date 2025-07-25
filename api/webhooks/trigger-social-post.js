@@ -1,5 +1,6 @@
 // Enhanced manual trigger with dual posting options
 import { createClient } from '@sanity/client';
+import crypto from 'crypto';
 
 const sanityClient = createClient({
   projectId: process.env.SANITY_PROJECT_ID || '8vo1vk23',
@@ -9,26 +10,90 @@ const sanityClient = createClient({
   token: process.env.SANITY_API_WRITE_TOKEN,
 });
 
-// Direct X Poster
+// Direct X Poster with OAuth 1.0a
 class DirectXPoster {
   constructor() {
-    this.bearerToken = process.env.X_BEARER_TOKEN;
+    this.apiKey = process.env.X_API_KEY;
+    this.apiSecret = process.env.X_API_SECRET;
+    this.accessToken = process.env.X_ACCESS_TOKEN;
+    this.accessTokenSecret = process.env.X_ACCESS_TOKEN_SECRET;
+  }
+
+  // Generate OAuth 1.0a signature
+  generateOAuthSignature(method, url, params, tokenSecret = '') {
+    // Sort parameters
+    const sortedParams = Object.keys(params)
+      .sort()
+      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+      .join('&');
+
+    // Create signature base string
+    const signatureBaseString = [
+      method.toUpperCase(),
+      encodeURIComponent(url),
+      encodeURIComponent(sortedParams)
+    ].join('&');
+
+    // Create signing key
+    const signingKey = `${encodeURIComponent(this.apiSecret)}&${encodeURIComponent(tokenSecret)}`;
+
+    // Generate signature
+    const signature = crypto
+      .createHmac('sha1', signingKey)
+      .update(signatureBaseString)
+      .digest('base64');
+
+    return signature;
+  }
+
+  // Generate OAuth 1.0a header
+  generateOAuthHeader(method, url, bodyParams = {}) {
+    const timestamp = Math.floor(Date.now() / 1000);
+    const nonce = crypto.randomBytes(16).toString('hex');
+
+    const oauthParams = {
+      oauth_consumer_key: this.apiKey,
+      oauth_nonce: nonce,
+      oauth_signature_method: 'HMAC-SHA1',
+      oauth_timestamp: timestamp,
+      oauth_token: this.accessToken,
+      oauth_version: '1.0'
+    };
+
+    // Combine OAuth params with body params for signature
+    const allParams = { ...oauthParams, ...bodyParams };
+
+    // Generate signature
+    const signature = this.generateOAuthSignature(method, url, allParams, this.accessTokenSecret);
+    oauthParams.oauth_signature = signature;
+
+    // Build authorization header
+    const authHeader = 'OAuth ' + Object.keys(oauthParams)
+      .map(key => `${encodeURIComponent(key)}="${encodeURIComponent(oauthParams[key])}"`)
+      .join(', ');
+
+    return authHeader;
   }
 
   async postToX(content) {
     try {
-      if (!this.bearerToken) {
-        throw new Error('X Bearer Token not configured');
+      if (!this.apiKey || !this.apiSecret || !this.accessToken || !this.accessTokenSecret) {
+        throw new Error('X OAuth 1.0a credentials not configured');
       }
 
-      console.log('🐦 Posting to X:', content.substring(0, 50) + '...');
+      console.log('🐦 Posting to X with OAuth 1.0a:', content.substring(0, 50) + '...');
 
+      const url = 'https://api.twitter.com/2/tweets';
+      const method = 'POST';
       const tweetData = { text: content };
 
-      const response = await fetch('https://api.twitter.com/2/tweets', {
-        method: 'POST',
+      // Generate OAuth header
+      const authHeader = this.generateOAuthHeader(method, url, tweetData);
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
-          'Authorization': `Bearer ${this.bearerToken}`,
+          'Authorization': authHeader,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(tweetData)
