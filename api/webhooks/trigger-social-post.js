@@ -221,22 +221,18 @@ class EnhancedAutomatedSocialPoster {
       
       const socialResult = await socialResponse.json();
       const socialGeneratedText = socialResult.candidates[0].content.parts[0].text;
-      const socialJsonString = socialGeneratedText.match(/```json\n([\s\S]*?)\n```/)?.[1];
+      const socialJsonString = socialGeneratedText.match(/```json\n([\s\S]*?)\n```/)[1];
+      const socialPost = JSON.parse(socialJsonString);
       
-      if (socialJsonString) {
-        const socialPost = JSON.parse(socialJsonString);
-        
-        // Replace placeholder with actual URL
-        if (socialPost.social_post_text.includes('[Link to blog post]')) {
-          socialPost.social_post_text = socialPost.social_post_text.replace('[Link to blog post]', postUrl);
-        } else {
-          const withLink = `${socialPost.social_post_text} ${postUrl}`;
-          socialPost.social_post_text = withLink.length <= 280 ? withLink : socialPost.social_post_text;
-        }
-        
-        console.log('✅ Generated AI social post:', socialPost.social_post_text);
-        return socialPost.social_post_text;
+      if (socialPost.social_post_text.includes('[Link to blog post]')) {
+        socialPost.social_post_text = socialPost.social_post_text.replace('[Link to blog post]', postUrl);
+      } else {
+        const withLink = `${socialPost.social_post_text} ${postUrl}`;
+        socialPost.social_post_text = withLink.length <= 280 ? withLink : socialPost.social_post_text;
       }
+      
+      console.log('✅ Generated AI social post:', socialPost.social_post_text);
+      return socialPost.social_post_text;
     } catch (error) {
       console.warn('⚠️ AI generation failed, using fallback:', error.message);
     }
