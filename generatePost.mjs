@@ -119,7 +119,7 @@ async function generateAndPublish() {
   Generate a new, unique blog post as a guide for real-world romance and intimacy. The post must have a catchy, provocative title and a structured body.
 
   **TITLE REQUIREMENTS:**
-  The title must feel original, emotionally charged, and varied in structure. Do **not** reuse the same phrasing or templates across posts. Avoid overused patterns like "The Art of..." or "How to..." unless you are subverting them in a clever, poetic way.
+  The title must feel original, emotionally charged, and varied in structure. Do **not** reuse the same phrasing or templates. Avoid overused patterns like "The Art of..." or "How to..." unless you are subverting them in a clever, poetic way.
 
   Vary the tone, rhythm, and form using one of the following styles:
   - metaphorical titles (e.g., "The Hunger Beneath the Silence")

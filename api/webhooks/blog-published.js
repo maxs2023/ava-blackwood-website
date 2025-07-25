@@ -1,7 +1,6 @@
-// Complete self-contained webhook for blog publishing
+// Enhanced blog-published webhook with dual posting
 import { createClient } from '@sanity/client';
 
-// Create Sanity client directly in the webhook
 const sanityClient = createClient({
   projectId: process.env.SANITY_PROJECT_ID || '8vo1vk23',
   dataset: 'production',
@@ -10,14 +9,69 @@ const sanityClient = createClient({
   token: process.env.SANITY_API_WRITE_TOKEN,
 });
 
-// Self-contained automation logic
-class AutomatedSocialPoster {
+// Direct X Poster
+class DirectXPoster {
+  constructor() {
+    this.bearerToken = process.env.X_BEARER_TOKEN;
+  }
+
+  async postToX(content) {
+    try {
+      if (!this.bearerToken) {
+        throw new Error('X Bearer Token not configured');
+      }
+
+      console.log('🐦 Posting to X:', content.substring(0, 50) + '...');
+
+      const tweetData = { text: content };
+
+      const response = await fetch('https://api.twitter.com/2/tweets', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.bearerToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tweetData)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ X API Error:', errorText);
+        throw new Error(`Tweet failed: ${response.status} - ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Successfully posted to X:', result.data.id);
+      
+      return {
+        success: true,
+        tweetId: result.data.id,
+        tweetUrl: `https://twitter.com/user/status/${result.data.id}`,
+        message: 'Successfully posted to X',
+        platform: 'x'
+      };
+
+    } catch (error) {
+      console.error('❌ X posting failed:', error.message);
+      return {
+        success: false,
+        error: error.message,
+        platform: 'x'
+      };
+    }
+  }
+}
+
+// Enhanced Social Media Automation
+class EnhancedAutomatedSocialPoster {
   constructor(config = {}) {
     this.config = {
       baseUrl: 'https://www.avablackwood.com',
       zapierWebhookUrl: config.zapierWebhookUrl || process.env.ZAPIER_WEBHOOK_URL,
       ...config
     };
+    
+    this.xPoster = new DirectXPoster();
   }
 
   async getBlogPost(slug) {
@@ -48,22 +102,34 @@ class AutomatedSocialPoster {
       return cleanExcerpt;
     }
     
-    return `Explore the depths of desire and forbidden attraction in this captivating piece from Ava Blackwood's collection.`;
+    return `Explore the depths of desire and forbidden attraction in this captivating piece.`;
   }
 
-  generateTwitterContent(post) {
+  generateXContent(post) {
     const postUrl = `${this.config.baseUrl}/blog/${post.slug.current}`;
-    const excerpt = this.createExcerpt(post, 100);
+    const excerpt = this.createExcerpt(post, 80);
 
-    return `🖤 ${post.title}
+    const content = `🖤 ${post.title}
 
 ${excerpt}
 
-The art of seduction lives in the pause before the touch...
-
 Read more: ${postUrl}
 
-#DarkAcademia #Romance #BlogPost #AvaBlackwood`;
+#DarkAcademia #Romance #AvaBlackwood`;
+
+    // Ensure under 280 characters for X
+    if (content.length > 280) {
+      const shorterExcerpt = this.createExcerpt(post, 40);
+      return `🖤 ${post.title}
+
+${shorterExcerpt}
+
+${postUrl}
+
+#DarkAcademia #Romance #AvaBlackwood`;
+    }
+
+    return content;
   }
 
   formatForZapier(post) {
@@ -72,7 +138,7 @@ Read more: ${postUrl}
 
     return {
       title: post.title,
-      content: this.generateTwitterContent(post),
+      content: this.generateXContent(post),
       image_url: post.mainImageUrl,
       link_url: postUrl,
       blog_post: {
@@ -91,12 +157,19 @@ Read more: ${postUrl}
 
   async sendToZapier(post) {
     if (!this.config.zapierWebhookUrl) {
-      throw new Error('Zapier webhook URL not configured');
+      return {
+        success: false,
+        error: 'Zapier webhook URL not configured',
+        skipped: true,
+        platform: 'zapier'
+      };
     }
 
     const zapierData = this.formatForZapier(post);
 
     try {
+      console.log('📤 Sending to Zapier...');
+      
       const response = await fetch(this.config.zapierWebhookUrl, {
         method: 'POST',
         headers: {
@@ -109,27 +182,45 @@ Read more: ${postUrl}
         throw new Error(`Zapier webhook failed: ${response.statusText}`);
       }
 
+      console.log('✅ Successfully sent to Zapier');
+
       return {
         success: true,
         message: 'Successfully sent to Zapier',
-        data: zapierData
+        data: zapierData,
+        platform: 'zapier'
       };
     } catch (error) {
+      console.error('❌ Zapier failed:', error.message);
       return {
         success: false,
         error: error.message,
-        data: zapierData
+        data: zapierData,
+        platform: 'zapier'
       };
     }
   }
 
-  async automatePost(slug) {
+  async postDirectlyToX(post) {
+    const content = this.generateXContent(post);
+    return await this.xPoster.postToX(content);
+  }
+
+  async automatePost(slug, options = {}) {
+    const {
+      useZapier = true,
+      useDirectPosting = false
+    } = options;
+
     try {
       const post = await this.getBlogPost(slug);
 
       if (!post) {
         throw new Error('No blog post found');
       }
+
+      console.log(`📝 Processing: ${post.title}`);
+      console.log(`⚙️ Methods: Zapier=${useZapier}, Direct=${useDirectPosting}`);
 
       const results = {
         success: true,
@@ -141,11 +232,47 @@ Read more: ${postUrl}
           socialCardUrl: `${this.config.baseUrl}/api/social-card/${post.slug.current}`,
           publishedAt: post.publishedAt
         },
-        zapier: await this.sendToZapier(post)
+        zapier: null,
+        directPosting: null,
+        summary: {
+          attempted: [],
+          successful: [],
+          failed: []
+        }
       };
+
+      // Send to Zapier if enabled
+      if (useZapier) {
+        results.summary.attempted.push('zapier');
+        results.zapier = await this.sendToZapier(post);
+        
+        if (results.zapier.success) {
+          results.summary.successful.push('zapier');
+        } else {
+          results.summary.failed.push('zapier');
+        }
+      }
+
+      // Direct posting if enabled
+      if (useDirectPosting) {
+        results.summary.attempted.push('direct_x');
+        results.directPosting = await this.postDirectlyToX(post);
+        
+        if (results.directPosting.success) {
+          results.summary.successful.push('direct_x');
+        } else {
+          results.summary.failed.push('direct_x');
+        }
+      }
+
+      // Overall success if at least one method succeeded
+      results.success = results.summary.successful.length > 0;
+
+      console.log(`📊 Results: ${results.summary.successful.length}/${results.summary.attempted.length} successful`);
 
       return results;
     } catch (error) {
+      console.error('❌ Automation error:', error.message);
       return {
         success: false,
         error: error.message
@@ -155,7 +282,6 @@ Read more: ${postUrl}
 }
 
 export default async function handler(req, res) {
-  // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -172,7 +298,6 @@ export default async function handler(req, res) {
   try {
     const { _type, slug, title, _id } = req.body;
     
-    // Verify this is a blog post publication
     if (_type !== 'post' || !slug?.current) {
       return res.status(400).json({
         success: false,
@@ -183,17 +308,22 @@ export default async function handler(req, res) {
 
     console.log(`📝 New blog post published: ${title} (${slug.current})`);
 
-    // Initialize the social poster
-    const socialPoster = new AutomatedSocialPoster({
-      zapierWebhookUrl: process.env.ZAPIER_WEBHOOK_URL
-    });
+    const socialPoster = new EnhancedAutomatedSocialPoster();
 
-    // Trigger automated posting
-    const result = await socialPoster.automatePost(slug.current);
+    // Determine posting methods based on available credentials
+    const hasZapier = !!process.env.ZAPIER_WEBHOOK_URL;
+    const hasDirectX = !!process.env.X_BEARER_TOKEN;
+
+    console.log(`🔧 Available methods: Zapier=${hasZapier}, DirectX=${hasDirectX}`);
+
+    // Use both methods for maximum reliability
+    const result = await socialPoster.automatePost(slug.current, {
+      useZapier: hasZapier,
+      useDirectPosting: hasDirectX
+    });
 
     console.log('🚀 Automation result:', JSON.stringify(result, null, 2));
 
-    // Return success response
     return res.status(200).json({
       success: true,
       message: 'Social media automation triggered successfully',
@@ -202,13 +332,16 @@ export default async function handler(req, res) {
         slug: slug.current,
         id: _id
       },
-      automation_result: result
+      automation_result: result,
+      methods_available: {
+        zapier: hasZapier,
+        direct_x: hasDirectX
+      }
     });
 
   } catch (error) {
     console.error('❌ Webhook error:', error);
     
-    // Return error response
     return res.status(500).json({
       success: false,
       error: error.message,
