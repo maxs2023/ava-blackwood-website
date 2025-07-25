@@ -190,19 +190,69 @@ class EnhancedAutomatedSocialPoster {
     return `Explore the depths of desire and forbidden attraction in this captivating piece.`;
   }
 
-  generateXContent(post) {
+  async generateXContent(post) {
     const postUrl = `${this.config.baseUrl}/blog/${post.slug.current}`;
-    const excerpt = this.createExcerpt(post, 80);
+    
+    // Create plain text summary for AI
+    const plainTextBodyForSocial = this.createExcerpt(post, 200);
+    
+    console.log('🤖 Generating social media post with Gemini...');
+    const socialPostPrompt = `
+      You are a social media manager for spicy romance author Ava Blackwood.
+      Create a short, catchy, and intriguing social media post based on her latest blog post.
+      The tone should be sophisticated and tempting.
+      Hint at the spicy advice in the post to encourage clicks.
+      *** Include this link at the end: [Link to blog post]
+      Include 3 relevant hashtags like #SpicyRomance, #RomanceAuthor, #AvaBlackwood.
+      *** Keep the output text under 280 characters for posting on X.
 
+      Blog Post Title: "${post.title}"
+      Blog Post Content Summary: "${plainTextBodyForSocial}"
+
+      Based on this, generate a JSON object with one key: "social_post_text".
+    `;
+
+    try {
+      const socialResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: socialPostPrompt }] }] }),
+      });
+
+      if (!socialResponse.ok) throw new Error(`Gemini API Error: ${await socialResponse.text()}`);
+      
+      const socialResult = await socialResponse.json();
+      const socialGeneratedText = socialResult.candidates[0].content.parts[0].text;
+      const socialJsonString = socialGeneratedText.match(/```json\n([\s\S]*?)\n```/)?.[1];
+      
+      if (socialJsonString) {
+        const socialPost = JSON.parse(socialJsonString);
+        
+        // Replace placeholder with actual URL
+        if (socialPost.social_post_text.includes('[Link to blog post]')) {
+          socialPost.social_post_text = socialPost.social_post_text.replace('[Link to blog post]', postUrl);
+        } else {
+          const withLink = `${socialPost.social_post_text} ${postUrl}`;
+          socialPost.social_post_text = withLink.length <= 280 ? withLink : socialPost.social_post_text;
+        }
+        
+        console.log('✅ Generated AI social post:', socialPost.social_post_text);
+        return socialPost.social_post_text;
+      }
+    } catch (error) {
+      console.warn('⚠️ AI generation failed, using fallback:', error.message);
+    }
+
+    // Fallback to original format if AI fails
+    const excerpt = this.createExcerpt(post, 80);
     const content = `🖤 ${post.title}
 
 ${excerpt}
 
 Read more: ${postUrl}
 
-#DarkAcademia #Romance #AvaBlackwood`;
+#SpicyRomance #RomanceAuthor #AvaBlackwood`;
 
-    // Ensure under 280 characters for X
     if (content.length > 280) {
       const shorterExcerpt = this.createExcerpt(post, 40);
       return `🖤 ${post.title}
@@ -211,19 +261,20 @@ ${shorterExcerpt}
 
 ${postUrl}
 
-#DarkAcademia #Romance #AvaBlackwood`;
+#SpicyRomance #RomanceAuthor #AvaBlackwood`;
     }
 
     return content;
   }
 
-  formatForZapier(post) {
+  async formatForZapier(post) {
     const postUrl = `${this.config.baseUrl}/blog/${post.slug.current}`;
     const excerpt = this.createExcerpt(post, 120);
+    const content = await this.generateXContent(post);
 
     return {
       title: post.title,
-      content: this.generateXContent(post),
+      content: content,
       image_url: post.mainImageUrl,
       link_url: postUrl,
       blog_post: {
@@ -250,7 +301,7 @@ ${postUrl}
       };
     }
 
-    const zapierData = this.formatForZapier(post);
+    const zapierData = await this.formatForZapier(post);
 
     try {
       console.log('📤 Sending to Zapier...');
@@ -287,7 +338,7 @@ ${postUrl}
   }
 
   async postDirectlyToX(post) {
-    const content = this.generateXContent(post);
+    const content = await this.generateXContent(post);
     return await this.xPoster.postToX(content);
   }
 
