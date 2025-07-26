@@ -167,7 +167,7 @@ async function generateAndPublish() {
     **Mandatory creative content within the body:**
     1. One **poetic metaphor** for physical desire (e.g., *“desire is a fever that blooms beneath the ribs”*)
     2. One **literary or psychological term** describing intimacy (e.g., *"transference," "liminal space," "interpersonal mirroring"*)
-    3. A **final paragraph** featuring a **single, symbolic, sensual image**—this should be **either a human detail** (e.g., a woman’s back in silk, parted lips in candlelight) or a **symbolic object** (e.g., a lace undergarment, a silk glove on marble). It does not need to reference Ava Blackwood or dark academia.
+    3. A **final paragraph** featuring a **single, symbolic, sensual image**—this should be **either a human detail** (e.g., a woman’s back in silk, parted lips in candlelight) or a **symbolic object** (e.g., a lace undergarment, a silk glove on marble). It does NOT need to reference Ava Blackwood or dark academia.
 
     ---
 
@@ -268,10 +268,10 @@ async function generateAndPublish() {
     }
     
     const primaryPrompt = `
-      Photorealistic still life, dark academia aesthetic, cinematic lighting with deep shadows.
+      Photorealistic, cinematic chiaroscuro lighting, sensual shadows, shallow depth of field.
       Focus on: ${imageSceneDescription}.
       The scene should feel intimate, evocative, and poetic.
-      No people, no text, no logos. Emphasis on texture and mood.
+      No text, no logos. Emphasis on texture and mood.
     `.trim();
 
     console.log(`Generating image with prompt: "${primaryPrompt}"`);
