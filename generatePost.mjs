@@ -110,12 +110,29 @@ async function generateAndPublish() {
   let plainTextBodyForSocial;
   let imageAsset;
 
-  // --- Part 1: Generate Blog Post Text ---
+  // --- Part 1: Fetch existing titles for uniqueness ---
+  let existingTitles = [];
+  try {
+    console.log('Fetching existing blog post titles for uniqueness check...');
+    const existingPosts = await sanityClient.fetch(`*[_type == "post"]{title}`);
+    existingTitles = existingPosts.map(post => post.title).filter(Boolean);
+    console.log(`Found ${existingTitles.length} existing blog post titles`);
+  } catch (error) {
+    console.warn('Failed to fetch existing titles, proceeding without uniqueness check:', error.message);
+  }
+
+  // --- Part 2: Generate Blog Post Text ---
   try {
     console.log('Generating rich, formatted blog post text...');
+    
+    // Create negative prompt from existing titles
+    const existingTitlesPrompt = existingTitles.length > 0 
+      ? `\n\n**CRITICAL: AVOID THESE EXISTING TITLES:**\nDo NOT create titles similar to these already published posts:\n${existingTitles.map(title => `- "${title}"`).join('\n')}\n\nYour title MUST be completely unique and different from all the above.\n\n---\n`
+      : '';
+    
     const blogPostPrompt = `
     You are **Ava Blackwood**, an author of dark academia and sensual romance. Your prose is evocative, mysterious, and magnetic—laced with *forbidden longing, power play, and intellectual seduction*. You understand that intimacy lives not just in the body, but in the pause between words, the gaze that lingers too long, and the secrets we yearn to speak but never do.
-
+    ${existingTitlesPrompt}
     ---
 
     **TASK:**  
@@ -150,7 +167,7 @@ async function generateAndPublish() {
     **Mandatory creative content within the body:**
     1. One **poetic metaphor** for physical desire (e.g., *“desire is a fever that blooms beneath the ribs”*)
     2. One **literary or psychological term** describing intimacy (e.g., *"transference," "liminal space," "interpersonal mirroring"*)
-    3. A **final paragraph** featuring a **single, symbolic, sensual image**—this should be **either a human detail** (e.g., a woman’s back in silk, parted lips in candlelight) or a **symbolic object** (e.g., a velvet ribbon on a leather journal, a silk glove on marble)
+    3. A **final paragraph** featuring a **single, symbolic, sensual image**—this should be **either a human detail** (e.g., a woman’s back in silk, parted lips in candlelight) or a **symbolic object** (e.g., a lace undergarment, a silk glove on marble)
 
     ---
 
@@ -195,7 +212,47 @@ async function generateAndPublish() {
     const generatedText = aiResult.candidates[0].content.parts[0].text;
     const jsonString = generatedText.match(/```json\n([\s\S]*?)\n```/)[1];
     postContent = JSON.parse(jsonString);
-    console.log(`Generated Blog Title: ${postContent.title}`);
+    
+    // Double-check title uniqueness
+    const isTitleUnique = !existingTitles.some(existingTitle => 
+      existingTitle.toLowerCase().trim() === postContent.title.toLowerCase().trim()
+    );
+    
+    if (!isTitleUnique) {
+      console.warn(`⚠️ Generated title "${postContent.title}" already exists! Attempting regeneration...`);
+      
+      // Try one more time with stronger uniqueness prompt
+      const retryPrompt = blogPostPrompt.replace(
+        '**TASK:**',
+        `**URGENT: The title "${postContent.title}" already exists! Generate a COMPLETELY DIFFERENT title.**\n\n**TASK:**`
+      );
+      
+      const retryResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: retryPrompt }] }] }),
+      });
+      
+      if (retryResponse.ok) {
+        const retryResult = await retryResponse.json();
+        const retryText = retryResult.candidates[0].content.parts[0].text;
+        const retryJsonString = retryText.match(/```json\n([\s\S]*?)\n```/)[1];
+        const retryContent = JSON.parse(retryJsonString);
+        
+        const isRetryUnique = !existingTitles.some(existingTitle => 
+          existingTitle.toLowerCase().trim() === retryContent.title.toLowerCase().trim()
+        );
+        
+        if (isRetryUnique) {
+          postContent = retryContent;
+          console.log(`✅ Generated unique title on retry: ${postContent.title}`);
+        } else {
+          console.warn(`⚠️ Retry also generated duplicate title. Proceeding with: ${postContent.title}`);
+        }
+      }
+    } else {
+      console.log(`✅ Generated unique blog title: ${postContent.title}`);
+    }
   } catch (error) {
     console.error('Failed during blog post text generation:', error);
     process.exit(1);
