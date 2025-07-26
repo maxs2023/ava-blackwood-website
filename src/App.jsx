@@ -480,9 +480,9 @@ const NFTPage = () => {
     const getRarityColor = (rarity) => {
         switch(rarity) {
             case 'common': return 'bg-gray-500';
-            case 'rare': return 'bg-blue-500';
-            case 'ultra-rare': return 'bg-purple-500';
-            case 'legendary': return 'bg-yellow-500';
+            case 'rare': return 'bg-blue-600';
+            case 'ultra-rare': return 'bg-purple-600';
+            case 'legendary': return 'bg-accent text-accent-foreground';
             default: return 'bg-gray-500';
         }
     };
@@ -507,22 +507,22 @@ const NFTPage = () => {
             <div className="max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="text-center mb-12">
-                    <h1 className="text-5xl font-serif text-burgundy mb-4">Exclusive Book NFTs</h1>
+                    <h1 className="text-5xl font-serif text-primary mb-4">Exclusive Book NFTs</h1>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
                         Own a piece of literary history with exclusive digital collectibles from Ava Blackwood's romance universe. 
                         Character art, manuscript excerpts, and unique experiences await.
                     </p>
                     <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
                         <div className="flex items-center gap-2">
-                            <Zap className="w-4 h-4 text-burgundy" />
+                            <Zap className="w-4 h-4 text-primary" />
                             <span>Blockchain Verified</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Eye className="w-4 h-4 text-burgundy" />
+                            <Eye className="w-4 h-4 text-primary" />
                             <span>Limited Editions</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Coins className="w-4 h-4 text-burgundy" />
+                            <Coins className="w-4 h-4 text-primary" />
                             <span>ETH & Credit Cards</span>
                         </div>
                     </div>
@@ -535,7 +535,7 @@ const NFTPage = () => {
                             key={category.key} 
                             variant={selectedCategory === category.key ? 'default' : 'outline'} 
                             onClick={() => setSelectedCategory(category.key)} 
-                            className={selectedCategory === category.key ? 'bg-primary text-white' : 'text-gray-700 border-gray-300 hover:text-burgundy'}
+                            className={selectedCategory === category.key ? 'bg-primary text-white' : 'text-gray-700 border-gray-300 hover:text-primary'}
                         >
                             {category.label} ({category.count})
                         </Button>
@@ -548,7 +548,7 @@ const NFTPage = () => {
                         <Card key={nft.id} className="book-card hover:shadow-xl transition-all duration-300 overflow-hidden">
                             <CardContent className="p-0">
                                 {/* NFT Image */}
-                                <div className="relative h-80 bg-gradient-to-br from-burgundy/10 to-accent/10">
+                                <div className="relative h-80 bg-gradient-to-br from-primary/10 to-accent/10">
                                     <div className="absolute inset-0 flex items-center justify-center text-gray-400">
                                         <div className="text-center">
                                             <BookOpen size={48} className="mx-auto mb-2" />
@@ -568,7 +568,7 @@ const NFTPage = () => {
                                 {/* NFT Details */}
                                 <div className="p-6 space-y-4">
                                     <div>
-                                        <h3 className="text-xl font-serif text-burgundy font-bold mb-2">{nft.title}</h3>
+                                        <h3 className="text-xl font-serif text-primary font-bold mb-2">{nft.title}</h3>
                                         <p className="text-gray-600 text-sm mb-2">{nft.description}</p>
                                         <div className="flex items-center gap-2 text-xs text-gray-500">
                                             <BookOpen size={12} />
@@ -578,7 +578,7 @@ const NFTPage = () => {
                                     
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-2xl font-bold text-burgundy">{nft.price}</p>
+                                            <p className="text-2xl font-bold text-primary">{nft.price}</p>
                                             <p className="text-xs text-gray-500">{nft.edition}</p>
                                         </div>
                                         <Button 
@@ -600,9 +600,9 @@ const NFTPage = () => {
 
                 {/* Newsletter Signup for NFT Updates */}
                 <div className="mt-16">
-                    <Card className="bg-burgundy text-white">
+                    <Card className="burgundy-section">
                         <CardContent className="p-8 text-center">
-                            <h3 className="text-2xl font-bold mb-4">Get NFT Drop Notifications</h3>
+                            <h3 className="text-2xl font-bold mb-4 text-white">Get NFT Drop Notifications</h3>
                             <p className="mb-6 text-gray-200">
                                 Be the first to know about new NFT releases, exclusive drops, and special collector events.
                             </p>

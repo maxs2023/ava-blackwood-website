@@ -179,7 +179,8 @@ async function generateAndPublish() {
     Examples:
     - "A single black stocking draped over a velvet armchair"
     - "A woman's bare back, bathed in golden candlelight"
-    - "Silk gloves resting on an open book with red wine stains"
+    - "A silk slip, clinging to the curve of a hip in the hush of moonlight"
+    - "A wrist turned upward, veins like silk threads, pulse flickering beneath the surface"
 
     ---
 
