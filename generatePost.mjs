@@ -172,16 +172,14 @@ async function generateAndPublish() {
     ---
 
     **IMAGE PROMPT:**
-    From the final paragraph, create a sophisticated, aesthetic image description:
+    From the final paragraph, extract this JSON key:
     \`\`\`json
-    "image_prompt": "Elegant [object/detail] with [luxury texture/material], [lighting/mood], under 15 words"
+    "image_prompt": "A [object or sensual detail] [setting or texture], under 15 words"
     \`\`\`
-    Focus on: Premium materials (silk, velvet, satin, lace, cashmere), elegant objects, sophisticated lighting
     Examples:
-    - "Silk champagne lingerie draped over marble surface, soft golden hour lighting"
-    - "Crystal wine glass with lipstick trace on white silk sheets"
-    - "Black lace gloves beside pearl necklace on velvet, candlelight shadows"
-    - "Red rose petals scattered on satin bedsheets, warm amber lighting"
+    - "A single black stocking draped over a velvet armchair"
+    - "A woman's bare back, bathed in golden candlelight"
+    - "Silk gloves resting on an open book with red wine stains"
 
     ---
 
@@ -288,19 +286,10 @@ async function generateAndPublish() {
     }
     
     const primaryPrompt = `
-      Ultra-high quality, photorealistic, magazine-grade photography. 
-      Professional studio lighting with dramatic chiaroscuro effects, deep shadows and warm highlights.
-      Shallow depth of field with artistic bokeh. Rich textures and luxurious materials.
-      
-      Subject: ${imageSceneDescription}
-      
-      Style: Sensual, elegant, sophisticated aesthetic. Moody and atmospheric.
-      Colors: Rich jewel tones, warm golds, deep shadows. Avoid harsh lighting.
-      Composition: Artistic framing, negative space, minimalist yet evocative.
-      Quality: Sharp focus on key elements, soft romantic lighting, premium fashion photography style.
-      
-      Avoid: Text, logos, faces, explicit content, academic settings, gothic architecture.
-      Emphasize: Texture, mood, elegance, sensuality through implication rather than explicitness.
+      Photorealistic person or still life, cinematic lighting with deep shadows, shallow depth of field.
+      Focus on: ${imageSceneDescription}.
+      The scene should feel intimate, evocative, and poetic.
+      No text, no logos. Emphasis on texture and mood.
     `.trim();
 
     console.log(`Generating image with prompt: "${primaryPrompt}"`);
