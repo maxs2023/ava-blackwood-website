@@ -172,14 +172,16 @@ async function generateAndPublish() {
     ---
 
     **IMAGE PROMPT:**
-    From the final paragraph, extract this JSON key:
+    From the final paragraph, create a sophisticated, aesthetic image description:
     \`\`\`json
-    "image_prompt": "A [object or sensual detail] [setting or texture], under 15 words"
+    "image_prompt": "Elegant [object/detail] with [luxury texture/material], [lighting/mood], under 15 words"
     \`\`\`
+    Focus on: Premium materials (silk, velvet, satin, lace, cashmere), elegant objects, sophisticated lighting
     Examples:
-    - "A single black stocking draped over a velvet armchair"
-    - "A woman’s bare back, bathed in golden candlelight"
-    - "Silk gloves resting on an open book with red wine stains"
+    - "Silk champagne lingerie draped over marble surface, soft golden hour lighting"
+    - "Crystal wine glass with lipstick trace on white silk sheets"
+    - "Black lace gloves beside pearl necklace on velvet, candlelight shadows"
+    - "Red rose petals scattered on satin bedsheets, warm amber lighting"
 
     ---
 
@@ -213,10 +215,21 @@ async function generateAndPublish() {
     const jsonString = generatedText.match(/```json\n([\s\S]*?)\n```/)[1];
     postContent = JSON.parse(jsonString);
     
-    // Double-check title uniqueness
-    const isTitleUnique = !existingTitles.some(existingTitle => 
-      existingTitle.toLowerCase().trim() === postContent.title.toLowerCase().trim()
-    );
+    // Enhanced title uniqueness check (exact + similarity)
+    const normalizeTitle = (title) => title.toLowerCase().trim().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ');
+    const generatedNormalized = normalizeTitle(postContent.title);
+    
+    const isTitleUnique = !existingTitles.some(existingTitle => {
+      const existingNormalized = normalizeTitle(existingTitle);
+      // Check exact match
+      if (existingNormalized === generatedNormalized) return true;
+      // Check similarity (if titles share >70% of words)
+      const genWords = new Set(generatedNormalized.split(' '));
+      const existWords = new Set(existingNormalized.split(' '));
+      const intersection = [...genWords].filter(x => existWords.has(x));
+      const similarity = intersection.length / Math.max(genWords.size, existWords.size);
+      return similarity > 0.7;
+    });
     
     if (!isTitleUnique) {
       console.warn(`⚠️ Generated title "${postContent.title}" already exists! Attempting regeneration...`);
@@ -239,9 +252,16 @@ async function generateAndPublish() {
         const retryJsonString = retryText.match(/```json\n([\s\S]*?)\n```/)[1];
         const retryContent = JSON.parse(retryJsonString);
         
-        const isRetryUnique = !existingTitles.some(existingTitle => 
-          existingTitle.toLowerCase().trim() === retryContent.title.toLowerCase().trim()
-        );
+        const retryNormalized = normalizeTitle(retryContent.title);
+        const isRetryUnique = !existingTitles.some(existingTitle => {
+          const existingNormalized = normalizeTitle(existingTitle);
+          if (existingNormalized === retryNormalized) return true;
+          const genWords = new Set(retryNormalized.split(' '));
+          const existWords = new Set(existingNormalized.split(' '));
+          const intersection = [...genWords].filter(x => existWords.has(x));
+          const similarity = intersection.length / Math.max(genWords.size, existWords.size);
+          return similarity > 0.7;
+        });
         
         if (isRetryUnique) {
           postContent = retryContent;
@@ -268,10 +288,19 @@ async function generateAndPublish() {
     }
     
     const primaryPrompt = `
-      Photorealistic, cinematic chiaroscuro lighting, sensual shadows, shallow depth of field.
-      Focus on: ${imageSceneDescription}.
-      The scene should feel intimate, evocative, and poetic.
-      No text, no logos. Emphasis on texture and mood.
+      Ultra-high quality, photorealistic, magazine-grade photography. 
+      Professional studio lighting with dramatic chiaroscuro effects, deep shadows and warm highlights.
+      Shallow depth of field with artistic bokeh. Rich textures and luxurious materials.
+      
+      Subject: ${imageSceneDescription}
+      
+      Style: Sensual, elegant, sophisticated aesthetic. Moody and atmospheric.
+      Colors: Rich jewel tones, warm golds, deep shadows. Avoid harsh lighting.
+      Composition: Artistic framing, negative space, minimalist yet evocative.
+      Quality: Sharp focus on key elements, soft romantic lighting, premium fashion photography style.
+      
+      Avoid: Text, logos, faces, explicit content, academic settings, gothic architecture.
+      Emphasize: Texture, mood, elegance, sensuality through implication rather than explicitness.
     `.trim();
 
     console.log(`Generating image with prompt: "${primaryPrompt}"`);
