@@ -140,28 +140,17 @@ class DirectXPoster {
     }
   }
 
-  async postToX(content, imageUrl = null) {
+  async postToX(content) {
     try {
       if (!this.apiKey || !this.apiSecret || !this.accessToken || !this.accessTokenSecret) {
         throw new Error('X OAuth 1.0a credentials not configured');
       }
 
-      console.log('🐦 Posting to X with improved OAuth 1.0a:', content.substring(0, 50) + '...');
+      console.log('🐦 Posting to X with Twitter Card preview:', content.substring(0, 50) + '...');
 
       const url = 'https://api.twitter.com/2/tweets';
       const method = 'POST';
       const tweetData = { text: content };
-
-      // Upload image if provided
-      if (imageUrl) {
-        try {
-          const mediaId = await this.uploadImage(imageUrl);
-          tweetData.media = { media_ids: [mediaId] };
-          console.log('📸 Image attached to tweet');
-        } catch (imageError) {
-          console.warn('⚠️ Image upload failed, posting without image:', imageError.message);
-        }
-      }
 
       // Generate OAuth header (without including JSON body in signature)
       const authHeader = this.generateOAuthHeader(method, url);
@@ -186,7 +175,7 @@ class DirectXPoster {
       }
 
       const result = await response.json();
-      console.log('✅ Successfully posted to X:', result.data?.id || 'Tweet created');
+      console.log('✅ Successfully posted to X with card preview:', result.data?.id || 'Tweet created');
       
       return {
         success: true,
@@ -252,7 +241,8 @@ class EnhancedAutomatedSocialPoster {
   }
 
   async generateXContent(post) {
-    const postUrl = `${this.config.baseUrl}/blog/${post.slug.current}`;
+    // Use social card URL instead of direct blog URL for Twitter Card preview
+    const socialCardUrl = `${this.config.baseUrl}/api/social-card/${post.slug.current}`;
     
     // Create plain text summary for AI
     const plainTextBodyForSocial = this.createExcerpt(post, 200);
@@ -265,7 +255,7 @@ class EnhancedAutomatedSocialPoster {
       Hint at the spicy advice in the post to encourage clicks.
       *** Include this link at the end: [Link to blog post]
       Include 3 relevant hashtags like #SpicyRomance, #RomanceAuthor, #AvaBlackwood.
-      *** Keep the output text under 280 characters for posting on X.
+      *** Keep the output text under 220 characters to leave room for the link preview card.
 
       Blog Post Title: "${post.title}"
       Blog Post Content Summary: "${plainTextBodyForSocial}"
@@ -288,35 +278,35 @@ class EnhancedAutomatedSocialPoster {
       const socialPost = JSON.parse(socialJsonString);
       
       if (socialPost.social_post_text.includes('[Link to blog post]')) {
-        socialPost.social_post_text = socialPost.social_post_text.replace('[Link to blog post]', postUrl);
+        socialPost.social_post_text = socialPost.social_post_text.replace('[Link to blog post]', socialCardUrl);
       } else {
-        const withLink = `${socialPost.social_post_text} ${postUrl}`;
-        socialPost.social_post_text = withLink.length <= 280 ? withLink : socialPost.social_post_text;
+        const withLink = `${socialPost.social_post_text} ${socialCardUrl}`;
+        socialPost.social_post_text = withLink.length <= 260 ? withLink : socialPost.social_post_text;
       }
       
-      console.log('✅ Generated AI social post:', socialPost.social_post_text);
+      console.log('✅ Generated AI social post with card URL:', socialPost.social_post_text);
       return socialPost.social_post_text;
     } catch (error) {
       console.warn('⚠️ AI generation failed, using fallback:', error.message);
     }
 
     // Fallback to original format if AI fails
-    const excerpt = this.createExcerpt(post, 80);
+    const excerpt = this.createExcerpt(post, 60);
     const content = `🖤 ${post.title}
 
 ${excerpt}
 
-Read more: ${postUrl}
+${socialCardUrl}
 
 #SpicyRomance #RomanceAuthor #AvaBlackwood`;
 
-    if (content.length > 280) {
-      const shorterExcerpt = this.createExcerpt(post, 40);
+    if (content.length > 260) {
+      const shorterExcerpt = this.createExcerpt(post, 30);
       return `🖤 ${post.title}
 
 ${shorterExcerpt}
 
-${postUrl}
+${socialCardUrl}
 
 #SpicyRomance #RomanceAuthor #AvaBlackwood`;
     }
@@ -396,7 +386,7 @@ ${postUrl}
 
   async postDirectlyToX(post) {
     const content = await this.generateXContent(post);
-    return await this.xPoster.postToX(content, post.mainImageUrl);
+    return await this.xPoster.postToX(content);
   }
 
   async automatePost(slug, options = {}) {
