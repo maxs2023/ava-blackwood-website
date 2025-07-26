@@ -44,6 +44,7 @@ jobs:
           SANITY_API_WRITE_TOKEN: ${{ secrets.SANITY_API_WRITE_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SOCIAL_MEDIA_WEBHOOK_URL: ${{ secrets.SOCIAL_MEDIA_WEBHOOK_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
   verify-post:
     # This job runs only after the 'generate-and-publish' job is successful
