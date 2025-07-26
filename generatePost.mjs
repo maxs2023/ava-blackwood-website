@@ -204,41 +204,94 @@ async function generateAndPublish() {
 
     console.log(`Generating image with prompt: "${primaryPrompt}"`);
 
-    const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        instances: [{ prompt: primaryPrompt }],
-        parameters: {
-          "sampleCount": 1,
-          "aspectRatio": "16:9"
+    let base64ImageData;
+    let imageGenerated = false;
+
+    // Try OpenAI DALL-E first
+    if (process.env.OPENAI_API_KEY) {
+      try {
+        console.log('🎨 Attempting image generation with OpenAI DALL-E...');
+        
+        const openaiResponse = await fetch('https://api.openai.com/v1/images/generations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: 'dall-e-3',
+            prompt: primaryPrompt,
+            n: 1,
+            size: '1792x1024',
+            response_format: 'b64_json',
+            quality: 'hd'
+          })
+        });
+
+        if (openaiResponse.ok) {
+          const openaiResult = await openaiResponse.json();
+          if (openaiResult?.data?.[0]?.b64_json) {
+            base64ImageData = openaiResult.data[0].b64_json;
+            imageGenerated = true;
+            console.log('✅ Image successfully generated with OpenAI DALL-E');
+          }
+        } else {
+          const errorText = await openaiResponse.text();
+          console.warn('⚠️ OpenAI DALL-E failed:', errorText);
         }
-      }),
-    });
-    
-    if (!imageResponse.ok) {
-      console.error("Imagen API Error:", await imageResponse.text());
-      throw new Error(`Imagen API failed with status: ${imageResponse.status}`);
+      } catch (openaiError) {
+        console.warn('⚠️ OpenAI DALL-E error:', openaiError.message);
+      }
+    } else {
+      console.log('⚠️ OPENAI_API_KEY not found, skipping OpenAI image generation');
     }
 
-    const imageResult = await imageResponse.json();
-
-    if (!imageResult?.predictions || imageResult.predictions.length === 0) {
-      console.error("Image generation failed: no predictions returned.", JSON.stringify(imageResult, null, 2));
-      throw new Error("No image predictions available from Gemini.");
+    // Fallback to Gemini if OpenAI failed
+    if (!imageGenerated && process.env.GEMINI_API_KEY) {
+      try {
+        console.log('🔄 Falling back to Gemini Imagen...');
+        
+        const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            instances: [{ prompt: primaryPrompt }],
+            parameters: {
+              "sampleCount": 1,
+              "aspectRatio": "16:9"
+            }
+          }),
+        });
+        
+        if (imageResponse.ok) {
+          const imageResult = await imageResponse.json();
+          if (imageResult?.predictions?.[0]?.bytesBase64Encoded) {
+            base64ImageData = imageResult.predictions[0].bytesBase64Encoded;
+            imageGenerated = true;
+            console.log('✅ Image successfully generated with Gemini Imagen (fallback)');
+          }
+        } else {
+          const errorText = await imageResponse.text();
+          console.error("❌ Gemini Imagen fallback failed:", errorText);
+        }
+      } catch (geminiError) {
+        console.error('❌ Gemini fallback error:', geminiError.message);
+      }
     }
-    
-    const base64ImageData = imageResult.predictions[0].bytesBase64Encoded;
 
-    console.log('Image generated, now uploading to Sanity...');
+    if (!imageGenerated) {
+      throw new Error("Both OpenAI and Gemini image generation failed");
+    }
+
+    console.log('📤 Uploading generated image to Sanity...');
     const imageBuffer = Buffer.from(base64ImageData, 'base64');
     imageAsset = await sanityClient.assets.upload('image', imageBuffer, {
       filename: `${createSlug(postContent.title)}.png`,
       contentType: 'image/png'
     });
-    console.log('Successfully uploaded image asset with ID:', imageAsset._id);
+    console.log('✅ Successfully uploaded image asset with ID:', imageAsset._id);
   } catch (error) {
-    console.error('Failed during image generation or upload:', error);
+    console.error('❌ Failed during image generation or upload:', error);
     process.exit(1);
   }
 
