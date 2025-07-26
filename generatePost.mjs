@@ -167,7 +167,7 @@ async function generateAndPublish() {
     **Mandatory creative content within the body:**
     1. One **poetic metaphor** for physical desire (e.g., *“desire is a fever that blooms beneath the ribs”*)
     2. One **literary or psychological term** describing intimacy (e.g., *"transference," "liminal space," "interpersonal mirroring"*)
-    3. A **final paragraph** featuring a **single, symbolic, sensual image**—this should be **either a human detail** (e.g., a woman’s back in silk, parted lips in candlelight) or a **symbolic object** (e.g., a lace undergarment, a silk glove on marble)
+    3. A **final paragraph** featuring a **single, symbolic, sensual image**—this should be **either a human detail** (e.g., a woman’s back in silk, parted lips in candlelight) or a **symbolic object** (e.g., a lace undergarment, a silk glove on marble). It does not need to reference Ava Blackwood or dark academia.
 
     ---
 
