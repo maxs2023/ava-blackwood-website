@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input.jsx';
 import { Badge } from '@/components/ui/badge.jsx';
 import { Textarea } from '@/components/ui/textarea.jsx';
 // --- MODIFICATION: Added Menu and X icons for the mobile menu button ---
-import { BookOpen, Mail, ExternalLink, Calendar, User, Send, Star, Award, Coffee, Pen, Menu, X } from 'lucide-react';
+import { BookOpen, Mail, ExternalLink, Calendar, User, Send, Star, Award, Coffee, Pen, Menu, X, Coins, Zap, Eye, ShoppingCart } from 'lucide-react';
 import './App.css';
 
 // --- Import Sanity and PortableText ---
@@ -133,6 +133,7 @@ const Navigation = () => {
     const navLinks = [
         { path: '/', label: 'Home' },
         { path: '/books', label: 'Books' },
+        { path: '/nft', label: 'NFT' },
         { path: '/about', label: 'About' },
         { path: '/blog', label: 'Blog' },
         { path: '/contact', label: 'Contact' },
@@ -396,6 +397,224 @@ const ContactPage = () => {
     );
 };
 
+const NFTPage = () => {
+    const [selectedCategory, setSelectedCategory] = useState('all');
+    
+    // Mock NFT data - replace with actual blockchain integration
+    const nftCollections = [
+        {
+            id: 1,
+            title: "Dark Academia Character Portraits",
+            description: "Exclusive character art from my Dark Academia series",
+            price: "0.05 ETH",
+            image: "/api/placeholder/300/400",
+            edition: "Limited Edition - 100 pieces",
+            category: "character-art",
+            book: "Playing with Fire",
+            rarity: "rare",
+            status: "available"
+        },
+        {
+            id: 2,
+            title: "First Edition Book Covers",
+            description: "Original digital book cover art as collectible NFTs",
+            price: "0.08 ETH",
+            image: "/api/placeholder/300/400",
+            edition: "Ultra Rare - 25 pieces",
+            category: "book-covers",
+            book: "Control and Release",
+            rarity: "ultra-rare",
+            status: "available"
+        },
+        {
+            id: 3,
+            title: "Behind-the-Scenes Manuscripts",
+            description: "Handwritten notes and deleted scenes from my writing process",
+            price: "0.12 ETH",
+            image: "/api/placeholder/300/400",
+            edition: "Legendary - 10 pieces",
+            category: "manuscripts",
+            book: "En Pointe",
+            rarity: "legendary",
+            status: "sold-out"
+        },
+        {
+            id: 4,
+            title: "Romance Scene Audio NFTs",
+            description: "Exclusive audio readings of steamy scenes by Ava Blackwood",
+            price: "0.06 ETH",
+            image: "/api/placeholder/300/400",
+            edition: "Limited Edition - 50 pieces",
+            category: "audio",
+            book: "Under Surgical Lights",
+            rarity: "rare",
+            status: "available"
+        },
+        {
+            id: 5,
+            title: "Interactive Story Experiences",
+            description: "Choose-your-own-adventure style interactive story NFTs",
+            price: "0.15 ETH",
+            image: "/api/placeholder/300/400",
+            edition: "Exclusive - 5 pieces",
+            category: "interactive",
+            book: "Volley of Temptation",
+            rarity: "legendary",
+            status: "coming-soon"
+        }
+    ];
+
+    const categories = [
+        { key: 'all', label: 'All NFTs', count: nftCollections.length },
+        { key: 'character-art', label: 'Character Art', count: nftCollections.filter(n => n.category === 'character-art').length },
+        { key: 'book-covers', label: 'Book Covers', count: nftCollections.filter(n => n.category === 'book-covers').length },
+        { key: 'manuscripts', label: 'Manuscripts', count: nftCollections.filter(n => n.category === 'manuscripts').length },
+        { key: 'audio', label: 'Audio', count: nftCollections.filter(n => n.category === 'audio').length },
+        { key: 'interactive', label: 'Interactive', count: nftCollections.filter(n => n.category === 'interactive').length }
+    ];
+
+    const filteredNFTs = selectedCategory === 'all' 
+        ? nftCollections 
+        : nftCollections.filter(nft => nft.category === selectedCategory);
+
+    const getRarityColor = (rarity) => {
+        switch(rarity) {
+            case 'common': return 'bg-gray-500';
+            case 'rare': return 'bg-blue-500';
+            case 'ultra-rare': return 'bg-purple-500';
+            case 'legendary': return 'bg-yellow-500';
+            default: return 'bg-gray-500';
+        }
+    };
+
+    const getStatusColor = (status) => {
+        switch(status) {
+            case 'available': return 'text-green-600 bg-green-100';
+            case 'sold-out': return 'text-red-600 bg-red-100';
+            case 'coming-soon': return 'text-blue-600 bg-blue-100';
+            default: return 'text-gray-600 bg-gray-100';
+        }
+    };
+
+    const handlePurchaseClick = (nft) => {
+        trackEvent('nft_purchase_click', { nft_title: nft.title, price: nft.price });
+        // Here you would integrate with Web3 wallet and NFT marketplace
+        alert(`Purchase functionality coming soon!\n\nNFT: ${nft.title}\nPrice: ${nft.price}`);
+    };
+
+    return (
+        <div className="min-h-screen py-12 px-4">
+            <div className="max-w-7xl mx-auto">
+                {/* Header Section */}
+                <div className="text-center mb-12">
+                    <h1 className="text-5xl font-serif text-burgundy mb-4">Exclusive Book NFTs</h1>
+                    <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                        Own a piece of literary history with exclusive digital collectibles from Ava Blackwood's romance universe. 
+                        Character art, manuscript excerpts, and unique experiences await.
+                    </p>
+                    <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
+                        <div className="flex items-center gap-2">
+                            <Zap className="w-4 h-4 text-burgundy" />
+                            <span>Blockchain Verified</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Eye className="w-4 h-4 text-burgundy" />
+                            <span>Limited Editions</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Coins className="w-4 h-4 text-burgundy" />
+                            <span>ETH & Credit Cards</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Category Filter */}
+                <div className="flex justify-center flex-wrap gap-2 mb-8">
+                    {categories.map(category => (
+                        <Button 
+                            key={category.key} 
+                            variant={selectedCategory === category.key ? 'default' : 'outline'} 
+                            onClick={() => setSelectedCategory(category.key)} 
+                            className={selectedCategory === category.key ? 'bg-primary text-white' : 'text-gray-700 border-gray-300 hover:text-burgundy'}
+                        >
+                            {category.label} ({category.count})
+                        </Button>
+                    ))}
+                </div>
+
+                {/* NFT Grid */}
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredNFTs.map((nft) => (
+                        <Card key={nft.id} className="book-card hover:shadow-xl transition-all duration-300 overflow-hidden">
+                            <CardContent className="p-0">
+                                {/* NFT Image */}
+                                <div className="relative h-80 bg-gradient-to-br from-burgundy/10 to-accent/10">
+                                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                                        <div className="text-center">
+                                            <BookOpen size={48} className="mx-auto mb-2" />
+                                            <p className="text-sm">NFT Preview</p>
+                                        </div>
+                                    </div>
+                                    {/* Rarity Badge */}
+                                    <Badge className={`absolute top-3 left-3 ${getRarityColor(nft.rarity)} text-white capitalize`}>
+                                        {nft.rarity}
+                                    </Badge>
+                                    {/* Status Badge */}
+                                    <Badge className={`absolute top-3 right-3 ${getStatusColor(nft.status)} capitalize`}>
+                                        {nft.status.replace('-', ' ')}
+                                    </Badge>
+                                </div>
+                                
+                                {/* NFT Details */}
+                                <div className="p-6 space-y-4">
+                                    <div>
+                                        <h3 className="text-xl font-serif text-burgundy font-bold mb-2">{nft.title}</h3>
+                                        <p className="text-gray-600 text-sm mb-2">{nft.description}</p>
+                                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                                            <BookOpen size={12} />
+                                            <span>From: {nft.book}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-2xl font-bold text-burgundy">{nft.price}</p>
+                                            <p className="text-xs text-gray-500">{nft.edition}</p>
+                                        </div>
+                                        <Button 
+                                            className={`${nft.status === 'available' ? 'bg-primary hover:bg-primary/90' : 'bg-gray-400 cursor-not-allowed'} text-white`}
+                                            onClick={() => handlePurchaseClick(nft)}
+                                            disabled={nft.status !== 'available'}
+                                        >
+                                            <ShoppingCart size={16} className="mr-2" />
+                                            {nft.status === 'available' ? 'Buy Now' : 
+                                             nft.status === 'sold-out' ? 'Sold Out' : 
+                                             'Coming Soon'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+
+                {/* Newsletter Signup for NFT Updates */}
+                <div className="mt-16">
+                    <Card className="bg-burgundy text-white">
+                        <CardContent className="p-8 text-center">
+                            <h3 className="text-2xl font-bold mb-4">Get NFT Drop Notifications</h3>
+                            <p className="mb-6 text-gray-200">
+                                Be the first to know about new NFT releases, exclusive drops, and special collector events.
+                            </p>
+                            <NewsletterSignup variant="compact" className="max-w-md mx-auto" />
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Footer = () => (
   <footer className="burgundy-section py-16 px-4 mt-16">
       <div className="max-w-7xl mx-auto">
@@ -413,7 +632,7 @@ const Footer = () => (
                   <div>
                       <h4 className="text-lg font-semibold mb-4 text-white">Quick Links</h4>
                       <ul className="space-y-2">
-                          {['/', '/books', '/about', '/blog', '/contact'].map(path => (
+                          {['/', '/books', '/nft', '/about', '/blog', '/contact'].map(path => (
                               <li key={path}>
                                   <Link 
                                       to={path} 
@@ -453,6 +672,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<HomePage />} />
                         <Route path="/books" element={<BooksPage />} />
+                        <Route path="/nft" element={<NFTPage />} />
                         <Route path="/about" element={<AboutPage />} />
                         <Route path="/contact" element={<ContactPage />} />
                         <Route path="/blog" element={<BlogList />} />
